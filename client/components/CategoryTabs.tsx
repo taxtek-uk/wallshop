@@ -253,66 +253,55 @@ export default function CategoryTabs() {
   const current = CATEGORIES.find((c) => c.id === active)!;
 
   return (
-    <section className="w-full">
-      {/* Navigation */}
-      <div className="flex justify-center mb-10">
-        <div className="flex backdrop-blur bg-white/40 rounded-full p-1 shadow-inner">
-          {CATEGORIES.map((cat) => (
-            <TabButton
-              key={cat.id}
-              active={cat.id === active}
-              onClick={() => setActive(cat.id)}
-              icon={cat.icon}
-            >
-              {cat.name}
-            </TabButton>
-          ))}
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 mb-4">
-          <current.icon className="w-8 h-8 text-accent drop-shadow" />
-          <h2 className="text-3xl lg:text-4xl font-bold">{current.name}</h2>
-        </div>
-        <p className="text-lg text-gray-600 max-w-xl mx-auto">
-          {current.description}
-        </p>
-      </header>
-
-      {/* Products */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {current.products.map((p, i) => (
-          <ProductCard
-            key={p.title}
-            title={p.title}
-            description={p.description}
-            features={p.features}
-            imagePlaceholder={p.image}
-            featured={i === 0}
-          />
-        ))}
-      </div>
-
-      {/* CTA */}
-      {/* <div className="text-center mt-12">
-        <Button
-          variant="luxury"
-          className="px-8 py-4 flex items-center gap-2 group"
+    <section className="w-full overflow-x-hidden px-4"> {/* Added padding for mobile */}
+  {/* Navigation */}
+  <div className="flex justify-center mb-10 overflow-x-auto">
+    <div className="flex flex-wrap backdrop-blur bg-white/40 rounded-full p-1 shadow-inner max-w-full">
+      {CATEGORIES.map((cat) => (
+        <TabButton
+          key={cat.id}
+          active={cat.id === active}
+          onClick={() => setActive(cat.id)}
+          icon={cat.icon}
         >
-          View All {current.name}
-          <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-        </Button>
-      </div> */}
+          {cat.name}
+        </TabButton>
+      ))}
+    </div>
+  </div>
 
-      {/* Stats */}
-      <div className="mt-16 bg-gradient-to-br from-gray-900 via-gray-950 to-black text-white rounded-2xl p-8 grid grid-cols-2 md:grid-cols-4 gap-6 shadow-inner">
-          {current.stats.map((s) => (
-            <Stat key={s.label} {...s} />
-          ))}
-        </div>
+  {/* Header */}
+  <header className="text-center mb-12">
+    <div className="inline-flex items-center gap-2 mb-4 flex-wrap justify-center">
+      <current.icon className="w-8 h-8 text-accent drop-shadow" />
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{current.name}</h2> {/* Added smaller mobile font */}
+    </div>
+    <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto px-2">
+      {current.description}
+    </p>
+  </header>
 
-    </section>
+  {/* Products */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {current.products.map((p, i) => (
+      <ProductCard
+        key={p.title}
+        title={p.title}
+        description={p.description}
+        features={p.features}
+        imagePlaceholder={p.image}
+        featured={i === 0}
+      />
+    ))}
+  </div>
+
+  {/* Stats */}
+  <div className="mt-16 bg-gradient-to-br from-gray-900 via-gray-950 to-black text-white rounded-2xl p-6 sm:p-8 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 shadow-inner">
+    {current.stats.map((s) => (
+      <Stat key={s.label} {...s} />
+    ))}
+  </div>
+</section>
+
   );
 }

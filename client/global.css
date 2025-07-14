@@ -72,6 +72,12 @@
     @apply border-border;
   }
 
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
   html {
     scroll-behavior: smooth;
   }
