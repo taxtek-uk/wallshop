@@ -36,10 +36,10 @@ const BeforeAfterSlider = () => {
     <div className="w-full max-w-6xl mx-auto mb-16">
       <div className="text-center mb-8">
         <h3 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-          Traditional vs Smart Wall
+          Media Wall vs Smart Wall
         </h3>
         <p className="text-lg text-muted-foreground">
-          Drag the slider to compare traditional setup vs our smart wall solution
+          Drag the slider to compare traditional media wall installation with our plug-and-play smart wall system
         </p>
       </div>
 
@@ -51,24 +51,22 @@ const BeforeAfterSlider = () => {
         onMouseLeave={handleMouseUp}
         onTouchMove={handleTouchMove}
       >
-        {/* Traditional Image */}
+        {/* Traditional Media Wall Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('/images/traditional-wall.jpg')`,
-          }}
+          style={{ backgroundImage: `url('/images/traditional-wall.jpg')` }}
         >
           <div className="absolute inset-0 bg-black/20" />
           <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-2 rounded-lg font-semibold shadow">
-            Traditional Setup
+            Traditional Media Wall
           </div>
           <div className="absolute bottom-4 left-4 bg-black/80 text-white px-4 py-2 rounded-lg max-w-xs shadow">
-            <p className="text-sm font-medium mb-1">Issues:</p>
+            <p className="text-sm font-medium mb-1">Drawbacks:</p>
             <ul className="text-xs space-y-1">
-              <li>• Visible cables everywhere</li>
-              <li>• Multiple mounting holes</li>
-              <li>• 3-5 days installation</li>
-              <li>• Limited customization</li>
+              <li>• 3–5 day multi-trade install</li>
+              <li>• Requires electrician & joiner</li>
+              <li>• Visible wiring & brackets</li>
+              <li>• Difficult to upgrade or reconfigure</li>
             </ul>
           </div>
         </div>
@@ -83,15 +81,15 @@ const BeforeAfterSlider = () => {
         >
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-2 rounded-lg font-semibold shadow">
-            Smart Wall System
+            Smart Wall by The Wall Shop
           </div>
           <div className="absolute bottom-4 right-4 bg-black/80 text-white px-4 py-2 rounded-lg max-w-xs shadow">
-            <p className="text-sm font-medium mb-1">Benefits:</p>
+            <p className="text-sm font-medium mb-1">Advantages:</p>
             <ul className="text-xs space-y-1">
-              <li>• No visible cables</li>
-              <li>• One-day installation</li>
-              <li>• Modular & expandable</li>
-              <li>• 100+ finish options</li>
+              <li>• Installed in 2–4 hours</li>
+              <li>• Pre-wired with electrics</li>
+              <li>• DIY friendly — no trades needed</li>
+              <li>• Integrates with smart home devices</li>
             </ul>
           </div>
         </div>
@@ -108,17 +106,18 @@ const BeforeAfterSlider = () => {
           </div>
         </div>
 
-        {/* Instruction Text */}
+        {/* Instruction */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 px-4 py-2 rounded-lg shadow text-sm font-medium pointer-events-none">
           ← Drag to compare →
         </div>
       </div>
 
-      {/* Stats comparison */}
+      {/* Comparison Stats */}
       <div className="grid md:grid-cols-2 gap-8 mt-10">
+        {/* Traditional Media Wall */}
         <div className="text-center p-6 bg-red-50 border border-red-200 rounded-lg">
           <h4 className="text-lg font-semibold text-red-800 mb-2">
-            Traditional Wall
+            Traditional Media Wall
           </h4>
           <div className="space-y-2 text-sm text-red-700">
             <div className="flex justify-between">
@@ -126,20 +125,21 @@ const BeforeAfterSlider = () => {
               <span className="font-medium">3–5 days</span>
             </div>
             <div className="flex justify-between">
+              <span>Skilled Trades Needed:</span>
+              <span className="font-medium">4+</span>
+            </div>
+            <div className="flex justify-between">
               <span>Cable Management:</span>
-              <span className="font-medium">Complex</span>
+              <span className="font-medium">Visible</span>
             </div>
             <div className="flex justify-between">
-              <span>Customization:</span>
-              <span className="font-medium">Limited</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Future Changes:</span>
-              <span className="font-medium">Difficult</span>
+              <span>Smart Home Integration:</span>
+              <span className="font-medium">Manual & Limited</span>
             </div>
           </div>
         </div>
 
+        {/* Smart Wall */}
         <div className="text-center p-6 bg-green-50 border border-green-200 rounded-lg">
           <h4 className="text-lg font-semibold text-green-800 mb-2">
             Smart Wall System
@@ -147,19 +147,19 @@ const BeforeAfterSlider = () => {
           <div className="space-y-2 text-sm text-green-700">
             <div className="flex justify-between">
               <span>Installation Time:</span>
-              <span className="font-medium">3-4 Hours</span>
+              <span className="font-medium">2–4 hours</span>
             </div>
             <div className="flex justify-between">
-              <span>Cable Management:</span>
-              <span className="font-medium">Hidden</span>
+              <span>Skilled Trades Needed:</span>
+              <span className="font-medium">None (DIY)</span>
             </div>
             <div className="flex justify-between">
-              <span>Customization:</span>
-              <span className="font-medium">100+ options</span>
+              <span>Electrics:</span>
+              <span className="font-medium">Pre-installed</span>
             </div>
             <div className="flex justify-between">
-              <span>Future Changes:</span>
-              <span className="font-medium">Plug & play</span>
+              <span>Smart Home Integration:</span>
+              <span className="font-medium">Built-in & Expandable</span>
             </div>
           </div>
         </div>
