@@ -18,7 +18,7 @@ const projectImages: Record<string, string> = {
   "1": "/images/projects/modern-penthouse-smart-wall.webp",     // Modern Penthouse Smart Wall
   "2": "/images/projects/hotel-lobby-wallpaper.webp",            // Luxury Hotel Lobby Wallpaper
   "3": "/images/projects/corporate-office-acoustic-solution.webp", // Corporate Office Acoustic Solution
-  "4": "/images/projects/carbon-rock-restaurant.webp",           // Restaurant Carbon Rock Feature Wall
+  "4": "/images/carbon-rock-boards/gallery/showroom/showroom-corner-feature.jpg",           // Restaurant Carbon Rock Feature Wall
   "5": "/images/projects/home-cenima.webp",                      // Private Cinema Smart Wall System
   "6": "/images/projects/botique.webp",                          // Boutique Store Textured Wallpaper
 };
@@ -80,7 +80,7 @@ const projects: Project[] = [
   },
   {
     id: "4",
-    title: "Restaurant Carbon Rock Feature Wall",
+    title: "Carbon Rock Feature Wall",
     category: "carbon",
     location: "Chicago, IL",
     date: "April 2024",

@@ -14,12 +14,7 @@ export default function ModularSmartWallsSection() {
   const [selected, setSelected] = useState(modules[0]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
 
   const widthToPx = (width) => {
     switch (width) {
@@ -48,31 +43,16 @@ export default function ModularSmartWallsSection() {
       ...formData,
       selectedModule: `${selected.width} (W) x ${selected.depth} (D)`,
     };
-
-    // Replace this with a real backend/EmailJS/Formspree call
     alert(`Quote Requested:\n\n${JSON.stringify(quoteDetails, null, 2)}`);
-
     setModalVisible(false);
     setFormData({ name: "", email: "", phone: "", message: "" });
   };
 
   return (
     <>
-      <section className="relative py-24 bg-[#1a1a1a] text-white overflow-hidden select-none">
-        {/* Background Image & Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/smart-home.png"
-            alt="Smart Wall Background"
-            className="w-full h-full object-cover object-center"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-70" />
-        </div>
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+      <section className="relative py-24 bg-[#f9f7f4] text-[#231c14] overflow-hidden select-none">
+        <div className="container mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-
             {/* Text Column */}
             <div>
               <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-6 max-w-xl">
@@ -81,49 +61,37 @@ export default function ModularSmartWallsSection() {
                   Modular Smart Wall Systems
                 </span>
               </h2>
-
-              <p className="text-white/90 text-lg max-w-xl mb-8 leading-relaxed tracking-wide">
+              <p className="text-lg max-w-xl mb-8 leading-relaxed tracking-wide">
                 Engineered for fast installation and timeless luxury, our smart walls combine a steel frame with premium marble & stone-effect boards. Integrated technology supports TVs, shelves, dimmable lighting, speakers, fireplaces — all controlled via{" "}
                 <strong className="text-[#b69777]">Smart home devices</strong>.
               </p>
-
-              <ul className="space-y-6 max-w-md font-semibold text-white/90">
+              <ul className="space-y-6 max-w-md font-semibold">
                 <li className="flex items-center gap-4 hover:text-[#b69777] transition-colors cursor-pointer">
-                  <MoveHorizontal className="w-7 h-7 text-[#b69777] drop-shadow" />
+                  <MoveHorizontal className="w-7 h-7 text-[#b69777]" />
                   <span>Width options: 400mm, 600mm, 800mm, 1000mm, 1100mm, 1200mm</span>
                 </li>
                 <li className="flex items-center gap-4 hover:text-[#b69777] transition-colors cursor-pointer">
-                  <Box className="w-7 h-7 text-[#b69777] drop-shadow" />
+                  <Box className="w-7 h-7 text-[#b69777]" />
                   <span>Depths: 120mm, 150mm, 180mm — perfect for lights, speakers & shelves</span>
                 </li>
                 <li className="flex items-center gap-4 hover:text-[#b69777] transition-colors cursor-pointer">
-                  <PlugZap className="w-7 h-7 text-[#b69777] drop-shadow" />
-                  <span>Seamless integration with Our smart home systems</span>
+                  <PlugZap className="w-7 h-7 text-[#b69777]" />
+                  <span>Seamless integration with our smart home systems</span>
                 </li>
                 <li className="flex items-center gap-4 hover:text-[#b69777] transition-colors cursor-pointer">
-                  <Clock className="w-7 h-7 text-[#b69777] drop-shadow" />
+                  <Clock className="w-7 h-7 text-[#b69777]" />
                   <span>Professional installation in under 4 hours</span>
                 </li>
               </ul>
             </div>
 
-            {/* Interactive Visual */}
+            {/* Visual + Selector */}
             <div className="relative flex flex-col items-center">
-
-              {/* Selected Module Display */}
-              <div
-                className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 mb-8 text-[#231c14] transform transition-transform duration-500 ease-in-out"
-                style={{ scale: 1.05 }}
-              >
-                <h3 className="text-2xl font-bold text-[#907252] text-center mb-4 select-text">
-                  Selected Module
-                </h3>
-                <div
-                  className="relative h-40 mx-auto rounded-lg overflow-hidden shadow-inner cursor-pointer"
-                  aria-label="Selected module visual"
-                >
+              <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 mb-8 text-[#231c14]">
+                <h3 className="text-2xl font-bold text-[#907252] text-center mb-4">Selected Module</h3>
+                <div className="relative h-40 mx-auto rounded-lg overflow-hidden">
                   <div
-                    className="absolute bottom-0 left-1/2 bg-gradient-to-br from-[#b69777] to-[#907252] rounded-t-lg shadow-lg transition-transform duration-500 ease-in-out"
+                    className="absolute bottom-0 left-1/2 bg-gradient-to-br from-[#b69777] to-[#907252] rounded-t-lg shadow-lg transition-transform"
                     style={{
                       width: widthToPx(selected.width),
                       height: depthToPx(selected.depth),
@@ -131,14 +99,13 @@ export default function ModularSmartWallsSection() {
                     }}
                   />
                 </div>
-
-                <div className="text-center text-[#8e7762] font-semibold mt-4 select-text">
+                <div className="text-center text-[#8e7762] font-semibold mt-4">
                   Width: <span className="text-[#907252]">{selected.width}</span> | Depth:{" "}
                   <span className="text-[#907252]">{selected.depth}</span>
                 </div>
               </div>
 
-              {/* Module Selector Grid */}
+              {/* Module Selector */}
               <div className="grid grid-cols-3 gap-6 max-w-md w-full">
                 {modules.map((mod, i) => (
                   <button
@@ -146,16 +113,11 @@ export default function ModularSmartWallsSection() {
                     onClick={() => setSelected(mod)}
                     onMouseEnter={() => setHoveredIndex(i)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className={`p-4 rounded-xl border
-                      transition-shadow duration-300 transform
-                      ${selected === mod
+                    className={`p-4 rounded-xl border ${
+                      selected === mod
                         ? "border-[#907252] shadow-lg scale-105"
-                        : "border-[#ede1d3] hover:shadow-md hover:scale-[1.03]"}
-                      bg-white text-[#231c14]
-                      flex flex-col items-center cursor-pointer
-                      focus:outline-none focus:ring-2 focus:ring-[#b69777]
-                      relative
-                      `}
+                        : "border-[#ddd5cb] hover:shadow-md hover:scale-[1.03]"
+                    } bg-white text-[#231c14] flex flex-col items-center cursor-pointer transition-transform relative`}
                     aria-pressed={selected === mod}
                   >
                     <div className="text-[#907252] font-bold mb-2">{mod.width}</div>
@@ -163,7 +125,7 @@ export default function ModularSmartWallsSection() {
                     <div className="mt-2 text-xs text-[#8e7762]">{`Depth: ${mod.depth}`}</div>
 
                     {hoveredIndex === i && (
-                      <div className="absolute -top-10 z-20 bg-[#b69777cc] text-[#231c14] rounded-md px-3 py-1 text-xs font-semibold whitespace-nowrap pointer-events-none select-none shadow-lg">
+                      <div className="absolute -top-10 z-20 bg-[#b69777cc] text-[#231c14] rounded-md px-3 py-1 text-xs font-semibold whitespace-nowrap pointer-events-none shadow-lg">
                         {mod.info}
                       </div>
                     )}
@@ -171,100 +133,18 @@ export default function ModularSmartWallsSection() {
                 ))}
               </div>
 
-              <p className="mt-6 text-sm italic text-white/80 text-center max-w-sm select-none">
+              <p className="mt-6 text-sm italic text-[#6f5e4a] text-center max-w-sm">
                 Click a module to see its size visualized above.
               </p>
-
-              <button
-                type="button"
-                className="mt-10 inline-block px-8 py-3 bg-gradient-to-r from-[#b69777] to-[#907252] text-white font-bold rounded-full shadow-lg hover:brightness-110 transition"
-                onClick={() => setModalVisible(true)}
-              >
-                Request a Quote
-              </button>
+    
+           
             </div>
           </div>
         </div>
       </section>
 
-      {/* Modal */}
-      {modalVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center px-4">
-          <div className="bg-white text-[#231c14] rounded-2xl shadow-xl w-full max-w-lg p-8 relative">
-            <button
-              className="absolute top-4 right-4 text-[#907252] hover:text-[#b69777] text-xl font-bold"
-              onClick={() => setModalVisible(false)}
-            >
-              ×
-            </button>
-
-            <h3 className="text-2xl font-extrabold text-[#907252] mb-4">Request a Quote</h3>
-            <p className="mb-6 text-sm text-[#8e7762]">Please fill in the form below to request a formal quotation for your chosen module.</p>
-
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label className="block text-sm mb-1 font-medium">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-[#e0d8cd] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#b69777]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 font-medium">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-[#e0d8cd] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#b69777]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 font-medium">Phone Number</label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full border border-[#e0d8cd] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#b69777]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 font-medium">Project Description</label>
-                <textarea
-                  rows={4}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full border border-[#e0d8cd] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#b69777]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 font-medium">Selected Module</label>
-                <input
-                  type="text"
-                  value={`${selected.width} (W) x ${selected.depth} (D)`}
-                  readOnly
-                  className="w-full bg-gray-100 border border-[#e0d8cd] rounded-lg px-4 py-2"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-[#b69777] to-[#907252] text-white font-bold rounded-lg shadow-md hover:brightness-110 transition"
-              >
-                Submit Quote Request
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Modal Form */}
+  
     </>
   );
 }

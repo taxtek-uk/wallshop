@@ -1,10 +1,8 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
-import CategoryTabs from "@/components/CategoryTabs";
+import IntroSection from "@/components/home/IntroSection";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import SmartWallsSection from "@/components/SmartWallsSection";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
-import VariantSwitcher from "@/components/VariantSwitcher";
-import FeatureHotspots from "@/components/FeatureHotspots";
 import SolutionsSection from "@/components/SolutionsSection";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import GalleryViewToggle from "@/components/GalleryViewToggle";
@@ -13,6 +11,7 @@ import FloatingCTA from "@/components/FloatingCTA";
 import Footer from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ModularSmartWallsSection from "@/components/ModularSmartWallsSection";
 
 export default function Index() {
   const scrollToSection = (sectionId: string) => {
@@ -32,11 +31,15 @@ export default function Index() {
 
       {/* Hero Section */}
       <HeroSection />
+      {/* Intro Section */}
+      <IntroSection />
+      {/* Featured Products */}
+      <FeaturedProducts />
 
       {/* Product Categories Section with Interactive Tabs */}
-      <section className="py-24 lg:py-32 bg-white">
+      {/* <section className="py-24 lg:py-32 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          {/* Section Header */}
+      
           <div className="text-center max-w-4xl mx-auto mb-20 animate-fade-in">
             <h2 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
               <span className="gradient-text-platinum">Premium Wall</span>
@@ -48,14 +51,14 @@ export default function Index() {
               detail.
             </p>
           </div>
-
-          {/* Interactive Category Tabs */}
+ 
           <CategoryTabs />
         </div>
-      </section>
+      </section> */}
+      <ModularSmartWallsSection />
 
       {/* Smart Walls Featured Section */}
-      <SmartWallsSection />
+      {/* <SmartWallsSection /> */}
 
       {/* Before/After Comparison */}
       {/* <section className="py-24 lg:py-32 bg-luxgray-50">

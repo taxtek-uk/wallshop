@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { X, ArrowLeft, ArrowRight, Images, Eye } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Images, Eye, MessagesSquare, Ruler, Layers, Truck } from "lucide-react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+// import 'swiper/css/navigation';
+// import 'swiper/css/pagination';
 
 const galleryData = {
   "Cloth Series": [
@@ -85,7 +89,6 @@ const galleryData = {
   ]
 };
 
-
 const PanelGallery = () => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -108,9 +111,9 @@ const PanelGallery = () => {
     setCurrentImageIndex((i) => (i - 1 + galleryData[activeCategory].length) % galleryData[activeCategory].length);
 
   return (
-    <section className="py-20 bg-[#f8f6f3]">
+    <section className="pt-20 pb-20 bg-[#f8f6f3]">
       <div className="container mx-auto px-4">
-        <h2 className="text-5xl font-extrabold text-center mb-12 bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+        <h2 className="text-4xl font-extrabold text-center mb-12 bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
           Explore Our Panel Series
         </h2>
 
@@ -184,6 +187,42 @@ const PanelGallery = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Mobile Slider Process Timeline */}
+      <div className="container mx-auto px-4 mt-24 lg:hidden">
+        <h2 className="text-3xl font-extrabold text-center mb-10 bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+          How It Works
+        </h2>
+        <Swiper spaceBetween={24} slidesPerView={1} className="w-full">
+          {[{
+            icon: MessagesSquare,
+            title: "1. Consultation",
+            desc: "Tell us your vision. Our design team will guide you with expert product suggestions and samples."
+          }, {
+            icon: Ruler,
+            title: "2. Measurement",
+            desc: "Send us your layout or schedule a visit. We ensure millimetre-accurate wall panel sizing."
+          }, {
+            icon: Layers,
+            title: "3. Manufacturing",
+            desc: "Your panels are crafted to order using the selected textures, edges, and finishes."
+          }, {
+            icon: Truck,
+            title: "4. Delivery & Install",
+            desc: "We dispatch across the UK. Optional certified installation ensures perfect fit and finish."
+          }].map((step, i) => (
+            <SwiperSlide key={i}>
+              <div className="bg-white shadow-md rounded-xl p-6 text-center border">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] text-white flex items-center justify-center mb-4 mx-auto">
+                  <step.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-semibold text-[#231c14] mb-2">{step.title}</h3>
+                <p className="text-sm text-[#6b5c47]">{step.desc}</p>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </section>
   );

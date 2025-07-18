@@ -9,7 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ScrollToTop from "./components/ScrollToTop"; // adjust path if needed
 import NotFound from "./pages/NotFound";
-
+// import SmartWallInquiry from "./pages/SmartWallInquiry";
 // Legal Pages
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -45,7 +45,7 @@ const App = () => (
           <Route path="/contact" element={<ContactUs />} />
 
           {/* Static Pages */}
-          
+          {/* <Route path="/smart-wall-inquiry" element={<SmartWallInquiry />} /> */}
 
           {/* Product Pages */}
           <Route path="/smart-walls" element={<SmartWalls />} />

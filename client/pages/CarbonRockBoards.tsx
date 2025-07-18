@@ -211,7 +211,7 @@ const CarbonRockBoards = () => {
       {/* Right Image */}
       <div className="relative">
         <img
-          src="/images/carbon-rock-boards/wood-grain-sample.jpg"
+          src="/images/carbon-rock-boards/wpc.jpg"
           alt="Decorative Wall Panel Sample"
           className="rounded-2xl shadow-2xl w-full max-w-md mx-auto border-4 border-white"
           draggable={false}
