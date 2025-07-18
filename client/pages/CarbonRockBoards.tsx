@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
+import PanelGallery from "@/components/PanelGallery";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -166,77 +167,124 @@ const CarbonRockBoards = () => {
       <Navigation />
 
       {/* Hero */}
-      <section
-        className="pt-24 pb-16 relative"
-        style={{
-          backgroundImage: "url('/images/projects/carbon-rock-restaurant.webp')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/55" />
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-block bg-gradient-to-br from-[#b69777] to-[#907252] text-white px-4 py-2 rounded-full text-sm font-semibold shadow mb-6">
-                🔥 Carbon Rock Boards
-              </span>
-              <h1 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow">
-                Next-Generation Wall Panels
-              </h1>
-              <p className="text-xl text-white/90 mb-8 leading-relaxed drop-shadow">
-                Fireproof. Soundproof. Future-ready.<br />
-                Transform any space with the ultimate in safety, style, and performance.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="px-8 py-4 text-lg font-semibold shadow bg-gradient-to-br from-[#b69777] to-[#907252] text-white"
-                >
-                  Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                
-              </div>
-            </div>
-            <div className="relative">
-              <img
-                src="/images/carbon-rock-boards/01.webp"
-                alt="Carbon Rock Board Sample"
-                className="rounded-2xl shadow-2xl w-full max-w-md mx-auto border-4 border-white"
-                draggable={false}
-              />
-              <div className="absolute top-4 left-4">
-                <span className="bg-gradient-to-br from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-xs font-semibold shadow">
-                  Fireproof & Soundproof
-                </span>
-              </div>
-            </div>
-          </div>
+<section
+  className="pt-24 pb-16 relative"
+  style={{
+    backgroundImage: "url('/images/carbon-rock-boards/hero-img.webp')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
+  <div className="absolute inset-0 bg-black/60" />
+  <div className="container mx-auto px-4 lg:px-8 relative z-10">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      {/* Left Content */}
+      <div>
+        <span className="inline-block bg-gradient-to-br from-[#b69777] to-[#907252] text-white px-4 py-2 rounded-full text-sm font-semibold shadow mb-6">
+          🔥 Carbon Rock Boards
+        </span>
+        <h1 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow">
+          Next-Gen Decorative Wall Panels
+        </h1>
+        <p className="text-xl text-white/90 mb-8 leading-relaxed drop-shadow">
+          Stone | Wood | WPC | Mirror | Fluted | Acoustic
+          <br />
+          Reinvent your space with advanced stone, wood, WPC, and fabric finishes that blend safety and style.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button
+            size="lg"
+            className="px-8 py-4 text-lg font-semibold shadow bg-gradient-to-br from-[#b69777] to-[#907252] text-white"
+          >
+            Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="border-2 border-white text-white hover:bg-white hover:text-[#b69777] px-8 py-4 text-lg font-bold"
+          >
+            Request Free Sample
+          </Button>
         </div>
-      </section>
+      </div>
 
-      {/* Feature Cards */}
-      <section className="py-14 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((f, idx) => {
-              const Icon = f.icon;
-              return (
-                <div
-                  key={idx}
-                  className="text-center p-8 rounded-2xl bg-gradient-to-br from-[#f9f7f5] via-[#fcf9f5] to-[#ece2d2] shadow hover:scale-105 transition-all duration-300 border border-[#e2d5c4]"
-                >
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-4 shadow-md">
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[#231c14] mb-1">{f.title}</h3>
-                  <p className="text-[#907252]">{f.description}</p>
-                </div>
-              );
-            })}
-          </div>
+      {/* Right Image */}
+      <div className="relative">
+        <img
+          src="/images/carbon-rock-boards/wood-grain-sample.jpg"
+          alt="Decorative Wall Panel Sample"
+          className="rounded-2xl shadow-2xl w-full max-w-md mx-auto border-4 border-white"
+          draggable={false}
+        />
+        <div className="absolute top-4 left-4">
+          <span className="bg-gradient-to-br from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-xs font-semibold shadow">
+            Premium Finish
+          </span>
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+      {/* Features Section – Why Choose Carbon Rock Boards */}
+<section className="py-16 bg-white">
+  <div className="container mx-auto px-4 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+        Why Choose Carbon Rock Boards?
+      </h2>
+      <p className="text-xl text-[#6b5c47] mt-4 max-w-2xl mx-auto">
+        Engineered for performance. Designed for impact. Our panels combine fire resistance, sound insulation, and durable luxury for every space.
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {[
+        {
+          icon: Shield,
+          title: "A1 Fire-Rated",
+          description: "Certified fireproof technology for unbeatable protection in residential and commercial applications.",
+        },
+        {
+          icon: Flame,
+          title: "Thermal & Acoustic",
+          description: "Excellent heat insulation and sound absorption for comfortable, quiet interiors.",
+        },
+        {
+          icon: Hammer,
+          title: "Ultra Durable",
+          description: "Scratch-resistant, impact-proof, and moisture-tolerant—perfect for high-traffic zones.",
+        },
+        {
+          icon: Sparkles,
+          title: "Designer Finishes",
+          description: "Choose from realistic wood, natural stone, metallics, and more to match any aesthetic.",
+        },
+      ].map((f, idx) => {
+        const Icon = f.icon;
+        return (
+          <div
+            key={idx}
+            className="text-center p-8 rounded-2xl bg-gradient-to-br from-[#f9f7f5] via-[#fcf9f5] to-[#ece2d2] shadow hover:scale-105 transition-all duration-300 border border-[#e2d5c4]"
+          >
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Icon className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-lg font-bold text-[#231c14] mb-1">{f.title}</h3>
+            <p className="text-[#907252]">{f.description}</p>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+
+      {/* Explore Our Panel Series – Visual Gallery */}
+ 
+
+      <PanelGallery />
 
       {/* Application Scenarios */}
       <section className="py-16 bg-[#faf7f3]">
