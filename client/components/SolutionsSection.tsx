@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import {
   Smartphone,
   LayoutGrid,
@@ -16,40 +16,70 @@ const SOLUTIONS = [
     description:
       "All-in-one app to connect lighting, security & more. User-friendly controls, supports 15 languages and many users.",
     icon: Smartphone,
+    gradient: "from-yellow-400 to-yellow-500",
   },
   {
     title: "MixPad Super Smart Panel",
     description:
       "Four-way high-power light control, IR appliance management, touchscreen & app interaction, 400W load.",
     icon: LayoutGrid,
+    gradient: "from-[#b69777] to-[#907252]",
   },
   {
     title: "Smart Switch & Dimmer",
     description:
       "Scene & timer control, voice (Alexa/Google/Siri), remote & app control, vacation mode & group control.",
     icon: ToggleRight,
+    gradient: "from-[#b89773] to-[#6b5c47]",
   },
   {
     title: "Smart Curtain",
     description:
       "One-touch, voice & app control; ultra-quiet motor; precise open/close; no rewiring, instant install.",
     icon: Sliders,
+    gradient: "from-[#d1a574] to-[#b68c5a]",
   },
   {
     title: "Smart Security",
     description:
       "AI 3D face recognition, 4″ IPS HD screen, visual door viewer, full-house linkage & 3-year warranty.",
     icon: Shield,
+    gradient: "from-[#907252] to-[#4d392a]",
   },
   {
     title: "Sky Dome Smart Light",
     description:
       "Four lighting modes, blue-light-free technology, patented quick-install, natural sky-light reproduction.",
     icon: Sun,
+    gradient: "from-[#f9d382] to-[#e6b260]",
   },
 ];
 
-export default function SolutionsSection() {
+const SolutionsSection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   const scrollToSolutions = useCallback(() => {
     const el = document.querySelector("#solutions");
     if (el) {
@@ -59,84 +89,76 @@ export default function SolutionsSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="solutions"
-      className="py-12 lg:py-16 bg-gradient-to-br from-white via-luxgray-50 to-luxgray-100 text-foreground"
+      className="relative py-24 text-white overflow-hidden bg-white"
     >
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Heading */}
-        <div className="text-center max-w-4xl mx-auto mb-20 animate-fade-in">
-          <h2 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight drop-shadow-sm">
-            <span className="gradient-text-platinum">Smart Home</span>
-            <span className="block gradient-text-luxury">Solutions</span>
-          </h2>
-          <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed">
+      <div className="relative z-10 container mx-auto px-4 lg:px-8">
+        <div className={`text-center max-w-4xl mx-auto mb-20 transition-all duration-1000 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
+         <h2 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight text-center">
+  <span className="block text-gray-800">
+    Seamless Smart Living.
+  </span>
+  <span className="block text-[#6b5c47] mt-2">
+    Tailored Solutions for Modern Homes
+  </span>
+</h2>
+          <p className="text-xl lg:text-2xl text-neutral-700 leading-relaxed font-light">
             From intuitive app control to AI-powered security, explore our full suite
             of smart home solutions designed for effortless living.
           </p>
         </div>
 
-        {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          {SOLUTIONS.map(({ title, description, icon: Icon }, idx) => (
+          {SOLUTIONS.map(({ title, description, icon: Icon, gradient }, idx) => (
             <div
               key={idx}
-              className="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-lg transition-all duration-300 group hover:border-accent/60 animate-fade-up"
-              style={{ animationDelay: `${idx * 0.1}s`, animationFillMode: "both" }}
+              className={`group relative border border-neutral-200 rounded-3xl p-8 hover:shadow-lg transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-2 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+              }`}
+              style={{ 
+                transitionDelay: `${0.2 + idx * 0.1}s`,
+                animationFillMode: "both" 
+              }}
             >
-              <div className="w-16 h-16 mb-6 mx-auto flex items-center justify-center bg-accent/10 rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:rotate-1">
-                <Icon className="text-accent w-8 h-8 group-hover:animate-bounce-slow" />
+              <div className="w-16 h-16 mb-6 mx-auto flex items-center justify-center">
+                <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-md`}>
+                  <Icon className="text-white w-8 h-8" />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2 text-center">
+
+              <h3 className="text-xl font-bold text-neutral-800 mb-4 text-center group-hover:text-black transition-colors duration-300">
                 {title}
               </h3>
-              <p className="text-muted-foreground text-sm text-center leading-relaxed">
+              <p className="text-neutral-600 text-sm text-center leading-relaxed group-hover:text-neutral-800 transition-colors duration-300">
                 {description}
               </p>
+
+              <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${gradient} opacity-10 blur-xl`} />
+              </div>
             </div>
           ))}
         </div>
-
-        {/* Centered CTA Button */}
-        <div className="flex justify-center mt-16">
+{/* 
+        <div className={`flex justify-center mt-16 transition-all duration-1000 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`} style={{ transitionDelay: '0.8s' }}>
           <Button
             onClick={scrollToSolutions}
-            variant="luxury"
-            size="lg"
-            className="px-8 py-4 text-white inline-flex items-center space-x-2 group"
+            className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-[#b69777] to-[#e6b260] hover:from-[#b89773] hover:to-[#e6c191] text-black rounded-2xl shadow-xl hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105"
           >
-            <span>Explore All Solutions</span>
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            <span className="flex items-center space-x-3">
+              <span>Explore All Solutions</span>
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </span>
           </Button>
-        </div>
+        </div> */}
       </div>
-
-      {/* Custom Animations */}
-      <style>{`
-        @keyframes fade-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-up {
-          animation: fade-up 0.6s ease-out both;
-        }
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-4px);
-          }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 1s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   );
-}
+};
+
+export default SolutionsSection;

@@ -1,0 +1,364 @@
+/* Theme System CSS Variables and Classes */
+
+/* Dark Theme (Default) */
+:root,
+:root[data-theme="dark"],
+.dark-theme {
+  /* Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-surface: rgba(0, 0, 0, 0.1);
+  --bg-card: rgba(0, 0, 0, 0.2);
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --text-disabled: rgba(255, 255, 255, 0.5);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(0, 0, 0, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-hover-bg: rgba(0, 0, 0, 0.2);
+  --glass-hover-border: rgba(255, 255, 255, 0.2);
+  
+  /* Accent Colors */
+  --accent-amber-from: #fbbf24;
+  --accent-amber-to: #eab308;
+  --accent-blue-from: #60a5fa;
+  --accent-blue-to: #a855f7;
+  --accent-green-from: #34d399;
+  --accent-green-to: #059669;
+  --accent-pink-from: #f472b6;
+  --accent-pink-to: #ec4899;
+  --accent-purple-from: #a78bfa;
+  --accent-purple-to: #8b5cf6;
+  --accent-red-from: #f87171;
+  --accent-red-to: #ef4444;
+  
+  /* Particles and Effects */
+  --particle-color: rgba(255, 255, 255, 0.1);
+  --shadow-glow: rgba(251, 191, 36, 0.25);
+  --border-color: rgba(255, 255, 255, 0.1);
+  
+  /* Navigation Specific */
+  --nav-bg-scrolled: rgba(0, 0, 0, 0.2);
+  --nav-border: rgba(255, 255, 255, 0.1);
+  --nav-text: #ffffff;
+  --nav-text-hover: #fcd34d;
+}
+
+/* Light Theme */
+:root[data-theme="light"],
+.light-theme {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --bg-card: rgba(255, 255, 255, 0.9);
+  
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: rgba(31, 41, 55, 0.8);
+  --text-muted: rgba(31, 41, 55, 0.6);
+  --text-disabled: rgba(31, 41, 55, 0.4);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(31, 41, 55, 0.1);
+  --glass-hover-bg: rgba(255, 255, 255, 0.9);
+  --glass-hover-border: rgba(31, 41, 55, 0.2);
+  
+  /* Accent Colors */
+  --accent-amber-from: #d97706;
+  --accent-amber-to: #b45309;
+  --accent-blue-from: #2563eb;
+  --accent-blue-to: #7c3aed;
+  --accent-green-from: #059669;
+  --accent-green-to: #047857;
+  --accent-pink-from: #ec4899;
+  --accent-pink-to: #db2777;
+  --accent-purple-from: #8b5cf6;
+  --accent-purple-to: #7c3aed;
+  --accent-red-from: #ef4444;
+  --accent-red-to: #dc2626;
+  
+  /* Particles and Effects */
+  --particle-color: rgba(31, 41, 55, 0.1);
+  --shadow-glow: rgba(217, 119, 6, 0.25);
+  --border-color: rgba(31, 41, 55, 0.1);
+  
+  /* Navigation Specific */
+  --nav-bg-scrolled: rgba(255, 255, 255, 0.8);
+  --nav-border: rgba(31, 41, 55, 0.1);
+  --nav-text: #374151;
+  --nav-text-hover: #d97706;
+}
+
+/* Base Body Styles */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 300ms ease-out, color 300ms ease-out;
+}
+
+/* Universal Theme Classes */
+.theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.theme-bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-bg-surface {
+  background-color: var(--bg-surface);
+}
+
+.theme-bg-card {
+  background-color: var(--bg-card);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.theme-glass:hover {
+  background: var(--glass-hover-bg);
+  border-color: var(--glass-hover-border);
+}
+
+/* Gradient Classes */
+.theme-gradient-amber {
+  background: linear-gradient(135deg, var(--accent-amber-from), var(--accent-amber-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-gradient-blue {
+  background: linear-gradient(135deg, var(--accent-blue-from), var(--accent-blue-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-gradient-green {
+  background: linear-gradient(135deg, var(--accent-green-from), var(--accent-green-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-gradient-pink {
+  background: linear-gradient(135deg, var(--accent-pink-from), var(--accent-pink-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-gradient-purple {
+  background: linear-gradient(135deg, var(--accent-purple-from), var(--accent-purple-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-gradient-red {
+  background: linear-gradient(135deg, var(--accent-red-from), var(--accent-red-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Background Gradient Classes */
+.theme-bg-gradient-amber {
+  background: linear-gradient(135deg, var(--accent-amber-from), var(--accent-amber-to));
+}
+
+.theme-bg-gradient-blue {
+  background: linear-gradient(135deg, var(--accent-blue-from), var(--accent-blue-to));
+}
+
+.theme-bg-gradient-green {
+  background: linear-gradient(135deg, var(--accent-green-from), var(--accent-green-to));
+}
+
+.theme-bg-gradient-pink {
+  background: linear-gradient(135deg, var(--accent-pink-from), var(--accent-pink-to));
+}
+
+.theme-bg-gradient-purple {
+  background: linear-gradient(135deg, var(--accent-purple-from), var(--accent-purple-to));
+}
+
+.theme-bg-gradient-red {
+  background: linear-gradient(135deg, var(--accent-red-from), var(--accent-red-to));
+}
+
+/* Smooth Theme Transitions */
+* {
+  transition: background-color 300ms ease-out, 
+              border-color 300ms ease-out, 
+              color 300ms ease-out,
+              box-shadow 300ms ease-out;
+}
+
+/* Particle Animation */
+.theme-particle {
+  background: var(--particle-color);
+}
+
+/* Glow Effects */
+.theme-glow {
+  box-shadow: 0 0 20px var(--shadow-glow);
+}
+
+/* Navigation Theme Styles */
+.nav-theme-bg {
+  background: var(--nav-bg-scrolled);
+  border-color: var(--nav-border);
+}
+
+.nav-theme-text {
+  color: var(--nav-text);
+}
+
+.nav-theme-text:hover {
+  color: var(--nav-text-hover);
+}
+
+/* Section Background Gradients */
+.section-bg-dark {
+  background: linear-gradient(135deg, #1e293b, #581c87, #1e293b);
+}
+
+.section-bg-light {
+  background: linear-gradient(135deg, #ffffff, #f9fafb, #f3f4f6);
+}
+
+/* Theme-aware section backgrounds */
+.dark-theme .section-bg {
+  background: linear-gradient(135deg, #1e293b, #581c87, #1e293b);
+}
+
+.light-theme .section-bg {
+  background: linear-gradient(135deg, #ffffff, #f9fafb, #f3f4f6);
+}
+
+/* Button Theme Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-amber-from), var(--accent-amber-to));
+  color: #000000;
+}
+
+.btn-secondary {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.btn-secondary:hover {
+  background: var(--glass-hover-bg);
+  border-color: var(--glass-hover-border);
+}
+
+/* Card Theme Styles */
+.card-theme {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.card-theme:hover {
+  background: var(--glass-hover-bg);
+  border-color: var(--glass-hover-border);
+}
+
+/* Input Theme Styles */
+.input-theme {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.input-theme::placeholder {
+  color: var(--text-muted);
+}
+
+.input-theme:focus {
+  border-color: var(--accent-amber-from);
+  background: var(--glass-hover-bg);
+}
+
+/* Animation Classes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .theme-glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dark-theme {
+    --bg-primary: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #333333;
+  }
+}

@@ -1,12 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
-
-// Bronze/Gold palette (sampled from your gradient):
-const GRADIENT_FROM = "#b69777";
-const GRADIENT_VIA = "#b89773";
-const GRADIENT_TO = "#907252";
-const TEXT_DARK = "#231c14";
-const BG_OFFWHITE = "bg-gradient-to-br from-[#fafbfc] via-[#f5f6f7] to-[#f8f8f8]";
 
 interface Testimonial {
   id: string;
@@ -22,6 +15,29 @@ interface Testimonial {
 const TestimonialsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
 
   const testimonials: Testimonial[] = [
     {
@@ -97,7 +113,7 @@ const TestimonialsCarousel = () => {
 
   const goToPrevious = () => {
     setCurrentIndex(
-      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length
     );
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
@@ -112,193 +128,175 @@ const TestimonialsCarousel = () => {
   const currentTestimonial = testimonials[currentIndex];
 
   return (
-    <section className={`py-16 lg:py-24 ${BG_OFFWHITE}`}>
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-14">
-          <h2
-            className="text-4xl lg:text-5xl font-extrabold mb-5 leading-tight bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent drop-shadow-lg"
-            style={{ letterSpacing: "0.01em" }}
-          >
+    <section
+      ref={sectionRef}
+      className="relative py-24 bg-white text-gray-800 overflow-hidden"
+    >
+      <div className="relative z-10 container mx-auto px-4 lg:px-8">
+        <div
+          className={`text-center mb-14 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          <h2 className="text-5xl lg:text-6xl font-black mb-6 leading-tight text-gray-900">
             What Our Clients Say
           </h2>
-          <p className="text-lg md:text-xl text-[#695c4c] max-w-2xl mx-auto">
+          <p className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
             Trusted by interior designers, architects, and homeowners for premium wall solutions.
           </p>
         </div>
 
-        {/* Main Testimonial Card */}
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white border-2 border-[#b89773] rounded-3xl p-8 lg:p-12 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-[#b69777]">
-            {/* Quote Icon */}
-            <div className="absolute top-8 right-8 text-[#b89773]/30 pointer-events-none z-0 animate-fadeInSlow">
-              <Quote className="w-16 h-16 drop-shadow-xl" />
+        <div
+          className={`max-w-4xl mx-auto transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+          }`}
+          style={{ transitionDelay: "0.2s" }}
+        >
+          <div className="relative bg-gray-50 border border-gray-200 rounded-3xl p-8 lg:p-12 shadow-xl">
+            <div className="absolute top-8 right-8 text-yellow-400/30 pointer-events-none z-0">
+              <Quote className="w-16 h-16" />
             </div>
-
-            {/* Content */}
             <div className="relative z-10">
-              {/* Stars */}
-              <div className="flex items-center justify-center mb-5">
+              <div className="flex items-center justify-center mb-6">
                 {[...Array(currentTestimonial.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-6 h-6"
-                    style={{
-                      color: GRADIENT_FROM,
-                      fill: GRADIENT_FROM,
-                      filter: "drop-shadow(0 2px 6px #b6977740)"
-                    }}
-                  />
+                  <Star key={i} className="w-6 h-6 text-yellow-400 fill-yellow-400" />
                 ))}
               </div>
-
-              {/* Testimonial Text */}
-              <blockquote className="text-xl lg:text-2xl text-[#3b3127] text-center font-medium leading-relaxed mb-8">
-                “{currentTestimonial.content}”
+              <blockquote className="text-xl lg:text-2xl text-center font-medium leading-relaxed mb-8">
+                "{currentTestimonial.content}"
               </blockquote>
-
-              {/* Client Info */}
               <div className="flex items-center justify-center space-x-4">
-                {/* Avatar */}
-                <div
-                  className="w-16 h-16 bg-gradient-to-tr from-[#b69777] to-[#907252] text-white rounded-full flex items-center justify-center font-bold text-xl shadow-md border-4 border-[#f2e5d3]"
-                  style={{
-                    boxShadow: "0 2px 8px 0 #b6977730"
-                  }}
-                >
+                <div className="w-16 h-16 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg border-4 border-white">
                   {currentTestimonial.image}
                 </div>
                 <div className="text-center">
-                  <h4 className="font-semibold text-[#231c14] text-lg">{currentTestimonial.name}</h4>
-                  <p className="font-semibold text-[#b89773]">{currentTestimonial.role}</p>
-                  <p className="text-sm text-[#a59685]">{currentTestimonial.company}</p>
+                  <h4 className="font-semibold text-lg">{currentTestimonial.name}</h4>
+                  <p className="font-semibold text-yellow-500">
+                    {currentTestimonial.role}
+                  </p>
+                  <p className="text-sm text-gray-500">{currentTestimonial.company}</p>
                 </div>
               </div>
-
-              {/* Project Tag */}
-              <div className="text-center mt-5">
-                <span className="inline-block bg-gradient-to-r from-[#f3ece6] to-[#ede1d3] text-[#b89773] px-4 py-2 rounded-full text-sm font-semibold shadow">
+              <div className="text-center mt-6">
+                <span className="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-semibold">
                   {currentTestimonial.project}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Navigation */}
           <div className="flex items-center justify-center space-x-8 mt-8">
-            {/* Previous Button */}
             <button
               onClick={goToPrevious}
-              className="w-12 h-12 bg-[#f5f0e9] hover:bg-gradient-to-tr hover:from-[#b69777] hover:to-[#907252] hover:text-white rounded-full flex items-center justify-center transition-all duration-200 shadow group"
+              className="w-12 h-12 bg-gray-100 border border-gray-300 hover:bg-yellow-400 hover:border-yellow-300 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 shadow group"
               aria-label="Previous Testimonial"
             >
               <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
             </button>
-            {/* Dots Indicator */}
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     index === currentIndex
-                      ? "bg-gradient-to-br from-[#b69777] to-[#907252] scale-125 shadow"
-                      : "bg-[#f2e5d3] hover:bg-[#b69777]"
+                      ? "bg-yellow-400 scale-125 shadow"
+                      : "bg-gray-300 hover:bg-yellow-300 hover:scale-110"
                   }`}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
               ))}
             </div>
-            {/* Next Button */}
             <button
               onClick={goToNext}
-              className="w-12 h-12 bg-[#f5f0e9] hover:bg-gradient-to-tr hover:from-[#b69777] hover:to-[#907252] hover:text-white rounded-full flex items-center justify-center transition-all duration-200 shadow group"
+              className="w-12 h-12 bg-gray-100 border border-gray-300 hover:bg-yellow-400 hover:border-yellow-300 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 shadow group"
               aria-label="Next Testimonial"
             >
               <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
-          {/* Auto-play Indicator */}
           <div className="text-center mt-4">
             <button
               onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="text-sm text-[#b89773] hover:text-[#907252] font-semibold transition-colors"
+              className="text-sm text-yellow-600 hover:text-yellow-500 font-semibold transition-colors duration-300"
             >
               {isAutoPlaying ? "⏸ Pause auto-play" : "▶ Resume auto-play"}
             </button>
           </div>
         </div>
 
-        {/* Thumbnail Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mt-12">
+        <div
+          className={`flex flex-wrap justify-center gap-4 mt-12 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+          }`}
+          style={{ transitionDelay: "0.4s" }}
+        >
           {testimonials.map((testimonial, index) => (
             <button
               key={testimonial.id}
               onClick={() => goToSlide(index)}
-              className={`p-3 rounded-xl border transition-all duration-200 hover:shadow-lg
-                ${
-                  index === currentIndex
-                    ? "border-[#b69777] bg-[#f3ece6]"
-                    : "border-[#ede1d3] hover:border-[#b69777]"
-                }`}
+              className={`p-3 rounded-2xl border transition-all duration-300 hover:scale-105 backdrop-blur-md ${
+                index === currentIndex
+                  ? "border-yellow-300 bg-yellow-100 shadow"
+                  : "border-gray-200 bg-white hover:border-yellow-200 hover:bg-yellow-50"
+              }`}
               aria-label={`View testimonial from ${testimonial.name}`}
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                    ${
-                      index === currentIndex
-                        ? "bg-gradient-to-tr from-[#b69777] to-[#907252] text-white"
-                        : "bg-[#f8f6f3] text-[#b89773]"
-                    }`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                    index === currentIndex
+                      ? "bg-yellow-400 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
                 >
                   {testimonial.image}
                 </div>
                 <div className="text-left">
-                  <p className="text-[15px] font-medium text-[#231c14]">
+                  <p
+                    className={`text-sm font-medium transition-colors duration-300 ${
+                      index === currentIndex ? "text-gray-900" : "text-gray-700"
+                    }`}
+                  >
                     {testimonial.name}
                   </p>
-                  <p className="text-xs text-[#b89773] font-semibold">{testimonial.role}</p>
+                  <p
+                    className={`text-xs font-semibold transition-colors duration-300 ${
+                      index === currentIndex ? "text-yellow-600" : "text-gray-500"
+                    }`}
+                  >
+                    {testimonial.role}
+                  </p>
                 </div>
               </div>
             </button>
           ))}
         </div>
 
-        {/* Client Logos */}
-        <div className="mt-16 text-center">
-          <p className="text-sm text-[#b9a382] mb-6">
+        <div
+          className={`mt-16 text-center transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+          }`}
+          style={{ transitionDelay: "0.6s" }}
+        >
+          <p className="text-sm text-gray-500 mb-6">
             Trusted by leading design professionals
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 opacity-80">
-            {[
-              "Mitchell Design Studio",
-              "Rodriguez & Associates",
-              "Thompson Construction",
-              "Luxury Homes",
-            ].map((company, index) => (
-              <div
-                key={index}
-                className="px-6 py-3 bg-[#f8f6f3] rounded-xl text-[15px] font-semibold text-[#b89773] border border-[#ede1d3]"
-              >
-                {company}
-              </div>
-            ))}
+          <div className="flex flex-wrap justify-center items-center gap-6">
+            {["Mitchell Design Studio", "Rodriguez & Associates", "Thompson Construction", "Luxury Homes"].map(
+              (company, index) => (
+                <div
+                  key={index}
+                  className="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-yellow-50 hover:border-yellow-200 transition-all duration-300"
+                >
+                  {company}
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes fadeInSlow {
-          from { opacity: 0; transform: scale(0.95);}
-          to { opacity: 1; transform: scale(1);}
-        }
-        .animate-fadeInSlow {
-          animation: fadeInSlow 1.2s cubic-bezier(.25,.8,.44,1) both;
-        }
-      `}</style>
     </section>
   );
 };
