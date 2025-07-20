@@ -82,7 +82,7 @@ const Footer = () => {
           <div className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           } lg:col-span-2`}>
-            <h2 className="text-2xl font-bold text-amber-400 mb-4">
+            <h2 className="text-2xl font-bold text-white mb-4">
               The Wall Shop
             </h2>
             <p className="text-white/80 leading-relaxed mb-8">
@@ -145,7 +145,7 @@ const Footer = () => {
                 placeholder="Enter your email"
                 className="bg-white/10 px-4 py-2 rounded-md placeholder-white/70 text-white focus:outline-none"
               />
-              <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-black hover:from-amber-400 hover:to-yellow-400 rounded-md py-2 font-semibold">
+              <Button className="bg-gradient-to-r from-gray-500 to-gray-600 text-black hover:from-gray-400 hover:to-gray-400 rounded-md py-2 font-semibold">
                 Subscribe
               </Button>
             </div>

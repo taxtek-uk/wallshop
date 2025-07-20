@@ -264,7 +264,7 @@ function SmartWalls() {
       transition={{ duration: 0.6 }}
       className="text-center mb-16"
     >
-      <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+      <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-800 mb-6">
         Choose Your Perfect Style
       </h2>
       <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
@@ -307,7 +307,7 @@ function SmartWalls() {
       ].map((item, i) => (
         <motion.div
           key={i}
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.6 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: i * 0.1 }}
           whileHover={{ scale: 1.05 }}
@@ -497,7 +497,7 @@ function SmartWalls() {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
               className="space-y-8"
             >
               <div className="p-6 bg-white/80 backdrop-blur-sm border border-[#e2d5c4] rounded-2xl">
@@ -523,7 +523,7 @@ function SmartWalls() {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-[#b69777]" />
-                    <span className="text-[#6b5c47]">+44 (0) 20 7XXX XXXX</span>
+                    <span className="text-[#6b5c47]">+44 141 739 3377</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Mail className="w-5 h-5 text-[#b69777]" />
@@ -531,7 +531,7 @@ function SmartWalls() {
                   </div>
                   <div className="flex items-center space-x-3">
                     <MapPin className="w-5 h-5 text-[#b69777]" />
-                    <span className="text-[#6b5c47]">London, United Kingdom</span>
+                    <span className="text-[#6b5c47]">Glasgow, United Kingdom</span>
                   </div>
                 </div>
               </div>
