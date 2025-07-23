@@ -23,10 +23,11 @@ import SmartWalls from "./pages/SmartWalls";
 import LuxuryWallpapers from "./pages/LuxuryWallpapers";
 import AcousticPanels from "./pages/AcousticPanels";
 import CarbonRockBoards from "./pages/CarbonRockBoards";
-
+import SmartWallConstructionPage from './pages/SmartWallConstructionPage';
 const queryClient = new QueryClient();
 
 const App = () => (
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -46,7 +47,10 @@ const App = () => (
 
           {/* Static Pages */}
           {/* <Route path="/smart-wall-inquiry" element={<SmartWallInquiry />} /> */}
-
+           <Route 
+          path="/smart-wall-construction" 
+          element={<SmartWallConstructionPage />} 
+        />
           {/* Product Pages */}
           <Route path="/smart-walls" element={<SmartWalls />} />
           <Route path="/luxury-wallpapers" element={<LuxuryWallpapers />} />
