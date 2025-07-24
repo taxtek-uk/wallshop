@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/home/IntroSection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import WallboardGallerySection from "@/components/home/WallboardGallerySection";
 import ImageGallery from "@/components/home/ImageGallery";
 import SmartWallsSection from "@/components/SmartWallsSection";
 import SolutionsSection from "@/components/SolutionsSection";
@@ -12,6 +13,7 @@ import FloatingCTA from "@/components/FloatingCTA";
 import Footer from "@/components/Footer";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 import ModularSmartWallsSection from "@/components/ModularSmartWallsSection";
 
 export default function Index() {
@@ -36,7 +38,7 @@ export default function Index() {
       <IntroSection />
       {/* Featured Products */}
       <FeaturedProducts />
-
+      <WallboardGallerySection />
       {/* Product Categories Section with Interactive Tabs */}
       {/* <section className="py-24 lg:py-32 bg-white">
         <div className="container mx-auto px-4 lg:px-8">

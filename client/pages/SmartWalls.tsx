@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
+import TextureSection from '@/components/TextureSection';
 import Footer from '@/components/Footer';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
@@ -172,7 +173,15 @@ function SmartWalls() {
               >
                 Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
               </button>
+
+              <a
+                href="/smart-wall-construction"
+                className="bg-black text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+              >
+                Design Smart Wall <ArrowRight className="ml-2 h-5 w-5" />
+              </a>
             </div>
+
           </motion.div>
 
           {/* Right Box with Photo */}
@@ -256,81 +265,7 @@ function SmartWalls() {
 
       {/* Board Styles Section */}
      
-<section className="py-20 bg-gradient-to-br from-[#faf7f3] to-[#f8f6f3]">
-  <div className="container mx-auto px-4 lg:px-8">
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="text-center mb-16"
-    >
-      <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-800 mb-6">
-        Choose Your Perfect Style
-      </h2>
-      <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-        Select from our premium rock board options to match your aesthetic vision and interior design.
-      </p>
-    </motion.div>
-
-    <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-      {[
-        {
-          name: "Stone Texture",
-          desc: "Classic stone surface with timeless elegance.",
-          icon: Mountain,
-          img: "/images/carbon-rock-boards/stone.jpg",
-        },
-        {
-          name: "Wood Grain",
-          desc: "Warm wood aesthetics with durable surface.",
-          icon: Layers,
-          img: "/images/carbon-rock-boards/wood.jpg",
-        },
-        {
-          name: "Fabric Look",
-          desc: "Soft textile pattern with acoustic value.",
-          icon: Paintbrush2,
-          img: "/images/carbon-rock-boards/cloth.jpg",
-        },
-        {
-          name: "Concrete Finish",
-          desc: "Modern industrial vibe with raw finish.",
-          icon: Ruler,
-          img: "/images/carbon-rock-boards/wpc.jpg",
-        },
-        {
-          name: "Metallic Shine",
-          desc: "Luxury feel with metallic luster and reflectivity.",
-          icon: Paintbrush2,
-          img: "/images/carbon-rock-boards/metal.jpg",
-        },
-      ].map((item, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, scale: 0.6 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: i * 0.1 }}
-          whileHover={{ scale: 1.05 }}
-          className="group cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-lg bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300"
-        >
-          <img
-            src={item.img}
-            alt={`${item.name} rock board`}
-            className="w-full h-40 object-cover"
-            loading="lazy"
-          />
-          <div className="p-5 text-center">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-              <item.icon className="text-white w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-[#231c14] mb-1">{item.name}</h4>
-            <p className="text-sm text-[#6b5c47]">{item.desc}</p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </div>
-</section>
+      <TextureSection/>
 
       {/* Enhanced Inquiry Form Section */}
       <section id="inquiry" className="py-20 relative overflow-hidden">
