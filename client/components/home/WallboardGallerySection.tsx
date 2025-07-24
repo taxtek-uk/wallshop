@@ -126,7 +126,7 @@ const WallboardGallerySection = () => {
       </div>
 
       {/* Floating Action Button */}
-      <div className="gallery-fab-bright">
+      {/* <div className="gallery-fab-bright">
         <button className="gallery-fab-button-bright" onClick={() => openLightbox(0)}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
@@ -135,7 +135,7 @@ const WallboardGallerySection = () => {
           </svg>
           <span>View Gallery</span>
         </button>
-      </div>
+      </div> */}
 
       <Lightbox
         isOpen={lightboxOpen}
