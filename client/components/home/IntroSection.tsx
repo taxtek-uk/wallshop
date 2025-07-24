@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from 'react-router-dom';
 import { Layers, MonitorSmartphone, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -77,12 +78,16 @@ const IntroSection = () => {
               </div>
 
               <div className="relative">
-                <Button className="group/btn w-full px-8 py-4 text-lg font-semibold bg-gradient-to-r from-[#f9d382] to-[#e6b260] hover:from-[#f3c669] hover:to-[#e1aa49] text-black rounded-2xl shadow-xl hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105">
-                  <span className="flex items-center justify-center space-x-3">
-                    <span>Explore Smart Walls</span>
-                    <ArrowRight className="h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
-                  </span>
+               
+                <Button asChild className="group/btn w-full px-8 py-4 text-lg font-semibold bg-gradient-to-r from-[#f9d382] to-[#e6b260] hover:from-[#f3c669] hover:to-[#e1aa49] text-black rounded-2xl shadow-xl hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105">
+                  <Link to="/smart-walls">
+                    <span className="flex items-center justify-center space-x-3">
+                      <span>Explore Smart Walls</span>
+                      <ArrowRight className="h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
+                    </span>
+                  </Link>
                 </Button>
+
               </div>
 
               <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -116,12 +121,14 @@ const IntroSection = () => {
               </div>
 
               <div className="relative">
-                <Button className="group/btn w-full px-8 py-4 text-lg font-semibold bg-white border border-neutral-300 text-neutral-800 rounded-2xl shadow-md hover:bg-neutral-100 hover:border-neutral-400 transition-all duration-300 transform hover:scale-105">
-                  <span className="flex items-center justify-center space-x-3">
-                    <span>Explore Rock Boards</span>
-                    <ArrowRight className="h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
-                  </span>
-                </Button>
+                <Link to="/carbon-rock-boards" className="w-full">
+                  <Button className="group/btn w-full px-8 py-4 text-lg font-semibold bg-white border border-neutral-300 text-neutral-800 rounded-2xl shadow-md hover:bg-neutral-100 hover:border-neutral-400 transition-all duration-300 transform hover:scale-105">
+                    <span className="flex items-center justify-center space-x-3">
+                      <span>Explore Rock Boards</span>
+                      <ArrowRight className="h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
+                    </span>
+                  </Button>
+                </Link>
               </div>
 
               <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">

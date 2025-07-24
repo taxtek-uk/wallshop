@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mountain, Layers, Paintbrush2, Ruler, ArrowLeft, X } from 'lucide-react';
+import { Mountain, Layers, Paintbrush2, Ruler, ArrowLeft } from 'lucide-react';
 
 const TextureSection = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isDetailView, setIsDetailView] = useState(false);
 
-  // Main categories data
+// Main categories data
   const categories = [
     {
       id: 'stone',
@@ -97,7 +96,6 @@ const TextureSection = () => {
       ]
     }
   ];
-
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setIsDetailView(true);
@@ -111,153 +109,118 @@ const TextureSection = () => {
   return (
     <section className="py-20 bg-gradient-to-br from-[#faf7f3] to-[#f8f6f3] min-h-screen">
       <div className="container mx-auto px-4 lg:px-8">
-        <AnimatePresence mode="wait">
-          {!isDetailView ? (
-            // Main Category View
-            <motion.div
-              key="main-view"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-16"
-              >
-                <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-800 mb-6">
-                  Choose Your Perfect Style
-                </h2>
-                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                  Select from our premium rock board options to match your aesthetic vision and interior design.
-                </p>
-              </motion.div>
+        {!isDetailView ? (
+          <div>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-800 mb-6">
+                Choose Your Perfect Style
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                Select from our premium rock board options to match your aesthetic vision and interior design.
+              </p>
+            </div>
 
-              <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-                {categories.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.6 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => handleCategoryClick(item)}
-                    className="group cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-lg bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300"
-                  >
-                    <img
-                      src={item.img}
-                      alt={`${item.name} rock board`}
-                      className="w-full h-40 object-cover"
-                      loading="lazy"
-                    />
-                    <div className="p-5 text-center">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-3 transition-transform duration-300">
-                        <item.icon className="text-white w-6 h-6" />
-                      </div>
-                      <h4 className="font-bold text-[#231c14] mb-1">{item.name}</h4>
-                      <p className="text-sm text-[#6b5c47]">{item.desc}</p>
-                      <div className="mt-3 text-xs text-[#b69777] font-medium">
-                        Click to view all options →
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
-            // Detail Panel View
-            <motion.div
-              key="detail-view"
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.6 }}
-            >
-              {/* Header with Back Button */}
-              <div className="flex items-center justify-between mb-12">
-                <motion.button
-                  onClick={handleBackClick}
-                  className="flex items-center gap-3 px-6 py-3 bg-white rounded-full shadow-md hover:shadow-lg border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {categories.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => handleCategoryClick(item)}
+                  className="group cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-lg bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300"
                 >
-                  <ArrowLeft className="w-5 h-5 text-[#b69777] group-hover:text-[#907252]" />
-                  <span className="text-[#231c14] font-medium">Back to Categories</span>
-                </motion.button>
-                
-                <div className="text-center flex-1">
-                  <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-800 mb-2">
-                    {selectedCategory?.name} Collection
-                  </h2>
-                  <p className="text-lg text-[#6b5c47]">
-                    Explore all available {selectedCategory?.name.toLowerCase()} options
-                  </p>
-                </div>
-                
-                <div className="w-24"></div> {/* Spacer for centering */}
-              </div>
-
-              {/* Panels Grid */}
-             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {selectedCategory?.panels.map((panel, i) => (
-                  <motion.div
-                    key={panel.id}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: i * 0.05 }}
-                    className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300"
-                  >
-                    <img
-                      src={panel.img}
-                      alt={panel.name}
-                      className="w-full h-58 object-cover"
-                      loading="lazy"
-                    />
-                    <div className="p-4 text-center">
-                      <h4 className="font-bold text-[#231c14] mb-1 text-base">{panel.name}</h4>
-                      <p className="text-sm text-[#6b5c47]">{panel.desc}</p>
+                  <img
+                    src={item.img}
+                    alt={`${item.name} rock board`}
+                    className="w-full h-40 object-cover"
+                    loading="lazy"
+                  />
+                  <div className="p-5 text-center">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-3">
+                      <item.icon className="text-white w-6 h-6" />
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Additional Info Section */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-                className="mt-16 bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-[#e2d5c4]"
-              >
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-[#231c14] mb-4">
-                    Why Choose {selectedCategory?.name}?
-                  </h3>
-                  <p className="text-[#6b5c47] max-w-2xl mx-auto leading-relaxed">
-                    Our {selectedCategory?.name.toLowerCase()} collection offers exceptional durability, 
-                    aesthetic appeal, and versatility for any interior design project. Each panel is 
-                    crafted with precision and attention to detail.
-                  </p>
-                  <div className="mt-6 flex flex-wrap justify-center gap-4">
-                    <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
-                      Eco-Friendly
-                    </span>
-                    <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
-                      Fire Resistant
-                    </span>
-                    <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
-                      Easy Installation
-                    </span>
-                    <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
-                      10 Year Warranty
-                    </span>
+                    <h4 className="font-bold text-[#231c14] mb-1">{item.name}</h4>
+                    <p className="text-sm text-[#6b5c47]">{item.desc}</p>
+                    <div className="mt-3 text-xs text-[#b69777] font-medium">
+                      Click to view all options →
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {/* Header with Back Button */}
+            <div className="flex items-center justify-between mb-12">
+              <button
+                onClick={handleBackClick}
+                className="flex items-center gap-3 px-6 py-3 bg-white rounded-full shadow-md hover:shadow-lg border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 group"
+              >
+                <ArrowLeft className="w-5 h-5 text-[#b69777] group-hover:text-[#907252]" />
+                <span className="text-[#231c14] font-medium">Back to Categories</span>
+              </button>
+
+              <div className="text-center flex-1">
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-800 mb-2">
+                  {selectedCategory?.name} Collection
+                </h2>
+                <p className="text-lg text-[#6b5c47]">
+                  Explore all available {selectedCategory?.name.toLowerCase()} options
+                </p>
+              </div>
+
+              <div className="w-24" />
+            </div>
+
+            {/* Panels Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {selectedCategory?.panels.map((panel) => (
+                <div
+                  key={panel.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300"
+                >
+                  <img
+                    src={panel.img}
+                    alt={panel.name}
+                    className="w-full h-58 object-cover"
+                    loading="lazy"
+                  />
+                  <div className="p-4 text-center">
+                    <h4 className="font-bold text-[#231c14] mb-1 text-base">{panel.name}</h4>
+                    <p className="text-sm text-[#6b5c47]">{panel.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Additional Info Section */}
+            <div className="mt-16 bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-[#e2d5c4]">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-[#231c14] mb-4">
+                  Why Choose {selectedCategory?.name}?
+                </h3>
+                <p className="text-[#6b5c47] max-w-2xl mx-auto leading-relaxed">
+                  Our {selectedCategory?.name.toLowerCase()} collection offers exceptional durability,
+                  aesthetic appeal, and versatility for any interior design project. Each panel is
+                  crafted with precision and attention to detail.
+                </p>
+                <div className="mt-6 flex flex-wrap justify-center gap-4">
+                  <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
+                    Eco-Friendly
+                  </span>
+                  <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
+                    Fire Resistant
+                  </span>
+                  <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
+                    Easy Installation
+                  </span>
+                  <span className="px-4 py-2 bg-[#b69777] text-black rounded-full text-sm font-medium">
+                    10 Year Warranty
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

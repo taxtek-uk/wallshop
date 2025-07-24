@@ -10,11 +10,17 @@ interface Feature {
   gradient: string;
 }
 const FEATURES: Feature[] = [
-  {
-    label: "Luxury Wallpapers",
-    description: "Premium materials & finishes",
-    icon: <Sparkles className="w-6 h-6" />,
-    gradient: "from-amber-400 via-yellow-500 to-amber-600",
+   {
+    label: "Smart Technology",
+    description: "Integrated IoT systems",
+    icon: <Cpu className="w-6 h-6" />,
+    gradient: "from-blue-400 via-purple-500 to-indigo-600",
+  },
+   {
+    label: "Carbon Rock Boards",
+    description: "Durable & sustainable",
+    icon: <Shield className="w-6 h-6" />,
+    gradient: "from-gray-400 via-gray-600 to-gray-800",
   },
   {
     label: "Acoustic Panels",
@@ -23,17 +29,12 @@ const FEATURES: Feature[] = [
     gradient: "from-orange-400 via-red-500 to-pink-600",
   },
   {
-    label: "Carbon Rock",
-    description: "Durable & sustainable",
-    icon: <Shield className="w-6 h-6" />,
-    gradient: "from-gray-400 via-gray-600 to-gray-800",
+    label: "Customizable Designs",
+    description: "Over 100+ coverings",
+    icon: <Sparkles className="w-6 h-6" />,
+    gradient: "from-green-400 via-teal-500 to-blue-600",
   },
-  {
-    label: "Smart Technology",
-    description: "Integrated IoT systems",
-    icon: <Cpu className="w-6 h-6" />,
-    gradient: "from-blue-400 via-purple-500 to-indigo-600",
-  },
+   
 ];
 
 const HeroSection: React.FC = () => {
