@@ -44,11 +44,12 @@ const socialLinks = [
 ];
 
 const quickLinks = [
-  { title: "Luxury Wallpapers", href: "/luxury-wallpapers" },
-  { title: "Acoustic Panels", href: "/acoustic-panels" },
-  { title: "Carbon Rock Boards", href: "/carbon-rock-boards" },
   { title: "Smart Walls", href: "/smart-walls" },
-  { title: "Free Sample", href: "/request-free-sample" },
+  { title: "Smart Devices", href: "#" },
+  { title: "Smart Wall Accessories", href: "#" },
+  { title: "Carbon Rock Boards", href: "/carbon-rock-boards" },
+  { title: "Acoustic Panels", href: "/acoustic-panels" },
+  { title: "Luxury Wallpapers", href: "/luxury-wallpapers" },
   { title: "Installation", href: "/installation" },
 ];
 

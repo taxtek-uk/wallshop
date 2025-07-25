@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
-import PanelGallery from "@/components/PanelGallery";
+import TextureSection from "@/components/TextureSection"
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -284,7 +284,7 @@ const CarbonRockBoards = () => {
       {/* Explore Our Panel Series – Visual Gallery */}
  
 
-      <PanelGallery />
+      <TextureSection />
 
       {/* Application Scenarios */}
       <section className="py-16 bg-[#faf7f3]">
