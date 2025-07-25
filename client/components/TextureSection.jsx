@@ -36,65 +36,109 @@ const TextureSection = () => {
       ]
     },
     {
-      id: 'wood',
-      name: "Wood Grain",
-      desc: "Warm wood aesthetics with durable surface.",
-      icon: Layers,
-      img: "/images/carbon-rock-boards/wood.jpg",
-      panels: [
-        { id: 1, name: "Oak Grain", img: "/images/carbon-rock-boards/wood-oak.jpg", desc: "Classic oak wood pattern" },
-        { id: 2, name: "Walnut Grain", img: "/images/carbon-rock-boards/wood-walnut.jpg", desc: "Rich walnut wood texture" },
-        { id: 3, name: "Pine Grain", img: "/images/carbon-rock-boards/wood-pine.jpg", desc: "Light pine wood finish" },
-        { id: 4, name: "Cherry Wood", img: "/images/carbon-rock-boards/wood-cherry.jpg", desc: "Elegant cherry wood grain" },
-        { id: 5, name: "Mahogany", img: "/images/carbon-rock-boards/wood-mahogany.jpg", desc: "Luxurious mahogany texture" },
-        { id: 6, name: "Bamboo", img: "/images/carbon-rock-boards/wood-bamboo.jpg", desc: "Sustainable bamboo pattern" }
-      ]
-    },
+  id: 'wood',
+  name: "Wood Grain",
+  desc: "Warm wood aesthetics with durable surface.",
+  icon: Layers,
+  img: "/images/carbon-rock-boards/wood.jpg",
+  panels: [
+    { id: 1, name: "Natural Oak", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Classic oak texture with soft grain pattern" },
+    { id: 2, name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations" },
+    { id: 3, name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast" },
+    { id: 4, name: "Golden Maple", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm maple hue with straight grain" },
+    { id: 5, name: "Weathered Cedar", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Textured cedar look with aged character" },
+    { id: 6, name: "Rustic Pine", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Light pine tone with visible knots and streaks" },
+    { id: 7, name: "Charcoal Oak", img: "/images/carbon-rock-boards/wood/7.jpg", desc: "Deep grey oak with modern finish" },
+    { id: 8, name: "Amber Teak", img: "/images/carbon-rock-boards/wood/8.jpg", desc: "Teak-inspired golden tones and natural flow" },
+    { id: 9, name: "Espresso Birch", img: "/images/carbon-rock-boards/wood/9.jpg", desc: "Bold espresso hue on tight birch grains" },
+    { id: 10, name: "Sunbleached Timber", img: "/images/carbon-rock-boards/wood/10.jpg", desc: "Light grey-brown tone like weathered wood" },
+    { id: 11, name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical rosewood" },
+    { id: 12, name: "Whitewashed Oak", img: "/images/carbon-rock-boards/wood/12.jpg", desc: "Pale oak with a whitewashed soft grain" },
+    { id: 13, name: "Hazel Beech", img: "/images/carbon-rock-boards/wood/13.jpg", desc: "Light beech finish with smooth texture" },
+    { id: 14, name: "Dark Walnut", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep tones" },
+    { id: 15, name: "Bamboo Slate", img: "/images/carbon-rock-boards/wood/15.jpg", desc: "Neutral bamboo-inspired texture in muted finish" },
+    { id: 16, name: "Ash Greywood", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone" },
+    { id: 17, name: "Ivory Elm", img: "/images/carbon-rock-boards/wood/17.jpg", desc: "Smooth ivory tone with linear elm grain" },
+    { id: 18, name: "Toasted Mahogany", img: "/images/carbon-rock-boards/wood/18.jpg", desc: "Dark toasted tone with rich mahogany grain" },
+    { id: 19, name: "Copperwood", img: "/images/carbon-rock-boards/wood/19.jpg", desc: "Copper-tinged finish with clean grain lines" },
+    { id: 20, name: "Chestnut Brown", img: "/images/carbon-rock-boards/wood/20.jpg", desc: "Balanced brown chestnut-inspired finish" },
+    { id: 21, name: "Graphite Oak", img: "/images/carbon-rock-boards/wood/21.jpg", desc: "Slate-grey grain for modern interiors" },
+    { id: 22, name: "Almond Timber", img: "/images/carbon-rock-boards/wood/22.jpg", desc: "Soft beige almond tone with faint grain" },
+    { id: 23, name: "Espresso Elm", img: "/images/carbon-rock-boards/wood/23.jpg", desc: "Dark espresso elm wood with deep tone" },
+    { id: 24, name: "Vanilla Maple", img: "/images/carbon-rock-boards/wood/24.jpg", desc: "Creamy maple with calm grain profile" },
+    { id: 25, name: "Antique Pine", img: "/images/carbon-rock-boards/wood/25.jpg", desc: "Vintage pine finish with natural age lines" },
+    { id: 26, name: "Wenge Shadow", img: "/images/carbon-rock-boards/wood/26.jpg", desc: "Exotic wenge look with dark shadowy tones" },
+    { id: 27, name: "Ironwood", img: "/images/carbon-rock-boards/wood/27.jpg", desc: "Heavy grained wood with metallic undertone" },
+    { id: 28, name: "Smoky Timber", img: "/images/carbon-rock-boards/wood/28.jpg", desc: "Soft smoky finish with layered woodgrain" },
+    { id: 29, name: "Cinnamon Oak", img: "/images/carbon-rock-boards/wood/29.jpg", desc: "Cinnamon-tinted oak grain with warm undertones" },
+    { id: 30, name: "Grey Driftwood", img: "/images/carbon-rock-boards/wood/30.jpg", desc: "Weathered driftwood look in calming grey" },
+    { id: 31, name: "Burnt Maple", img: "/images/carbon-rock-boards/wood/31.jpg", desc: "Darkened maple texture with bold personality" },
+    { id: 32, name: "Soft Sandalwood", img: "/images/carbon-rock-boards/wood/32.jpg", desc: "Subtle sandalwood tone with organic waves" },
+    { id: 33, name: "Molasses Walnut", img: "/images/carbon-rock-boards/wood/33.jpg", desc: "Deep walnut pattern with molasses hue" },
+    { id: 34, name: "Pearl Beech", img: "/images/carbon-rock-boards/wood/34.jpg", desc: "Creamy pearl finish with smooth beech flow" },
+    { id: 35, name: "Tundra Elm", img: "/images/carbon-rock-boards/wood/35.jpg", desc: "Frosty elm pattern perfect for minimal interiors" }
+  ]
+},
     {
-      id: 'fabric',
-      name: "Fabric Look",
-      desc: "Soft textile pattern with acoustic value.",
-      icon: Paintbrush2,
-      img: "/images/carbon-rock-boards/cloth.jpg",
-      panels: [
-        { id: 1, name: "Linen Weave", img: "/images/carbon-rock-boards/fabric-linen.jpg", desc: "Natural linen texture" },
-        { id: 2, name: "Canvas Look", img: "/images/carbon-rock-boards/fabric-canvas.jpg", desc: "Durable canvas appearance" },
-        { id: 3, name: "Tweed Pattern", img: "/images/carbon-rock-boards/fabric-tweed.jpg", desc: "Classic tweed design" },
-        { id: 4, name: "Velvet Touch", img: "/images/carbon-rock-boards/fabric-velvet.jpg", desc: "Soft velvet-like finish" },
-        { id: 5, name: "Burlap Texture", img: "/images/carbon-rock-boards/fabric-burlap.jpg", desc: "Rustic burlap pattern" },
-        { id: 6, name: "Silk Finish", img: "/images/carbon-rock-boards/fabric-silk.jpg", desc: "Smooth silk appearance" }
-      ]
-    },
+  id: 'fabric',
+  name: "Fabric Look",
+  desc: "Soft textile pattern with acoustic value.",
+  icon: Paintbrush2,
+  img: "/images/carbon-rock-boards/cloth.jpg",
+  panels: [
+    { id: 1, name: "Linen Weave", img: "/images/carbon-rock-boards/fabric/1.jpg", desc: "Linen Weave texture for contemporary interior walls" },
+    { id: 2, name: "Denim Texture", img: "/images/carbon-rock-boards/fabric/2.jpg", desc: "Denim Texture texture for contemporary interior walls" },
+    { id: 3, name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls" },
+    { id: 4, name: "Ivory Cotton", img: "/images/carbon-rock-boards/fabric/4.jpg", desc: "Ivory Cotton texture for contemporary interior walls" },
+    { id: 5, name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/5.jpg", desc: "Silver Mesh texture for contemporary interior walls" },
+    { id: 6, name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/6.jpg", desc: "Soft Gauze texture for contemporary interior walls" },
+    { id: 7, name: "Contrast Linen Panel", img: "/images/carbon-rock-boards/fabric/7.jpg", desc: "Contrast Linen Panel texture for contemporary interior walls" },
+    { id: 8, name: "Beige Canvas", img: "/images/carbon-rock-boards/fabric/8.jpg", desc: "Beige Canvas texture for contemporary interior walls" },
+    { id: 9, name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls" },
+    { id: 10, name: "Crosshatch Blend", img: "/images/carbon-rock-boards/fabric/10.jpg", desc: "Crosshatch Blend texture for contemporary interior walls" },
+    { id: 11, name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/11.jpg", desc: "Alabaster Cotton texture for contemporary interior walls" },
+    { id: 12, name: "Khaki Hemp", img: "/images/carbon-rock-boards/fabric/12.jpg", desc: "Khaki Hemp texture for contemporary interior walls" },
+    { id: 13, name: "Pebble Mesh", img: "/images/carbon-rock-boards/fabric/13.jpg", desc: "Pebble Mesh texture for contemporary interior walls" },
+    { id: 14, name: "Cream Wool", img: "/images/carbon-rock-boards/fabric/14.jpg", desc: "Cream Wool texture for contemporary interior walls" },
+    
+  ]
+},
     {
-      id: 'concrete',
-      name: "Concrete Finish",
-      desc: "Modern industrial vibe with raw finish.",
-      icon: Ruler,
-      img: "/images/carbon-rock-boards/wpc.jpg",
-      panels: [
-        { id: 1, name: "Raw Concrete", img: "/images/carbon-rock-boards/concrete-raw.jpg", desc: "Authentic concrete texture" },
-        { id: 2, name: "Polished Concrete", img: "/images/carbon-rock-boards/concrete-polished.jpg", desc: "Smooth polished finish" },
-        { id: 3, name: "Exposed Aggregate", img: "/images/carbon-rock-boards/concrete-aggregate.jpg", desc: "Textured aggregate surface" },
-        { id: 4, name: "Stamped Concrete", img: "/images/carbon-rock-boards/concrete-stamped.jpg", desc: "Decorative stamped pattern" },
-        { id: 5, name: "Weathered Concrete", img: "/images/carbon-rock-boards/concrete-weathered.jpg", desc: "Aged concrete appearance" },
-        { id: 6, name: "Smooth Concrete", img: "/images/carbon-rock-boards/concrete-smooth.jpg", desc: "Ultra-smooth finish" }
-      ]
-    },
+  id: 'concrete',
+  name: "Concrete Texture",
+  desc: "Industrial elegance with raw, minimalist tones.",
+  icon: Ruler,
+  img: "/images/carbon-rock-boards/wpc.jpg",
+  panels: [
+    { id: 1, name: "Urban Taupe", img: "/images/carbon-rock-boards/concrete/1.jpg", desc: "Urban Taupe concrete surface with modern industrial feel" },
+    { id: 2, name: "Mineral White", img: "/images/carbon-rock-boards/concrete/2.jpg", desc: "Mineral White concrete surface with modern industrial feel" },
+    { id: 3, name: "Charcoal Sand", img: "/images/carbon-rock-boards/concrete/3.jpg", desc: "Charcoal Sand concrete surface with modern industrial feel" },
+    { id: 4, name: "Muted Clay", img: "/images/carbon-rock-boards/concrete/4.jpg", desc: "Muted Clay concrete surface with modern industrial feel" },
+    { id: 5, name: "Weathered Bronze", img: "/images/carbon-rock-boards/concrete/5.jpg", desc: "Weathered Bronze concrete surface with modern industrial feel" },
+    { id: 6, name: "Burnt Terracotta", img: "/images/carbon-rock-boards/concrete/6.jpg", desc: "Burnt Terracotta concrete surface with modern industrial feel" },
+    { id: 7, name: "Fog White", img: "/images/carbon-rock-boards/concrete/7.jpg", desc: "Fog White concrete surface with modern industrial feel" },
+    { id: 8, name: "Ash Rose", img: "/images/carbon-rock-boards/concrete/8.jpg", desc: "Ash Rose concrete surface with modern industrial feel" },
+    { id: 9, name: "Chalk Grey", img: "/images/carbon-rock-boards/concrete/9.jpg", desc: "Chalk Grey concrete surface with modern industrial feel" },
+    { id: 10, name: "Bright Concrete", img: "/images/carbon-rock-boards/concrete/10.jpg", desc: "Bright Concrete surface with modern industrial feel" },
+    { id: 11, name: "Stone Grey", img: "/images/carbon-rock-boards/concrete/11.jpg", desc: "Stone Grey concrete surface with modern industrial feel" }
+  ]
+},
     {
-      id: 'metallic',
-      name: "Metallic Shine",
-      desc: "Luxury feel with metallic luster and reflectivity.",
-      icon: Paintbrush2,
-      img: "/images/carbon-rock-boards/metal.jpg",
-      panels: [
-        { id: 1, name: "Brushed Steel", img: "/images/carbon-rock-boards/metal-steel.jpg", desc: "Industrial brushed steel" },
-        { id: 2, name: "Copper Patina", img: "/images/carbon-rock-boards/metal-copper.jpg", desc: "Aged copper finish" },
-        { id: 3, name: "Gold Leaf", img: "/images/carbon-rock-boards/metal-gold.jpg", desc: "Luxurious gold appearance" },
-        { id: 4, name: "Silver Chrome", img: "/images/carbon-rock-boards/metal-chrome.jpg", desc: "Reflective chrome finish" },
-        { id: 5, name: "Bronze Patina", img: "/images/carbon-rock-boards/metal-bronze.jpg", desc: "Classic bronze texture" },
-        { id: 6, name: "Titanium", img: "/images/carbon-rock-boards/metal-titanium.jpg", desc: "Modern titanium finish" }
-      ]
-    }
+  id: 'metallic',
+  name: "Metallic Shine",
+  desc: "Luxury feel with metallic luster and reflectivity.",
+  icon: Paintbrush2,
+  img: "/images/carbon-rock-boards/metal.jpg",
+  panels: [
+    { id: 1, name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/1.jpg", desc: "Elegant bronze with a brushed satin finish" },
+    { id: 2, name: "Antique Copper", img: "/images/carbon-rock-boards/metal/2.jpg", desc: "Warm copper tone with vintage character" },
+    { id: 3, name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/3.jpg", desc: "Subtle golden shimmer with soft elegance" },
+    { id: 4, name: "Urban Brass", img: "/images/carbon-rock-boards/metal/4.jpg", desc: "Contemporary brass with matte warmth" },
+    { id: 5, name: "Mirror Silver", img: "/images/carbon-rock-boards/metal/5.jpg", desc: "Sleek silver chrome for high reflectivity" },
+    { id: 6, name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/6.jpg", desc: "Modern titanium finish with silky texture" }
+  ]
+}
+
   ];
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
