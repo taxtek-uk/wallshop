@@ -453,7 +453,6 @@ function SmartWalls() {
   </div>
 </section>
 
-
       {/* NEW SECTION 2: Versatile Smart Wall Environments */}
       <section id="environments" className="py-20 bg-gradient-to-br from-[#f8f6f3] to-white">
         <div className="container mx-auto px-4 lg:px-8">
