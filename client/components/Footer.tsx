@@ -45,7 +45,7 @@ const socialLinks = [
 
 const quickLinks = [
   { title: "Smart Walls", href: "/smart-walls" },
-  { title: "Smart Devices", href: "#" },
+  { title: "Smart Devices", href: "/smart-devices" },
   { title: "Smart Wall Accessories", href: "#" },
   { title: "Carbon Rock Boards", href: "/carbon-rock-boards" },
   { title: "Acoustic Panels", href: "/acoustic-panels" },

@@ -209,10 +209,10 @@ const SmartWallBuilder = () => {
                     onChange={(e) => setWallDimensions(prev => ({ ...prev, height: parseInt(e.target.value) || 0 }))}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="2100"
-                    min="1800"
-                    max="3000"
+                    min="2200"
+                    max="4000"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Min: 1800mm, Max: 3000mm</p>
+                  <p className="text-xs text-gray-500 mt-1">Min: 2200mm, Max: 4000mm</p>
                 </div>
               </div>
 

@@ -7,8 +7,12 @@ import {
   ArrowLeft,
   Eye,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Square,
+  Palette,
+  Layers2,
 } from "lucide-react";
+
 import Lightbox from "../../client/components/Lightbox";
 
 const TextureSection = () => {
@@ -68,7 +72,7 @@ const TextureSection = () => {
   id: 'solid',
   name: "Solid Color Series",
   desc: "Industrial elegance with raw, minimalist tones.",
-  icon: Ruler,
+  icon: Palette,
   img: "/images/carbon-rock-boards/wpc.jpg",
   color: "from-slate-100 to-gray-100",
   accent: "slate-600",
@@ -129,7 +133,7 @@ const TextureSection = () => {
       id: 'fabric',
       name: "Cloth Pattern Series",
       desc: "Soft textile pattern with acoustic value.",
-      icon: Paintbrush2,
+      icon: Palette,
       img: "/images/carbon-rock-boards/cloth.jpg",
       color: "from-neutral-100 to-stone-100",
       accent: "neutral-600",
@@ -154,7 +158,7 @@ const TextureSection = () => {
       id: 'metallic',
       name: "Metal Series",
       desc: "Luxury feel with metallic luster and reflectivity.",
-      icon: Paintbrush2,
+      icon: Layers2,
       img: "/images/carbon-rock-boards/metal.jpg",
       color: "from-amber-100 to-yellow-100",
       accent: "amber-600",
@@ -171,7 +175,7 @@ const TextureSection = () => {
       id: 'mirror',
       name: "Mirror Series",
       desc: "Reflective brilliance with a sleek, high-gloss finish.",
-      icon: Paintbrush2,
+      icon: Square,
       img: "/images/carbon-rock-boards/mirror.jpg",
       color: "from-blue-100 to-indigo-100",
       accent: "blue-600",
@@ -308,7 +312,7 @@ const TextureSection = () => {
             </div>
 
             {/* Panels Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
               {selectedCategory.panels.map((panel, index) => (
                 <div
                   key={panel.id}
@@ -320,7 +324,7 @@ const TextureSection = () => {
                     <img
                       src={panel.img}
                       alt={panel.name}
-                      className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-70 object-cover transition-transform duration-700 group-hover:scale-110"
                       loading="lazy"
                     />
                   </div>

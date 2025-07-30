@@ -20,6 +20,7 @@ import ContactUs from "./pages/ContactUs";
 
 // Product Pages
 import SmartWalls from "./pages/SmartWalls";
+import SmartDevices from "./pages/SmartDevices";
 import LuxuryWallpapers from "./pages/LuxuryWallpapers";
 import AcousticPanels from "./pages/AcousticPanels";
 import CarbonRockBoards from "./pages/CarbonRockBoards";
@@ -56,6 +57,8 @@ const App = () => (
           <Route path="/luxury-wallpapers" element={<LuxuryWallpapers />} />
           <Route path="/acoustic-panels" element={<AcousticPanels />} />
           <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
+          <Route path="/smart-devices" element={<SmartDevices />} />
+          
 
           {/* Catch-all for 404 */}
 
