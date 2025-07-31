@@ -8,7 +8,7 @@ const smartDevices = [
     description: "2K Ultra HD smart security camera with night vision",
     videoPath: "/videos/camera.mp4",
     imagePath: "/images/products/camera.png",
-    productLink: "https://www.orvibo.com/product/camera.html",
+    productLink: "#",
     icon: Camera
   },
   { 
