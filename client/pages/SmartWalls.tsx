@@ -18,13 +18,14 @@ import {
   Building, 
   Warehouse, 
   Globe,
-  Sparkles,
+  BatteryCharging,
   CheckCircle,
   Phone,
   Mail,
   MapPin,
-  Menu,
-  X,
+  Building2,
+  Hotel,
+  Ticket,
   Play,
   Palette,
   Shirt,
@@ -42,10 +43,13 @@ import {
 //import '../smart-wall.css';
 
 // Import images
-import modularGamingWall from '/images/modular-gaming-wall.jpg';
+import modularGamingWall from '/images/smart-gaming-wall-2.webp';
 import smartLivingRoom from '/images/F0VIppXJ6ZQe.jpg';
 import smartBedroom from '/images/luxury-living-room.webp';
 import smartBathroom from '/images/78K7MJq6E50c.jpg';
+import smartOffice from '/images/smart-office.webp';
+import smartHotel from '/images/123.jpg';
+import smartEvent from '/images/event-space.webp';
 
 function SmartWalls() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -107,32 +111,60 @@ function SmartWalls() {
       icon: Volume2,
       title: "Integrated Speakers & Concealed Disc Storage",
       description: "Premium speakers for crystal-clear game sound"
-    }
+    },
+  {
+    icon: BatteryCharging, // Suggested Lucide icon
+    title: "Wall-Mounted Controller Charger",
+    description: "Neatly docks and charges up to four gaming controllers"
+  }
   ];
 
   const environments = [
-    {
-      icon: Home,
-      title: "Living Room",
-      description: "Fully loaded entertainment hub with TV, sound and lighting",
-      image: smartLivingRoom,
-      features: ["Entertainment Hub", "Ambient Lighting", "Sound System"]
-    },
-    {
-      icon: Bed,
-      title: "Bedroom",
-      description: "Padded headboard module with speakers and adjustable lights behind the bed",
-      image: smartBedroom,
-      features: ["Padded Headboard", "Integrated Speakers", "Adjustable Lighting"]
-    },
-    {
-      icon: Bath,
-      title: "Bathroom",
-      description: "Sleek shelving units with soft ambient illumination and optional audio",
-      image: smartBathroom,
-      features: ["Illuminated Shelving", "Ambient Lighting", "Optional Audio"]
-    }
-  ];
+  {
+    icon: Home,
+    title: "Living Room",
+    description: "A central entertainment zone featuring integrated TV wall, subtle lighting, and minimal storage for a sleek modern look.",
+    image: smartLivingRoom,
+    features: ["Integrated TV Wall", "Ambient Lighting", "Minimalist Setup"]
+  },
+  {
+    icon: Bed,
+    title: "Bedroom",
+    description: "Smart lighting and media controls built into the wall for the ultimate relaxed and tech-enhanced bedroom experience.",
+    image: smartBedroom,
+    features: ["Scene Lighting", "Media Control Panel", "Integrated Smart Wall"]
+  },
+  {
+    icon: Bath,
+    title: "Bathroom",
+    description: "A luxurious mirror display with ambient glow and integrated media for a smart bathroom experience.",
+    image: smartBathroom,
+    features: ["Mirror Display", "Ambient Lighting", "Smart Media Integration"]
+  },
+  {
+    icon: Building2,
+    title: "Office Lounge",
+    description: "A modular setup for professional spaces featuring acoustic wall panels, presentation-ready surfaces, and soft lighting.",
+    image: smartOffice,
+    features: ["Acoustic Walls", "Presentation Space", "Ambient Light Zones"]
+  },
+  {
+    icon: Hotel,
+    title: "Hotel Room",
+    description: "Smart hospitality setup with custom lighting, elegant backdrop walls, and multimedia-ready features for guest comfort.",
+    image: smartHotel,
+    features: ["Smart Lighting", "Decorative Paneling", "Guest Media Control"]
+  },
+  {
+    icon: Ticket,
+    title: "Event Space",
+    description: "High-end smart wall for event halls with AV panels, branding options, and modular layout capabilities.",
+    image: smartEvent,
+    features: ["AV Ready", "Custom Branding", "Modular Setup"]
+  }
+];
+
+
 
   const installationSteps = [
     {
@@ -348,7 +380,7 @@ function SmartWalls() {
   {/* Background Image */}
   <div className="absolute inset-0 w-full h-full z-0">
     <img
-      src="/images/4ASIPmlGaVyW.jpg"
+      src="/images/smart-gaming-wall-3.webp"
       alt="Gaming Smart Wall Background"
       className="w-full h-full object-cover object-center"
       draggable="false"
@@ -396,10 +428,10 @@ function SmartWalls() {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6">
+          {/* <div className="absolute bottom-6 left-6 right-6">
             <h3 className="text-2xl font-bold text-white mb-2">Modular Gaming Paradise</h3>
             <p className="text-white/80">Two 1000mm TV modules along 3 x 400mm side modules with integrated console storage</p>
-          </div>
+          </div> */}
         </div>
       </motion.div>
 
@@ -465,12 +497,20 @@ function SmartWalls() {
             <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
               Versatile Solutions
             </div>
-            <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-              Versatile Smart Wall Environments
-            </h2>
-            <p className="text-xl text-[#6b5c47] max-w-4xl mx-auto leading-relaxed">
-              From entertainment hubs to serene bedrooms and luxurious bathrooms, our smart walls adapt to every space in your home with tailored functionality and elegant design.
-            </p>
+            <h2 className="text-5xl lg:text-6xl font-black mb-6 leading-tight">
+            <span className="block text-gray-800">
+              Smart Wall Environments.
+            </span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6b5c47] to-[#b68c5a] mt-2 mb-2">
+              For Residential & Commercial Spaces.
+            </span>
+          </h2>
+
+           
+          <p className="text-xl text-[#6b5c47] max-w-4xl mx-auto leading-relaxed">
+            From cozy bedrooms and luxurious bathrooms to professional offices, hotels, and events — our modular smart walls are designed to adapt to both residential and commercial environments with seamless technology, functional elegance, and customized features.
+          </p>
+
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8 mb-16">
@@ -499,8 +539,8 @@ function SmartWalls() {
                   
                   <div className="p-8">
                     <h3 className="text-2xl font-bold text-[#231c14] mb-4">{env.title}</h3>
-                    <p className="text-[#6b5c47] mb-6 leading-relaxed">{env.description}</p>
-                    
+                    {/* <p className="text-[#6b5c47] mb-6 leading-relaxed">{env.description}</p>
+                     */}
                     <div className="space-y-2">
                       {env.features.map((feature, j) => (
                         <div key={j} className="flex items-center space-x-2">
