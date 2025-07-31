@@ -468,10 +468,13 @@ function SmartWalls() {
       className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-3xl p-8 border border-white/10"
     >
       <div className="grid md:grid-cols-3 gap-8 text-center">
-        <div>
-          <h4 className="text-3xl font-bold text-white mb-2">Modular Design</h4>
-          <p className="text-white/70">Two 1000mm TV modules flanked by optional 3 x 400mm or 600mm side units </p>
+       <div>
+          <h4 className="text-3xl font-bold text-white mb-2">Modular Gaming Wall</h4>
+          <p className="text-white/70">
+            Configurable layout using two 1000mm smart modules with a central 700mm gap for a TV bracket. Optional extended layout available with 3 × 400mm and 2 × 1000mm modules — ideal for dual-screen setups.
+          </p>
         </div>
+
         <div>
           <h4 className="text-3xl font-bold text-white mb-2">Integrated Consoles</h4>
           <p className="text-white/70">Discreet PlayStation, Xbox or retro Atari bays beneath the screen</p>
