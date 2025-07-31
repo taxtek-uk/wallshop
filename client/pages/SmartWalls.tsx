@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // adjust import based on your setup
 import Navigation from '@/components/Navigation';
 import TextureSection from '@/components/TextureSection';
 import Footer from '@/components/Footer';
+
 import { 
   Lightbulb, 
   Film, 
@@ -16,6 +19,7 @@ import {
   ArrowRight, 
   Home, 
   Building, 
+  Info,
   Warehouse, 
   Globe,
   BatteryCharging,
@@ -470,9 +474,20 @@ function SmartWalls() {
       <div className="grid md:grid-cols-3 gap-8 text-center">
        <div>
           <h4 className="text-3xl font-bold text-white mb-2">Modular Gaming Wall</h4>
-          <p className="text-white/70">
-            Configurable layout using two 1000mm smart modules with a central 700mm gap for a TV bracket. Optional extended layout available with 3 × 400mm and 2 × 1000mm modules — ideal for dual-screen setups.
+          <p className="text-white/70 flex items-start gap-2">
+            Configurable layout using two 1000mm smart modules with a central 700mm gap for a TV bracket.
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-12 h-12 text-white/50 hover:text-white mt-1 cursor-pointer" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs text-sm text-white bg-[#2e2e2e] border border-white/10 shadow-lg p-3 rounded-md">
+                  Optional extended layout available with 3 × 400mm and 2 × 1000mm modules — ideal for dual-screen setups.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </p>
+
         </div>
 
         <div>
