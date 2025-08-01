@@ -47,8 +47,9 @@ const IntroSection = () => {
             </span>
           </h2>
           <p className="text-xl lg:text-2xl text-neutral-700 max-w-4xl mx-auto leading-relaxed font-light">
-            At <span className="text-[#b89773] font-semibold">The Wall Shop</span>, we specialize in crafting pre-engineered smart wall systems and ultra-durable carbon rock boards for modern living. Our smart walls are manufactured to exact specifications—preloaded with all electronics for plug-and-play setup in under 4 hours.
-          </p>
+          At <span className="text-[#b89773] font-semibold">The Wall Shop</span>, we supply pre-manufactured smart walls with over 100 luxurious coatings of your choice, installed in just 2 to 4 hours. Each wall comes pre-assembled with integrated technology for TV, sound, gaming, security, fire control, and dynamic lighting. A central control panel enables effortless smart home control - including curtain automation, climate regulation, door lock recognition, and external camera management - all accessible from a single screen and remote.
+        </p>
+
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
