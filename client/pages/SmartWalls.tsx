@@ -104,7 +104,7 @@ function SmartWalls() {
     {
       icon: Gamepad2,
       title: "Integrated Console Bays",
-      description: "Discreet PlayStation, Xbox, or retro Atari storage"
+      description: "Discreet PlayStation, Xbox, or gaming PC Storage"
     },
     {
       icon: Hexagon,
@@ -998,7 +998,7 @@ function SmartWalls() {
                   {[
                     "Free consultation and design service",
                     "Professional installation included",
-                    "5-year warranty on all components",
+                    "2-year warranty on all components",
                     "24/7 technical support",
                     "Customizable to any space",
                     "Energy-efficient smart technology"

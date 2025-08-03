@@ -53,20 +53,13 @@ const Warranty = () => {
   const warranties = [
     {
       product: "Smart Wall Systems",
-      duration: "3 Years",
+      duration: "2 Years",
       coverage: "Electronics, software, integration components",
       color: "bg-leather-600",
       textColor: "text-white",
       icon: Shield,
     },
-    {
-      product: "Luxury Wallpapers",
-      duration: "5 Years",
-      coverage: "Fading, peeling, material defects",
-      color: "bg-olive-500",
-      textColor: "text-white",
-      icon: CheckCircle,
-    },
+     
     {
       product: "Installation Work",
       duration: "2 Years",
@@ -77,7 +70,7 @@ const Warranty = () => {
     },
     {
       product: "Carbon Rock Boards",
-      duration: "10 Years",
+      duration: "5 Years",
       coverage: "Structural integrity, fire resistance",
       color: "bg-taupe-600",
       textColor: "text-white",
@@ -154,9 +147,9 @@ const Warranty = () => {
       </div>
 
       {/* Main Section */}
-      <div className="container mx-auto px-4 lg:px-8 py-24">
+      <div className="container mx-auto px-3 lg:px-6 py-24">
         {/* Warranty Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {warranties.map((w, i) => {
             const Icon = w.icon;
             return (
@@ -306,7 +299,7 @@ const Warranty = () => {
             <div className="flex flex-col items-center">
               <Phone className="w-8 h-8 mb-2" />
               <h4 className="font-semibold">Phone</h4>
-              <a href="tel:+442012345678" className="hover:underline">+44 (0) 20 1234 5678</a>
+              <a href="tel:+441417393377" className="hover:underline">+44 141 739 3377</a>
             </div>
             <div className="flex flex-col items-center">
               <Clock className="w-8 h-8 mb-2" />
