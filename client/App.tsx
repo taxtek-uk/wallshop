@@ -25,6 +25,12 @@ import LuxuryWallpapers from "./pages/LuxuryWallpapers";
 import AcousticPanels from "./pages/AcousticPanels";
 import CarbonRockBoards from "./pages/CarbonRockBoards";
 import SmartWallConstructionPage from './pages/SmartWallConstructionPage';
+
+// Wall Panel Pages
+import WallPanels from "./pages/WallPanels";
+import WPCWallPanels from "./pages/WPCWallPanels";
+import AntiCollisionWallPanels from "./pages/AntiCollisionWallPanels";
+import WPCSplicingBoards from "./pages/WPCSplicingBoards";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -58,6 +64,12 @@ const App = () => (
           <Route path="/acoustic-panels" element={<AcousticPanels />} />
           <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
           <Route path="/smart-devices" element={<SmartDevices />} />
+          
+          {/* Wall Panel Routes */}
+          <Route path="/wall-panels" element={<WallPanels />} />
+          <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
+          <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
+          <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
           
 
           {/* Catch-all for 404 */}

@@ -8,6 +8,7 @@ import useScrollPosition from '@/hooks/useScrollPosition';
 const NAV_ITEMS = [
   { name: 'Home',            to: '/' },
   { name: 'Smart Walls',     to: '/smart-walls' },
+  { name: 'Wall Panels',     to: '/wall-panels' },
   { name: 'Carbon Rock Boards',     to: '/carbon-rock-boards' },  
   { name: 'Acoustic Panels', to: '/acoustic-panels' },
   { name: 'Warranty',        to: '/warranty' },

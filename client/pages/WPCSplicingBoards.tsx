@@ -1,0 +1,538 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { 
+  Layers, 
+  Zap, 
+  Award, 
+  Wrench, 
+  Puzzle, 
+  ArrowRight,
+  CheckCircle,
+  Download,
+  Phone,
+  Mail,
+  Clock,
+  Shield,
+  Ruler,
+  Settings,
+  Home,
+  Building,
+  Hotel
+} from 'lucide-react';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+const WPCSplicingBoards = () => {
+  const [selectedPattern, setSelectedPattern] = useState('horizontal');
+
+  const patterns = [
+    {
+      id: 'horizontal',
+      name: 'Horizontal Planks',
+      description: 'Classic horizontal wood plank pattern',
+      image: '/client/images/wpc-splicing-board.png'
+    },
+    {
+      id: 'vertical',
+      name: 'Vertical Boards',
+      description: 'Modern vertical board arrangement',
+      image: '/client/images/wpc-wall-panel-detail.png'
+    },
+    {
+      id: 'herringbone',
+      name: 'Herringbone',
+      description: 'Sophisticated herringbone pattern',
+      image: '/client/images/wpc-wall-panel-hero.png'
+    },
+    {
+      id: 'chevron',
+      name: 'Chevron',
+      description: 'Contemporary chevron design',
+      image: '/client/images/wpc-splicing-board.png'
+    }
+  ];
+
+  const specifications = [
+    { label: 'Thickness', value: '6mm / 9mm' },
+    { label: 'Width', value: '150mm / 200mm' },
+    { label: 'Length', value: '1200mm / 1800mm' },
+    { label: 'Material', value: 'Premium WPC Composite' },
+    { label: 'Joint System', value: 'Precision Click-Lock' },
+    { label: 'Fire Rating', value: 'Class B1' },
+    { label: 'Installation', value: 'Seamless Interlocking' },
+    { label: 'Warranty', value: '12 Years Residential' }
+  ];
+
+  const features = [
+    {
+      icon: Puzzle,
+      title: 'Seamless Installation',
+      description: 'Advanced interlocking system creates perfectly aligned surfaces without visible joints or gaps.',
+      benefit: 'Professional finish every time'
+    },
+    {
+      icon: Layers,
+      title: 'Modular Design',
+      description: 'Flexible modular system allows for creative patterns and easy replacement of individual boards.',
+      benefit: 'Design freedom and maintenance ease'
+    },
+    {
+      icon: Wrench,
+      title: 'Tool-Free Assembly',
+      description: 'Precision-engineered click-lock mechanism requires no special tools or adhesives for installation.',
+      benefit: 'Faster installation, lower costs'
+    },
+    {
+      icon: Shield,
+      title: 'Professional Finish',
+      description: 'Micro-beveled edges and precision manufacturing ensure a flawless, professional appearance.',
+      benefit: 'Premium aesthetic quality'
+    },
+    {
+      icon: Settings,
+      title: 'Adjustable System',
+      description: 'Accommodates irregular wall surfaces and allows for thermal expansion without compromising appearance.',
+      benefit: 'Versatile installation options'
+    },
+    {
+      icon: Zap,
+      title: 'Quick Installation',
+      description: 'Rapid installation system reduces project time by up to 60% compared to traditional methods.',
+      benefit: 'Reduced labor costs and downtime'
+    }
+  ];
+
+  const installationSteps = [
+    {
+      step: 1,
+      title: 'Wall Preparation',
+      description: 'Ensure wall surface is clean, dry, and level. Install furring strips if required.',
+      time: '30 minutes'
+    },
+    {
+      step: 2,
+      title: 'Starting Row',
+      description: 'Install first row with proper spacing and alignment using laser level for precision.',
+      time: '45 minutes'
+    },
+    {
+      step: 3,
+      title: 'Interlocking Assembly',
+      description: 'Click subsequent boards into place, ensuring tight joints and proper alignment.',
+      time: '2-3 hours'
+    },
+    {
+      step: 4,
+      title: 'Finishing Touches',
+      description: 'Install edge trims, corner pieces, and final quality inspection.',
+      time: '30 minutes'
+    }
+  ];
+
+  const applications = [
+    {
+      icon: Home,
+      title: 'Residential Interiors',
+      description: 'Perfect for feature walls, accent panels, and complete room transformations.',
+      examples: ['Living Room Feature Walls', 'Bedroom Accent Panels', 'Dining Room Wainscoting']
+    },
+    {
+      icon: Building,
+      title: 'Commercial Spaces',
+      description: 'Professional-grade solution for offices, retail spaces, and public buildings.',
+      examples: ['Office Reception Areas', 'Retail Store Displays', 'Conference Room Walls']
+    },
+    {
+      icon: Hotel,
+      title: 'Hospitality Design',
+      description: 'Luxury finishes for hotels, restaurants, and entertainment venues.',
+      examples: ['Hotel Room Headboards', 'Restaurant Feature Walls', 'Lobby Accent Panels']
+    }
+  ];
+
+  const benefits = [
+    'No visible joints or seams when properly installed',
+    'Allows for creative pattern arrangements',
+    'Easy replacement of individual damaged boards',
+    'Accommodates building movement and settling',
+    'Reduces installation time by up to 60%',
+    'No special tools or adhesives required',
+    'Consistent gap spacing for professional appearance',
+    'Compatible with standard wall construction'
+  ];
+
+  const patternBenefits = {
+    horizontal: ['Creates sense of width', 'Classic, timeless appeal', 'Easy installation'],
+    vertical: ['Makes rooms appear taller', 'Modern, contemporary look', 'Emphasizes ceiling height'],
+    herringbone: ['Sophisticated, luxury appearance', 'Creates visual interest', 'Hides minor imperfections'],
+    chevron: ['Dynamic, energetic feel', 'Contemporary design statement', 'Creates focal point']
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-clay-50 to-taupe-50">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-clay-500/20 to-taupe-500/20"></div>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <nav className="text-white/70 mb-4">
+                <Link to="/wall-panels" className="hover:text-white transition-colors">Wall Panels</Link>
+                <span className="mx-2">/</span>
+                <span className="text-white">WPC Splicing Boards</span>
+              </nav>
+              
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+                Modular Installation System
+              </div>
+              <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+                WPC Splicing Boards
+              </h1>
+              <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+                Revolutionary interlocking system that creates seamless wall surfaces with professional-grade installation. 
+                Perfect alignment, no visible joints, and unlimited design possibilities.
+              </p>
+              
+              <div className="flex flex-wrap gap-4 mb-8">
+                <Badge className="bg-white/20 text-white border-white/30">From £52/m²</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">12 Year Warranty</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">Tool-Free Installation</Badge>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-purple-600 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                >
+                  Get Installation Quote <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Installation Guide
+                </Button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+                <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
+                  <img
+                    src="/client/images/wpc-splicing-board.png"
+                    alt="WPC Splicing Boards Installation"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
+                    <Puzzle className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Seamless Joints</p>
+                  </div>
+                  <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
+                    <Layers className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Modular Design</p>
+                  </div>
+                  <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
+                    <Wrench className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Tool-Free Install</p>
+                  </div>
+                  <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
+                    <Clock className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Quick Assembly</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Details Tabs */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <Tabs defaultValue="features" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 mb-12">
+              <TabsTrigger value="features">Features</TabsTrigger>
+              <TabsTrigger value="patterns">Patterns</TabsTrigger>
+              <TabsTrigger value="installation">Installation</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="features" className="space-y-12">
+              {/* Features Grid */}
+              <div>
+                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Advanced Splicing Technology</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {features.map((feature, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: i * 0.1 }}
+                      className="p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg rounded-xl"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mb-4">
+                        <feature.icon className="text-white w-6 h-6" />
+                      </div>
+                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{feature.title}</h3>
+                      <p className="text-mocha-700 text-sm leading-relaxed mb-3">{feature.description}</p>
+                      <div className="text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                        {feature.benefit}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Benefits List */}
+              <div className="bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-mocha-900 mb-6">Installation & Performance Benefits</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {benefits.map((benefit, i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                      <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                      <span className="text-mocha-700">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="patterns" className="space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Design Patterns & Layouts</h2>
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {patterns.map((pattern) => (
+                    <motion.div
+                      key={pattern.id}
+                      whileHover={{ scale: 1.02 }}
+                      className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                        selectedPattern === pattern.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-taupe-200 bg-white hover:border-blue-300'
+                      }`}
+                      onClick={() => setSelectedPattern(pattern.id)}
+                    >
+                      <div className="aspect-video bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                        <img
+                          src={pattern.image}
+                          alt={pattern.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <h3 className="text-xl font-bold text-mocha-900 mb-2">{pattern.name}</h3>
+                      <p className="text-mocha-700 mb-4">{pattern.description}</p>
+                      
+                      {selectedPattern === pattern.id && (
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-mocha-900">Pattern Benefits:</h4>
+                          {patternBenefits[pattern.id as keyof typeof patternBenefits].map((benefit, idx) => (
+                            <div key={idx} className="flex items-center space-x-2">
+                              <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                              <span className="text-sm text-mocha-700">{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="installation" className="space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Installation Process</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {installationSteps.map((step, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: i * 0.1 }}
+                      className="text-center p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 rounded-xl"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
+                        {step.step}
+                      </div>
+                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{step.title}</h3>
+                      <p className="text-sm text-mocha-700 leading-relaxed mb-3">{step.description}</p>
+                      <div className="text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                        {step.time}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <div className="mt-12 p-8 bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl">
+                  <h3 className="text-2xl font-bold text-mocha-900 mb-4">Professional Installation Service</h3>
+                  <p className="text-mocha-700 mb-6 leading-relaxed">
+                    Our certified installation team specializes in WPC splicing board systems. We ensure perfect 
+                    alignment, seamless joints, and professional results that exceed expectations.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <Clock className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm text-mocha-700">Average installation: 4-6 hours</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Award className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm text-mocha-700">Certified splicing specialists</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm text-mocha-700">Installation warranty included</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="specifications" className="space-y-8">
+              <div className="grid lg:grid-cols-2 gap-12">
+                <div>
+                  <h2 className="text-3xl font-bold text-mocha-900 mb-8">Technical Specifications</h2>
+                  <div className="space-y-4">
+                    {specifications.map((spec, i) => (
+                      <div key={i} className="flex justify-between items-center p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
+                        <span className="font-medium text-mocha-900">{spec.label}</span>
+                        <span className="text-mocha-700 font-semibold">{spec.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-2xl font-bold text-mocha-900 mb-6">Interlocking System Details</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
+                      <h4 className="font-semibold text-mocha-900 mb-2">Click-Lock Mechanism</h4>
+                      <p className="text-sm text-mocha-700">Precision-engineered tongue and groove system with secure locking tabs</p>
+                    </div>
+                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
+                      <h4 className="font-semibold text-mocha-900 mb-2">Expansion Joints</h4>
+                      <p className="text-sm text-mocha-700">Built-in expansion allowance accommodates thermal movement</p>
+                    </div>
+                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
+                      <h4 className="font-semibold text-mocha-900 mb-2">Edge Profiles</h4>
+                      <p className="text-sm text-mocha-700">Micro-beveled edges create seamless appearance when installed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Applications Section */}
+      <section className="py-20 bg-gradient-to-br from-clay-50 to-taupe-50">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-clay-600 via-taupe-600 to-leather-600 bg-clip-text text-transparent mb-6">
+              Perfect Applications
+            </h2>
+            <p className="text-xl text-mocha-700 max-w-3xl mx-auto leading-relaxed">
+              WPC splicing boards excel in projects requiring seamless, professional finishes with design flexibility.
+            </p>
+          </motion.div>
+          
+          <div className="grid lg:grid-cols-3 gap-8">
+            {applications.map((app, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="bg-white border border-taupe-200 hover:border-blue-400 transition-all duration-300 hover:shadow-xl rounded-2xl p-8"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mb-6">
+                  <app.icon className="text-white w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold text-mocha-900 mb-4">{app.title}</h3>
+                <p className="text-mocha-700 leading-relaxed mb-6">{app.description}</p>
+                <div className="space-y-2">
+                  {app.examples.map((example, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <span className="text-sm text-mocha-700">{example}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
+        <div className="container mx-auto px-4 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">
+              Create Seamless Perfection
+            </h2>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8">
+              Experience the precision and beauty of WPC splicing boards. Get professional installation 
+              and a flawless finish that transforms any space.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-purple-600 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+              >
+                <Phone className="mr-2 h-5 w-5" />
+                Get Installation Quote
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+              >
+                <Mail className="mr-2 h-5 w-5" />
+                Design Consultation
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default WPCSplicingBoards;
+
