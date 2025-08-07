@@ -34,6 +34,9 @@ const WallPanels = lazy(() => import("./pages/WallPanels"));
 const WPCWallPanels = lazy(() => import("./pages/WPCWallPanels"));
 const AntiCollisionWallPanels = lazy(() => import("./pages/AntiCollisionWallPanels"));
 const WPCSplicingBoards = lazy(() => import("./pages/WPCSplicingBoards"));
+const WPCHollowSeamlessLockingBoards = lazy(() => import("./pages/WPCHollowSeamlessLockingBoards"));
+const ClassAFireproofBoards = lazy(() => import("./pages/ClassAFireproofBoards"));
+const FlutedWallPanels = lazy(() => import("./pages/FlutedWallPanels"));
 
 // Loading component
 const PageLoader = () => (
@@ -87,12 +90,15 @@ const App = () => (
             <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
             <Route path="/smart-devices" element={<SmartDevices />} />
             
-            {/* Wall Panel Routes */}
-            <Route path="/wall-panels" element={<WallPanels />} />
-            <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
-            <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
-            <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
-
+          {/* Wall Panel Routes */}
+          <Route path="/wall-panels" element={<WallPanels />} />
+          <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
+          <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
+          <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
+          <Route path="/wall-panels/wpc-hollow" element={<WPCHollowSeamlessLockingBoards />} />
+          <Route path="/wall-panels/fireproof" element={<ClassAFireproofBoards />} />
+          <Route path="/wall-panels/fluted" element={<FlutedWallPanels />} />
+          
             {/* Catch-all for 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
