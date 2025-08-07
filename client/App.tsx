@@ -110,7 +110,7 @@ const App = () => (
           <Route path="/wall-panels/spc-background" element={<SPCBackgroundWall />} />
           <Route path="/wall-panels/uhd-continuous" element={<UHDContinuousPattern />} />
           <Route path="/wall-panels/spc-waterproof" element={<SPCWaterproofWallPanel />} />
-          <Route path="/wall-panels/spc-crystal" element={<SPCStoneCrystalFlooring />} />
+          <Route path="/wall-panels/spc-stone-crystal" element={<SPCStoneCrystalFlooring />} />
           <Route path="/wall-panels/plastic-wood" element={<PlasticWoodFlooring />} />
           
             {/* Catch-all for 404 */}
