@@ -38,28 +38,28 @@ const ClassAFireproofBoards = () => {
       id: 'healthcare',
       name: 'Healthcare Facilities',
       description: 'Critical fire safety for hospitals and medical centers',
-      image: '/public/images/class-a-fireproof-board-hero.png',
+      image: '/images/class-a-fireproof-board-hero.png',
       requirements: ['Class A fire rating mandatory', 'Non-toxic smoke emission', 'Easy decontamination']
     },
     {
       id: 'education',
       name: 'Educational Buildings',
       description: 'Protecting schools and universities with superior fire resistance',
-      image: '/public/images/class-a-fireproof-board-detail.png',
+      image: '/images/class-a-fireproof-board-detail.png',
       requirements: ['Student safety compliance', 'Durable high-traffic areas', 'Low maintenance']
     },
     {
       id: 'commercial',
       name: 'Commercial Offices',
       description: 'Professional fire safety for corporate environments',
-      image: '/public/images/class-a-fireproof-board-hero.png',
+      image: '/images/class-a-fireproof-board-hero.png',
       requirements: ['Building code compliance', 'Professional aesthetics', 'Insurance requirements']
     },
     {
       id: 'industrial',
       name: 'Industrial Facilities',
       description: 'Heavy-duty fire protection for manufacturing and processing',
-      image: '/public/images/class-a-fireproof-board-detail.png',
+      image: '/images/class-a-fireproof-board-detail.png',
       requirements: ['Extreme fire resistance', 'Chemical resistance', 'Impact durability']
     }
   ];
@@ -269,7 +269,7 @@ const ClassAFireproofBoards = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/class-a-fireproof-board-hero.png"
+                    src="/images/class-a-fireproof-board-hero.png"
                     alt="Class A Fireproof Boards"
                     className="w-full h-full object-cover"
                   />

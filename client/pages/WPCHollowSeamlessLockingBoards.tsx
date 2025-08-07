@@ -38,37 +38,37 @@ const WPCHollowSeamlessLockingBoards = () => {
       id: 'natural-oak',
       name: 'Natural Oak',
       description: 'Warm, natural wood grain with authentic oak texture',
-      image: '/public/images/wpc-hollow-seamless-locking-board-hero.png'
+      image: '/images/wpc-hollow-seamless-locking-board-hero.png'
     },
     {
       id: 'walnut-brown',
       name: 'Walnut Brown',
       description: 'Rich, deep brown with sophisticated walnut patterns',
-      image: '/public/images/wpc-hollow-seamless-locking-board-detail.png'
+      image: '/images/wpc-hollow-seamless-locking-board-detail.png'
     },
     {
       id: 'grey-ash',
       name: 'Grey Ash',
       description: 'Contemporary grey with subtle ash wood grain',
-      image: '/public/images/wpc-hollow-seamless-locking-board-hero.png'
+      image: '/images/wpc-hollow-seamless-locking-board-hero.png'
     },
     {
       id: 'white-pine',
       name: 'White Pine',
       description: 'Light, airy finish with clean pine wood texture',
-      image: '/public/images/wpc-hollow-seamless-locking-board-detail.png'
+      image: '/images/wpc-hollow-seamless-locking-board-detail.png'
     },
     {
       id: 'ebony-black',
       name: 'Ebony Black',
       description: 'Dramatic black finish with elegant wood grain',
-      image: '/public/images/wpc-hollow-seamless-locking-board-hero.png'
+      image: '/images/wpc-hollow-seamless-locking-board-hero.png'
     },
     {
       id: 'teak-gold',
       name: 'Teak Gold',
       description: 'Luxurious golden teak with premium wood patterns',
-      image: '/public/images/wpc-hollow-seamless-locking-board-detail.png'
+      image: '/images/wpc-hollow-seamless-locking-board-detail.png'
     }
   ];
 
@@ -266,7 +266,7 @@ const WPCHollowSeamlessLockingBoards = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/wpc-hollow-seamless-locking-board-hero.png"
+                    src="/images/wpc-hollow-seamless-locking-board-hero.png"
                     alt="WPC Hollow Seamless Locking Boards"
                     className="w-full h-full object-cover"
                   />

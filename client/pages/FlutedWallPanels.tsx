@@ -37,7 +37,7 @@ const FlutedWallPanels = () => {
       id: 'classic-vertical',
       name: 'Classic Vertical',
       description: 'Traditional vertical fluting with 20mm groove spacing',
-      image: '/public/images/fluted-wall-panel-hero.png',
+      image: '/images/fluted-wall-panel-hero.png',
       spacing: '20mm',
       depth: '8mm'
     },
@@ -45,7 +45,7 @@ const FlutedWallPanels = () => {
       id: 'wide-channel',
       name: 'Wide Channel',
       description: 'Contemporary wide channels with 40mm spacing',
-      image: '/public/images/fluted-wall-panel-detail.png',
+      image: '/images/fluted-wall-panel-detail.png',
       spacing: '40mm',
       depth: '12mm'
     },
@@ -53,7 +53,7 @@ const FlutedWallPanels = () => {
       id: 'narrow-groove',
       name: 'Narrow Groove',
       description: 'Fine detailed grooves with 10mm spacing',
-      image: '/public/images/fluted-wall-panel-hero.png',
+      image: '/images/fluted-wall-panel-hero.png',
       spacing: '10mm',
       depth: '6mm'
     },
@@ -61,7 +61,7 @@ const FlutedWallPanels = () => {
       id: 'curved-flute',
       name: 'Curved Flute',
       description: 'Elegant curved fluting for sophisticated interiors',
-      image: '/public/images/fluted-wall-panel-detail.png',
+      image: '/images/fluted-wall-panel-detail.png',
       spacing: '25mm',
       depth: '10mm'
     }
@@ -270,7 +270,7 @@ const FlutedWallPanels = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/fluted-wall-panel-hero.png"
+                    src="/images/fluted-wall-panel-hero.png"
                     alt="Fluted Wall Panels"
                     className="w-full h-full object-cover"
                   />
