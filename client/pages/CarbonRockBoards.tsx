@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import TextureSection from "@/components/TextureSection"
 import Footer from "@/components/Footer";
@@ -49,6 +49,8 @@ const AIChatWidget = () => (
 );
 
 const CarbonRockBoards = () => {
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{name?: string, price?: string}>({});
   // --- SEO and Schema ---
   useEffect(() => {
     document.title =
@@ -192,11 +194,12 @@ const CarbonRockBoards = () => {
           Reinvent your space with advanced stone, wood, WPC, and fabric finishes that blend safety and style.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            size="lg"
-            className="px-8 py-4 text-lg font-semibold shadow bg-gradient-to-br from-[#b69777] to-[#907252] text-white"
-          >
-            Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
+            <Button
+              size="lg"
+              className="px-8 py-4 text-lg font-semibold shadow bg-gradient-to-br from-[#b69777] to-[#907252] text-white"
+              onClick={() => setIsQuoteModalOpen(true)}
+            >
+              Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <Button
             variant="outline"
@@ -370,6 +373,11 @@ const CarbonRockBoards = () => {
 
       <Footer />
       <AIChatWidget />
+      <QuoteModal
+        isOpen={isQuoteModalOpen}
+        onClose={() => setIsQuoteModalOpen(false)}
+        selectedProduct={selectedProduct}
+      />
 
       {/* Soft fade animation */}
       <style>{`

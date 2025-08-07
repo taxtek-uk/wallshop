@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: ["8081-ik3eo5j9uhqzevw5a3dmn-9ce7ec25.manusvm.computer", "8082-ik3eo5j9uhqzevw5a3dmn-9ce7ec25.manusvm.computer"]
   },
   build: {
     outDir: "dist/spa",

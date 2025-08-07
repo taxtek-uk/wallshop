@@ -28,10 +28,11 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import QuoteModal from "@/components/QuoteModal";
 
 const WPCHollowSeamlessLockingBoards = () => {
-  const [selectedFinish, setSelectedFinish] = useState('natural-oak');
+  const [selectedFinish, setSelectedFinish] = useState("natural-oak");
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
   const finishes = [
     {
@@ -243,6 +244,7 @@ const WPCHollowSeamlessLockingBoards = () => {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-green-500 to-blue-600 text-white hover:from-blue-600 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                  onClick={() => setIsQuoteModalOpen(true)}
                 >
                   Get Professional Quote <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -566,6 +568,11 @@ const WPCHollowSeamlessLockingBoards = () => {
       </section>
 
       <Footer />
+      <QuoteModal
+        isOpen={isQuoteModalOpen}
+        onClose={() => setIsQuoteModalOpen(false)}
+        selectedProduct={{ name: "WPC Hollow Seamless Locking Boards", price: "From £48/m²" }}
+      />
     </div>
   );
 };

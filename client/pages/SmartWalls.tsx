@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-
+import { usimport { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // adjust import based on your setup
 import Navigation from '@/components/Navigation';
@@ -56,6 +55,8 @@ import smartHotel from '/images/123.jpg';
 import smartEvent from '/images/event-space.webp';
 
 function SmartWalls() {
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{name?: string, price?: string}>({});
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const { scrollYProgress } = useScroll();
@@ -283,9 +284,7 @@ function SmartWalls() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
-                  onClick={() =>
-                    document.getElementById("inquiry")?.scrollIntoView({ behavior: "smooth" })
-                  }
+                  onClick={() => setIsQuoteModalOpen(true)}
                 >
                   Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
@@ -1035,6 +1034,11 @@ function SmartWalls() {
 
       {/* Footer */}
       <Footer />
+      <QuoteModal
+        isOpen={isQuoteModalOpen}
+        onClose={() => setIsQuoteModalOpen(false)}
+        selectedProduct={selectedProduct}
+      />
     </div>
   );
 }

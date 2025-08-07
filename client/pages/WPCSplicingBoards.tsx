@@ -32,21 +32,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import QuoteModal from "@/components/QuoteModal";
 
 const WPCSplicingBoards = () => {
   const [selectedPattern, setSelectedPattern] = useState('horizontal');
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  const [quoteForm, setQuoteForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    projectType: '',
-    roomSize: '',
-    preferredPattern: '',
-    message: ''
-  });
+
 
   const patterns = [
     {
@@ -191,30 +182,7 @@ const WPCSplicingBoards = () => {
     chevron: ['Dynamic, energetic feel', 'Contemporary design statement', 'Creates focal point']
   };
 
-  const handleQuoteSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    console.log('Quote form submitted:', quoteForm);
-    setIsQuoteModalOpen(false);
-    // Reset form
-    setQuoteForm({
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      projectType: '',
-      roomSize: '',
-      preferredPattern: '',
-      message: ''
-    });
-  };
 
-  const handleInputChange = (field, value) => {
-    setQuoteForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
@@ -635,161 +603,12 @@ const WPCSplicingBoards = () => {
         </div>
       </section>
 
-      {/* Quote Modal */}
-      {isQuoteModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#e2d5c4]"
-          >
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-3xl font-extrabold text-[#231c14]">
-                Get Your Protection Quote
-              </h3>
-              <button
-                onClick={() => setIsQuoteModalOpen(false)}
-                className="rounded-full p-2 hover:bg-[#f8f6f3] transition-colors duration-200"
-              >
-                <X className="h-6 w-6 text-[#6b5c47]" />
-              </button>
-            </div>
-
-            <form onSubmit={handleQuoteSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Full Name *
-                  </label>
-                  <Input
-                    required
-                    value={quoteForm.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Email Address *
-                  </label>
-                  <Input
-                    type="email"
-                    required
-                    value={quoteForm.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Phone Number
-                  </label>
-                  <Input
-                    value={quoteForm.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Project Type
-                  </label>
-                  <Select value={quoteForm.projectType} onValueChange={(value) => handleInputChange('projectType', value)}>
-                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
-                      <SelectValue placeholder="Select project type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="residential">Residential</SelectItem>
-                      <SelectItem value="commercial">Commercial</SelectItem>
-                      <SelectItem value="hospitality">Hospitality</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                  Project Address
-                </label>
-                <Input
-                  value={quoteForm.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
-                  placeholder="Enter project address"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Room Size (approx.)
-                  </label>
-                  <Input
-                    value={quoteForm.roomSize}
-                    onChange={(e) => handleInputChange('roomSize', e.target.value)}
-                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
-                    placeholder="e.g., 4m x 3m"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                    Preferred Pattern
-                  </label>
-                  <Select value={quoteForm.preferredPattern} onValueChange={(value) => handleInputChange('preferredPattern', value)}>
-                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
-                      <SelectValue placeholder="Select pattern" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {patterns.map((pattern) => (
-                        <SelectItem key={pattern.id} value={pattern.id}>
-                          {pattern.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
-                  Additional Details
-                </label>
-                <Textarea
-                  value={quoteForm.message}
-                  onChange={(e) => handleInputChange('message', e.target.value)}
-                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4 min-h-[120px]"
-                  placeholder="Tell us more about your project requirements..."
-                />
-              </div>
-
-              <div className="flex gap-4 pt-6">
-                <button
-                  type="submit"
-                  className="flex-1 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  Submit Quote Request
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsQuoteModalOpen(false)}
-                  className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-[#b69777] text-[#231c14] hover:bg-[#f8f6f3] transition-all duration-300"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-
       <Footer />
+      <QuoteModal
+        isOpen={isQuoteModalOpen}
+        onClose={() => setIsQuoteModalOpen(false)}
+        selectedProduct={{ name: "WPC Splicing Boards", price: "From £52/m²" }}
+      />
     </div>
   );
 };

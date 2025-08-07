@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import QuoteModal from '@/components/QuoteModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,8 @@ const WallPanels = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState(new Set());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{name?: string, price?: string}>({});
 
   // SEO & AI-SEO: update document head manually
   useEffect(() => {
@@ -1283,7 +1286,7 @@ const WallPanels = () => {
                     <ArrowRight style={{ width: '1.25rem', height: '1.25rem' }} />
                   </button>
                   <button 
-                    onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} 
+                    onClick={() => setIsQuoteModalOpen(true)} 
                     style={styles.heroSecondaryButton}
                     onMouseEnter={(e) => {
                       (e.target as HTMLElement).style.background = 'rgba(255, 255, 255, 0.1)';
@@ -1732,7 +1735,8 @@ const WallPanels = () => {
                               ...styles.productButtonPrimary,
                             }}
                             onClick={() => {
-                              // handle quote action here
+                              setSelectedProduct({ name: product.name, price: product.price });
+                              setIsQuoteModalOpen(true);
                             }}
                           >
                             Get Quote
