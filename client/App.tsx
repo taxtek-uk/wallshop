@@ -37,6 +37,10 @@ const WPCSplicingBoards = lazy(() => import("./pages/WPCSplicingBoards"));
 const WPCHollowSeamlessLockingBoards = lazy(() => import("./pages/WPCHollowSeamlessLockingBoards"));
 const ClassAFireproofBoards = lazy(() => import("./pages/ClassAFireproofBoards"));
 const FlutedWallPanels = lazy(() => import("./pages/FlutedWallPanels"));
+const AluminumAlloyFitting = lazy(() => import("./pages/AluminumAlloyFitting"));
+const WPCHDPrintingWallPanel = lazy(() => import("./pages/WPCHDPrintingWallPanel"));
+const SPCBackgroundWall = lazy(() => import("./pages/SPCBackgroundWall"));
+const UHDContinuousPattern = lazy(() => import("./pages/UHDContinuousPattern"));
 
 // Loading component
 const PageLoader = () => (
@@ -98,6 +102,10 @@ const App = () => (
           <Route path="/wall-panels/wpc-hollow" element={<WPCHollowSeamlessLockingBoards />} />
           <Route path="/wall-panels/fireproof" element={<ClassAFireproofBoards />} />
           <Route path="/wall-panels/fluted" element={<FlutedWallPanels />} />
+          <Route path="/wall-panels/aluminum-fitting" element={<AluminumAlloyFitting />} />
+          <Route path="/wall-panels/wpc-hd-printing" element={<WPCHDPrintingWallPanel />} />
+          <Route path="/wall-panels/spc-background" element={<SPCBackgroundWall />} />
+          <Route path="/wall-panels/uhd-continuous" element={<UHDContinuousPattern />} />
           
             {/* Catch-all for 404 */}
             <Route path="*" element={<NotFound />} />
