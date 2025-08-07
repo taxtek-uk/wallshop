@@ -36,7 +36,7 @@ const AluminumAlloyFitting = () => {
       id: 'h-10t',
       name: 'H-10T Profile',
       description: 'Heavy-duty H-profile for 10mm panel thickness',
-      image: '/public/images/aluminum-alloy-fitting-hero.png',
+      image: '/images/aluminum-alloy-fitting-hero.png',
       dimensions: '10mm thickness',
       applications: ['WPC Wall Panels', 'Commercial Installations', 'High-Traffic Areas']
     },
@@ -44,7 +44,7 @@ const AluminumAlloyFitting = () => {
       id: 'h-15t',
       name: 'H-15T Profile',
       description: 'Robust H-profile for 15mm panel thickness',
-      image: '/public/images/aluminum-alloy-fitting-detail.png',
+      image: '/images/aluminum-alloy-fitting-detail.png',
       dimensions: '15mm thickness',
       applications: ['Thick Panel Systems', 'Industrial Applications', 'Heavy-Duty Installations']
     },
@@ -52,7 +52,7 @@ const AluminumAlloyFitting = () => {
       id: 'l-10x10',
       name: 'L-10×10 Profile',
       description: 'Versatile L-shaped profile for corner applications',
-      image: '/public/images/aluminum-alloy-fitting-hero.png',
+      image: '/images/aluminum-alloy-fitting-hero.png',
       dimensions: '10×10mm',
       applications: ['Corner Finishing', 'Edge Protection', 'Trim Applications']
     },
@@ -60,7 +60,7 @@ const AluminumAlloyFitting = () => {
       id: 'skirting',
       name: 'Skirting Line',
       description: 'Professional skirting profile for floor transitions',
-      image: '/public/images/aluminum-alloy-fitting-detail.png',
+      image: '/images/aluminum-alloy-fitting-detail.png',
       dimensions: '60mm height',
       applications: ['Floor Transitions', 'Wall Base Protection', 'Aesthetic Finishing']
     }
@@ -269,7 +269,7 @@ const AluminumAlloyFitting = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/aluminum-alloy-fitting-hero.png"
+                    src="/images/aluminum-alloy-fitting-hero.png"
                     alt="Aluminum Alloy Fitting"
                     className="w-full h-full object-cover"
                   />

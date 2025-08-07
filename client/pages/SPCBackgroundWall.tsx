@@ -39,7 +39,7 @@ const SPCBackgroundWall = () => {
       id: 'carrara',
       name: 'Carrara Marble',
       description: 'Classic white marble with elegant grey veining',
-      image: '/public/images/spc-background-wall-hero.png',
+      image: '/images/spc-background-wall-hero.png',
       category: 'Marble',
       applications: ['Luxury Interiors', 'Feature Walls', 'Commercial Lobbies']
     },
@@ -47,7 +47,7 @@ const SPCBackgroundWall = () => {
       id: 'emperador',
       name: 'Dark Emperador',
       description: 'Rich brown marble with golden veining',
-      image: '/public/images/spc-background-wall-detail.png',
+      image: '/images/spc-background-wall-detail.png',
       category: 'Marble',
       applications: ['Executive Offices', 'Hotel Lobbies', 'Residential Features']
     },
@@ -55,7 +55,7 @@ const SPCBackgroundWall = () => {
       id: 'travertine',
       name: 'Travertine Stone',
       description: 'Natural limestone with organic texture',
-      image: '/public/images/spc-background-wall-hero.png',
+      image: '/images/spc-background-wall-hero.png',
       category: 'Stone',
       applications: ['Spa Environments', 'Natural Interiors', 'Wellness Centers']
     },
@@ -63,7 +63,7 @@ const SPCBackgroundWall = () => {
       id: 'granite',
       name: 'Black Galaxy Granite',
       description: 'Deep black granite with metallic flecks',
-      image: '/public/images/spc-background-wall-detail.png',
+      image: '/images/spc-background-wall-detail.png',
       category: 'Granite',
       applications: ['Modern Interiors', 'Commercial Spaces', 'Contemporary Design']
     }
@@ -302,7 +302,7 @@ const SPCBackgroundWall = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/spc-background-wall-hero.png"
+                    src="/images/spc-background-wall-hero.png"
                     alt="SPC Background Wall"
                     className="w-full h-full object-cover"
                   />
@@ -481,7 +481,7 @@ const SPCBackgroundWall = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/spc-background-wall-detail.png"
+                        src="/images/spc-background-wall-detail.png"
                         alt="SPC Construction"
                         className="w-full rounded-xl shadow-lg"
                       />

@@ -46,7 +46,7 @@ const PlasticWoodFlooring = () => {
       id: 'striped',
       name: 'Striped Style',
       description: 'Classic striped pattern with hollow core construction',
-      image: '/public/images/plastic-wood-flooring-hero.png',
+      image: '/images/plastic-wood-flooring-hero.png',
       category: 'Classic',
       applications: ['Outdoor Decking', 'Balconies', 'Terraces']
     },
@@ -54,7 +54,7 @@ const PlasticWoodFlooring = () => {
       id: 'wood-grain',
       name: 'Wood Grain Style',
       description: 'Natural wood grain texture with authentic appearance',
-      image: '/public/images/plastic-wood-flooring-detail.png',
+      image: '/images/plastic-wood-flooring-detail.png',
       category: 'Natural',
       applications: ['Residential Decking', 'Garden Paths', 'Pool Areas']
     },
@@ -62,7 +62,7 @@ const PlasticWoodFlooring = () => {
       id: 'coextruded',
       name: '2nd Generation Coextruded',
       description: 'Advanced coextruded technology for superior performance',
-      image: '/public/images/plastic-wood-flooring-hero.png',
+      image: '/images/plastic-wood-flooring-hero.png',
       category: 'Premium',
       applications: ['Commercial Decking', 'Marine Applications', 'High-Traffic Areas']
     }
@@ -300,7 +300,7 @@ const PlasticWoodFlooring = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/plastic-wood-flooring-hero.png"
+                    src="/images/plastic-wood-flooring-hero.png"
                     alt="Plastic Wood Flooring"
                     className="w-full h-full object-cover"
                   />
@@ -479,7 +479,7 @@ const PlasticWoodFlooring = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/plastic-wood-flooring-detail.png"
+                        src="/images/plastic-wood-flooring-detail.png"
                         alt="Plastic Wood Construction"
                         className="w-full rounded-xl shadow-lg"
                       />

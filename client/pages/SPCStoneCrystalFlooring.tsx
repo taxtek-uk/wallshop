@@ -43,7 +43,7 @@ const SPCStoneCrystalFlooring = () => {
       id: 'wood-grain',
       name: 'Natural Wood Grain',
       description: 'Authentic wood grain patterns with crystal-clear finish',
-      image: '/public/images/spc-stone-crystal-flooring-hero.png',
+      image: '/images/spc-stone-crystal-flooring-hero.png',
       category: 'Wood',
       applications: ['Living Rooms', 'Bedrooms', 'Offices']
     },
@@ -51,7 +51,7 @@ const SPCStoneCrystalFlooring = () => {
       id: 'stone-texture',
       name: 'Stone Texture',
       description: 'Realistic stone textures with superior durability',
-      image: '/public/images/spc-stone-crystal-flooring-detail.png',
+      image: '/images/spc-stone-crystal-flooring-detail.png',
       category: 'Stone',
       applications: ['Kitchens', 'Bathrooms', 'Commercial Spaces']
     },
@@ -59,7 +59,7 @@ const SPCStoneCrystalFlooring = () => {
       id: 'marble-veining',
       name: 'Marble Veining',
       description: 'Elegant marble patterns with crystal clarity',
-      image: '/public/images/spc-stone-crystal-flooring-hero.png',
+      image: '/images/spc-stone-crystal-flooring-hero.png',
       category: 'Marble',
       applications: ['Luxury Interiors', 'Hotels', 'Retail Spaces']
     }
@@ -302,7 +302,7 @@ const SPCStoneCrystalFlooring = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/spc-stone-crystal-flooring-hero.png"
+                    src="/images/spc-stone-crystal-flooring-hero.png"
                     alt="SPC Stone Crystal Flooring"
                     className="w-full h-full object-cover"
                   />
@@ -481,7 +481,7 @@ const SPCStoneCrystalFlooring = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/spc-stone-crystal-flooring-detail.png"
+                        src="/images/spc-stone-crystal-flooring-detail.png"
                         alt="SPC Stone Crystal Construction"
                         className="w-full rounded-xl shadow-lg"
                       />

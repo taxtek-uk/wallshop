@@ -40,7 +40,7 @@ const UHDContinuousPattern = () => {
       id: 'wood-flow',
       name: 'Flowing Wood Grain',
       description: 'Natural wood grain that flows seamlessly across multiple panels',
-      image: '/public/images/uhd-continuous-pattern-hero.png',
+      image: '/images/uhd-continuous-pattern-hero.png',
       category: 'Wood',
       applications: ['Large Feature Walls', 'Reception Areas', 'Executive Offices']
     },
@@ -48,7 +48,7 @@ const UHDContinuousPattern = () => {
       id: 'marble-vein',
       name: 'Continuous Marble Veining',
       description: 'Elegant marble veins that continue uninterrupted across panels',
-      image: '/public/images/uhd-continuous-pattern-detail.png',
+      image: '/images/uhd-continuous-pattern-detail.png',
       category: 'Marble',
       applications: ['Luxury Interiors', 'Hotel Lobbies', 'Residential Features']
     },
@@ -56,7 +56,7 @@ const UHDContinuousPattern = () => {
       id: 'abstract-flow',
       name: 'Abstract Flow Patterns',
       description: 'Contemporary abstract designs with seamless continuity',
-      image: '/public/images/uhd-continuous-pattern-hero.png',
+      image: '/images/uhd-continuous-pattern-hero.png',
       category: 'Abstract',
       applications: ['Modern Interiors', 'Commercial Spaces', 'Art Installations']
     },
@@ -64,7 +64,7 @@ const UHDContinuousPattern = () => {
       id: 'textile-weave',
       name: 'Continuous Textile Weave',
       description: 'Sophisticated fabric patterns that flow across panel boundaries',
-      image: '/public/images/uhd-continuous-pattern-detail.png',
+      image: '/images/uhd-continuous-pattern-detail.png',
       category: 'Textile',
       applications: ['Hospitality Design', 'Retail Spaces', 'Wellness Centers']
     }
@@ -310,7 +310,7 @@ const UHDContinuousPattern = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/uhd-continuous-pattern-hero.png"
+                    src="/images/uhd-continuous-pattern-hero.png"
                     alt="UHD Continuous Pattern"
                     className="w-full h-full object-cover"
                   />
@@ -489,7 +489,7 @@ const UHDContinuousPattern = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/uhd-continuous-pattern-detail.png"
+                        src="/images/uhd-continuous-pattern-detail.png"
                         alt="UHD Technology"
                         className="w-full rounded-xl shadow-lg"
                       />

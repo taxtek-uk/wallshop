@@ -40,7 +40,7 @@ const SPCWaterproofWallPanel = () => {
       id: 'wood-grain',
       name: 'Classic Oak Wood Grain',
       description: 'Authentic wood grain patterns with waterproof performance',
-      image: '/public/images/spc-waterproof-wall-panel-hero.png',
+      image: '/images/spc-waterproof-wall-panel-hero.png',
       category: 'Wood',
       applications: ['Bathrooms', 'Kitchens', 'Basements']
     },
@@ -48,7 +48,7 @@ const SPCWaterproofWallPanel = () => {
       id: 'stone-texture',
       name: 'Natural Stone Texture',
       description: 'Realistic stone textures with superior water resistance',
-      image: '/public/images/spc-waterproof-wall-panel-detail.png',
+      image: '/images/spc-waterproof-wall-panel-detail.png',
       category: 'Stone',
       applications: ['Showers', 'Spas', 'Commercial Wet Areas']
     },
@@ -56,7 +56,7 @@ const SPCWaterproofWallPanel = () => {
       id: 'solid-color',
       name: 'Modern Solid Colors',
       description: 'Contemporary solid colors for minimalist waterproof design',
-      image: '/public/images/spc-waterproof-wall-panel-hero.png',
+      image: '/images/spc-waterproof-wall-panel-hero.png',
       category: 'Solid',
       applications: ['Laundry Rooms', 'Utility Areas', 'Accent Walls']
     }
@@ -299,7 +299,7 @@ const SPCWaterproofWallPanel = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/spc-waterproof-wall-panel-hero.png"
+                    src="/images/spc-waterproof-wall-panel-hero.png"
                     alt="SPC Waterproof Wall Panel"
                     className="w-full h-full object-cover"
                   />
@@ -478,7 +478,7 @@ const SPCWaterproofWallPanel = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/spc-waterproof-wall-panel-detail.png"
+                        src="/images/spc-waterproof-wall-panel-detail.png"
                         alt="SPC Waterproof Construction"
                         className="w-full rounded-xl shadow-lg"
                       />

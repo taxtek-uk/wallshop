@@ -38,7 +38,7 @@ const WPCHDPrintingWallPanel = () => {
       id: 'marble',
       name: 'Carrara Marble',
       description: 'Luxurious white marble with natural veining',
-      image: '/public/images/wpc-hd-printing-hero.png',
+      image: '/images/wpc-hd-printing-hero.png',
       category: 'Stone',
       applications: ['Luxury Interiors', 'Bathroom Walls', 'Feature Walls']
     },
@@ -46,7 +46,7 @@ const WPCHDPrintingWallPanel = () => {
       id: 'wood',
       name: 'Natural Oak',
       description: 'Authentic wood grain with rich texture',
-      image: '/public/images/wpc-hd-printing-detail.png',
+      image: '/images/wpc-hd-printing-detail.png',
       category: 'Wood',
       applications: ['Living Rooms', 'Bedrooms', 'Office Spaces']
     },
@@ -54,7 +54,7 @@ const WPCHDPrintingWallPanel = () => {
       id: 'solid',
       name: 'Contemporary Colors',
       description: 'Modern solid colors for minimalist design',
-      image: '/public/images/wpc-hd-printing-hero.png',
+      image: '/images/wpc-hd-printing-hero.png',
       category: 'Solid',
       applications: ['Modern Interiors', 'Commercial Spaces', 'Accent Walls']
     },
@@ -62,7 +62,7 @@ const WPCHDPrintingWallPanel = () => {
       id: 'fabric',
       name: 'Textile Patterns',
       description: 'Sophisticated fabric textures and weaves',
-      image: '/public/images/wpc-hd-printing-detail.png',
+      image: '/images/wpc-hd-printing-detail.png',
       category: 'Textile',
       applications: ['Hospitality', 'Retail Spaces', 'Residential']
     }
@@ -317,7 +317,7 @@ const WPCHDPrintingWallPanel = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/public/images/wpc-hd-printing-hero.png"
+                    src="/images/wpc-hd-printing-hero.png"
                     alt="WPC HD Printing Wall Panel"
                     className="w-full h-full object-cover"
                   />
@@ -482,7 +482,7 @@ const WPCHDPrintingWallPanel = () => {
                   <div className="grid lg:grid-cols-2 gap-8 items-center">
                     <div>
                       <img
-                        src="/public/images/wpc-hd-printing-detail.png"
+                        src="/images/wpc-hd-printing-detail.png"
                         alt="Layer Construction"
                         className="w-full rounded-xl shadow-lg"
                       />
