@@ -254,7 +254,7 @@ const WPCWallPanels = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/client/images/wpc-wall-panel-hero.png"
+                    src="/images/wpc-wall-panel-hero.png"
                     alt="WPC Wall Panels Installation"
                     className="w-full h-full object-cover"
                   />

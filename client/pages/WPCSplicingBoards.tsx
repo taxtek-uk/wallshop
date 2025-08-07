@@ -53,25 +53,25 @@ const WPCSplicingBoards = () => {
       id: 'horizontal',
       name: 'Horizontal Planks',
       description: 'Classic horizontal wood plank pattern',
-      image: '/client/images/wpc-splicing-board.png'
+      image: '/images/wpc-splicing-board.png'
     },
     {
       id: 'vertical',
       name: 'Vertical Boards',
       description: 'Modern vertical board arrangement',
-      image: '/client/images/wpc-wall-panel-detail.png'
+      image: '/images/wpc-wall-panel-detail.png'
     },
     {
       id: 'herringbone',
       name: 'Herringbone',
       description: 'Sophisticated herringbone pattern',
-      image: '/client/images/wpc-wall-panel-hero.png'
+      image: '/images/wpc-wall-panel-hero.png'
     },
     {
       id: 'chevron',
       name: 'Chevron',
       description: 'Contemporary chevron design',
-      image: '/client/images/wpc-splicing-board.png'
+      image: '/images/wpc-splicing-board.png'
     }
   ];
 
@@ -286,7 +286,7 @@ const WPCSplicingBoards = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/client/images/wpc-splicing-board.png"
+                    src="/images/wpc-splicing-board.png"
                     alt="WPC Splicing Boards Installation"
                     className="w-full h-full object-cover"
                   />

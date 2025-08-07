@@ -235,7 +235,7 @@ const AntiCollisionWallPanels = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/client/images/anti-collision-wall-panel.png"
+                    src="/images/anti-collision-wall-panel.png"
                     alt="Anti-Collision Wall Panel"
                     className="w-full h-full object-cover"
                   />
