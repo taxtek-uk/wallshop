@@ -1,24 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { 
-  Shield, 
-  Zap, 
-  Award, 
-  Wrench, 
-  Building, 
-  ArrowRight,
-  CheckCircle,
-  Download,
-  Phone,
-  Mail,
-  AlertTriangle,
-  Users,
-  Clock,
-  Stethoscope,
-  GraduationCap,
-  ShoppingCart,
-  Car
+import {
+  Shield, Layers, Zap, Award, Wrench, Puzzle, ArrowRight,
+  CheckCircle, Download, Phone, Mail, Clock, Ruler, Settings,
+  Home, Building, Hotel, X, User, MapPin, MessageSquare
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -26,143 +12,168 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const AntiCollisionWallPanels = () => {
-  const [selectedApplication, setSelectedApplication] = useState('healthcare');
+  const [selectedThickness, setSelectedThickness] = useState('6mm');
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    projectType: '',
+    roomSize: '',
+    preferredThickness: '',
+    message: ''
+  });
 
-  const applications = [
-    {
-      id: 'healthcare',
-      name: 'Healthcare Facilities',
-      icon: Stethoscope,
-      description: 'Hospitals, clinics, and medical centers requiring maximum protection',
-      features: ['Antimicrobial surface', 'Easy sanitization', 'Impact resistance', 'Chemical resistance']
-    },
-    {
-      id: 'education',
-      name: 'Educational Institutions',
-      icon: GraduationCap,
-      description: 'Schools, universities, and training facilities with high foot traffic',
-      features: ['Vandal resistance', 'Easy maintenance', 'Durable finish', 'Safety compliance']
-    },
-    {
-      id: 'retail',
-      name: 'Retail & Commercial',
-      icon: ShoppingCart,
-      description: 'Shopping centers, warehouses, and commercial buildings',
-      features: ['Heavy-duty protection', 'Professional appearance', 'Cost-effective', 'Long-term durability']
-    },
-    {
-      id: 'transport',
-      name: 'Transportation Hubs',
-      icon: Car,
-      description: 'Airports, train stations, and public transportation facilities',
-      features: ['High-impact resistance', 'Weather resistance', 'Fire safety', 'Low maintenance']
-    }
+  const thicknesses = [
+    { id: '6mm', name: '6mm Standard', description: 'Ideal for light to medium impact areas.', protection: 'Good' },
+    { id: '9mm', name: '9mm Heavy Duty', description: 'For high-traffic and heavy impact zones.', protection: 'Excellent' },
+    { id: '12mm', name: '12mm Extreme', description: 'Maximum protection for industrial or specialized applications.', protection: 'Superior' }
   ];
 
   const specifications = [
-    { label: 'Thickness', value: '8mm / 12mm' },
-    { label: 'Width', value: '1220mm' },
-    { label: 'Length', value: '2440mm / Custom' },
-    { label: 'Material', value: 'Reinforced WPC Composite' },
-    { label: 'Impact Rating', value: 'Class 1 Heavy Duty' },
-    { label: 'Fire Rating', value: 'Class A Fireproof' },
-    { label: 'Installation', value: 'Mechanical Fixing System' },
-    { label: 'Warranty', value: '20 Years Commercial' }
+    { label: 'Material', value: 'High-Density PVC Composite' },
+    { label: 'Standard Sizes', value: '1200mm x 2400mm' },
+    { label: 'Impact Resistance', value: 'ASTM D256 (Izod Impact)' },
+    { label: 'Fire Rating', value: 'Class A (ASTM E84)' },
+    { label: 'Chemical Resistance', value: 'Excellent' },
+    { label: 'Cleaning', value: 'Easy to Clean & Sanitize' },
+    { label: 'Installation', value: 'Adhesive or Mechanical Fasteners' },
+    { label: 'Warranty', value: '10 Years Commercial' }
   ];
 
   const features = [
     {
       icon: Shield,
-      title: 'Maximum Impact Protection',
-      description: 'Engineered to withstand heavy impacts from trolleys, wheelchairs, and equipment without damage.',
-      benefit: 'Reduces maintenance costs and extends wall life'
+      title: 'Superior Impact Protection',
+      description: 'Engineered to absorb and dissipate impact energy, preventing damage to walls and surfaces.',
+      benefit: 'Reduces maintenance costs'
+    },
+    {
+      icon: Layers,
+      title: 'Durable & Long-Lasting',
+      description: 'Made from high-density PVC composite, resistant to scratches, abrasions, and dents.',
+      benefit: 'Extends wall lifespan'
     },
     {
       icon: Zap,
-      title: 'Reinforced Core Structure',
-      description: 'Advanced composite construction with reinforced core for superior strength and durability.',
-      benefit: 'Exceptional performance in demanding environments'
-    },
-    {
-      icon: Building,
-      title: 'Commercial Grade Quality',
-      description: 'Meets stringent commercial building standards with certified performance ratings.',
-      benefit: 'Compliance with building codes and regulations'
+      title: 'Easy to Clean',
+      description: 'Non-porous surface resists stains and can be easily cleaned with standard disinfectants, ideal for healthcare.',
+      benefit: 'Maintains hygiene standards'
     },
     {
       icon: Award,
-      title: 'Antimicrobial Surface',
-      description: 'Integrated antimicrobial technology prevents bacterial growth and maintains hygiene.',
-      benefit: 'Ideal for healthcare and food service environments'
+      title: 'Aesthetically Pleasing',
+      description: 'Available in various colors and finishes to seamlessly integrate with any interior design.',
+      benefit: 'Enhances interior aesthetics'
     },
     {
       icon: Wrench,
-      title: 'Easy Maintenance',
-      description: 'Non-porous surface resists stains and allows for easy cleaning with standard products.',
-      benefit: 'Reduces ongoing maintenance time and costs'
+      title: 'Simple Installation',
+      description: 'Can be installed using adhesive or mechanical fasteners, suitable for various wall types.',
+      benefit: 'Quick and efficient setup'
     },
     {
-      icon: Users,
-      title: 'Safety Certified',
-      description: 'Comprehensive safety testing including fire resistance and low VOC emissions.',
-      benefit: 'Safe for occupied spaces and sensitive environments'
+      icon: Puzzle,
+      title: 'Versatile Applications',
+      description: 'Perfect for hospitals, schools, commercial kitchens, corridors, and high-traffic areas.',
+      benefit: 'Adaptable to diverse environments'
     }
   ];
 
-  const protectionLevels = [
+  const installationSteps = [
     {
-      level: 'Standard Protection',
-      thickness: '8mm',
-      applications: ['Office corridors', 'Retail spaces', 'Light commercial'],
-      impactRating: 'Medium duty',
-      price: 'From £65/m²'
+      step: 1,
+      title: 'Surface Preparation',
+      description: 'Ensure walls are clean, dry, and smooth. Fill any cracks or holes for a level surface.',
+      time: '30 minutes'
     },
     {
-      level: 'Heavy Duty Protection',
-      thickness: '12mm',
-      applications: ['Hospitals', 'Schools', 'Industrial facilities'],
-      impactRating: 'Heavy duty',
-      price: 'From £85/m²'
+      step: 2,
+      title: 'Adhesive Application',
+      description: 'Apply recommended adhesive evenly to the back of the panel or directly to the wall.',
+      time: '45 minutes'
     },
     {
-      level: 'Maximum Protection',
-      thickness: '15mm',
-      applications: ['Loading docks', 'Warehouses', 'High-traffic areas'],
-      impactRating: 'Extreme duty',
-      price: 'From £105/m²'
+      step: 3,
+      title: 'Panel Placement',
+      description: 'Carefully position and press panels onto the wall, ensuring proper alignment and adhesion.',
+      time: '2-3 hours'
+    },
+    {
+      step: 4,
+      title: 'Finishing & Sealing',
+      description: 'Install trim pieces, seal edges with appropriate sealant, and perform final inspection.',
+      time: '30 minutes'
     }
   ];
 
-  const installationBenefits = [
-    'Rapid installation reduces downtime',
-    'No special tools required for mounting',
-    'Modular system allows for easy replacement',
-    'Compatible with existing wall structures',
-    'Professional installation team available',
-    'Minimal disruption to operations',
-    'Quality assurance and testing included',
-    'Comprehensive project management'
+  const applications = [
+    {
+      icon: Home,
+      title: 'Healthcare Facilities',
+      description: 'Protects walls from impacts by gurneys, wheelchairs, and equipment.',
+      examples: ['Hospitals', 'Clinics', 'Nursing Homes']
+    },
+    {
+      icon: Building,
+      title: 'Educational Institutions',
+      description: 'Withstands daily wear and tear in classrooms, hallways, and gymnasiums.',
+      examples: ['Schools', 'Universities', 'Daycares']
+    },
+    {
+      icon: Hotel,
+      title: 'Commercial & Retail',
+      description: 'Maintains aesthetic appeal in high-traffic areas like lobbies, corridors, and back-of-house.',
+      examples: ['Hotels', 'Restaurants', 'Shopping Malls']
+    }
   ];
 
-  const performanceData = [
-    { metric: 'Impact Resistance', value: '40 Joules', standard: 'BS EN 14904' },
-    { metric: 'Fire Rating', value: 'Class A', standard: 'BS 476-7' },
-    { metric: 'Slip Resistance', value: 'R10', standard: 'DIN 51130' },
-    { metric: 'Chemical Resistance', value: 'Class 3', standard: 'EN 12720' },
-    { metric: 'Abrasion Resistance', value: 'AC4', standard: 'EN 13329' },
-    { metric: 'Thermal Stability', value: '-20°C to +60°C', standard: 'EN 1264' }
+  const benefits = [
+    'Reduces wall repair and maintenance costs',
+    'Extends the lifespan of interior walls',
+    'Provides a hygienic and easy-to-clean surface',
+    'Enhances the aesthetic appeal of high-traffic areas',
+    'Quick and straightforward installation process',
+    'Resistant to a wide range of chemicals and cleaning agents'
   ];
+
+  const handleQuoteSubmit = (e) => {
+    e.preventDefault();
+    console.log('Quote form submitted:', quoteForm);
+    setIsQuoteModalOpen(false);
+    setQuoteForm({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      projectType: '',
+      roomSize: '',
+      preferredThickness: '',
+      message: ''
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setQuoteForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-clay-50 to-taupe-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
       <Navigation />
-      
+
       {/* Hero Section */}
-      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
+      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-clay-500/20 to-taupe-500/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
@@ -175,41 +186,43 @@ const AntiCollisionWallPanels = () => {
               <nav className="text-white/70 mb-4">
                 <Link to="/wall-panels" className="hover:text-white transition-colors">Wall Panels</Link>
                 <span className="mx-2">/</span>
-                <span className="text-white">Anti-collision Wall Panels</span>
+                <span className="text-white">Anti-Collision Wall Panels</span>
               </nav>
-              
-              <div className="bg-gradient-to-r from-red-500 to-orange-600 text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
-                Heavy Duty Protection
+
+              <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+                Heavy-Duty Wall Protection
               </div>
+
               <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                Anti-collision Wall Panels
+                Anti-Collision Wall{" "}
+                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                  Panels
+                </span>
               </h1>
+
               <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
-                Ultimate protection for high-traffic areas. Our anti-collision panels provide superior impact resistance, 
-                durability, and safety for commercial, healthcare, and industrial environments.
+                Robust and durable wall panels designed to protect high-traffic areas from impacts, abrasions, and daily wear and tear.
               </p>
-              
+
               <div className="flex flex-wrap gap-4 mb-8">
-                <Badge className="bg-white/20 text-white border-white/30">From £65/m²</Badge>
-                <Badge className="bg-white/20 text-white border-white/30">20 Year Warranty</Badge>
-                <Badge className="bg-white/20 text-white border-white/30">Class A Fire Rating</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">10 Year Warranty</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">High Impact Resistance</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">Easy to Clean</Badge>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-red-500 to-orange-600 text-white hover:from-orange-600 hover:to-red-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                <button
+                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                  onClick={() => setIsQuoteModalOpen(true)}
                 >
                   Get Protection Quote <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                </button>
+                <button
+                  className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
                 >
                   <Download className="mr-2 h-5 w-5" />
-                  Technical Data
-                </Button>
+                  Product Brochure
+                </button>
               </div>
             </motion.div>
 
@@ -223,27 +236,27 @@ const AntiCollisionWallPanels = () => {
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
                     src="/client/images/anti-collision-wall-panel.png"
-                    alt="Anti-collision Wall Panels in Hospital Corridor"
+                    alt="Anti-Collision Wall Panel"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Shield className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                    <p className="text-xs font-medium text-white/90">Impact Resistant</p>
+                    <Shield className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">High Impact</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <AlertTriangle className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-                    <p className="text-xs font-medium text-white/90">Safety Certified</p>
+                    <Zap className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Easy Clean</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Building className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
-                    <p className="text-xs font-medium text-white/90">Commercial Grade</p>
+                    <Award className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Durable</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Award className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                    <p className="text-xs font-medium text-white/90">20 Year Warranty</p>
+                    <Ruler className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
+                    <p className="text-xs font-medium text-white/90">Custom Sizes</p>
                   </div>
                 </div>
               </div>
@@ -258,15 +271,25 @@ const AntiCollisionWallPanels = () => {
           <Tabs defaultValue="features" className="w-full">
             <TabsList className="grid w-full grid-cols-4 mb-12">
               <TabsTrigger value="features">Features</TabsTrigger>
-              <TabsTrigger value="protection">Protection Levels</TabsTrigger>
-              <TabsTrigger value="applications">Applications</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger value="thicknesses">Thicknesses</TabsTrigger>
+              <TabsTrigger value="installation">Installation</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
             </TabsList>
 
             <TabsContent value="features" className="space-y-12">
               {/* Features Grid */}
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Advanced Protection Features</h2>
+                <motion.h2
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Key Features & Benefits
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Our anti-collision wall panels offer unparalleled protection and aesthetic appeal for any high-traffic environment.
+                </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {features.map((feature, i) => (
                     <motion.div
@@ -274,110 +297,94 @@ const AntiCollisionWallPanels = () => {
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 hover:border-red-400 transition-all duration-300 hover:shadow-lg rounded-xl"
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      className="group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center mb-4">
-                        <feature.icon className="text-white w-6 h-6" />
-                      </div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{feature.title}</h3>
-                      <p className="text-mocha-700 text-sm leading-relaxed mb-3">{feature.description}</p>
-                      <div className="text-xs text-red-600 font-medium bg-red-50 px-3 py-1 rounded-full">
-                        {feature.benefit}
+                      <div className="p-6 h-full bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                          <feature.icon className="text-white w-6 h-6" />
+                        </div>
+                        <h3 className="text-lg font-bold text-[#231c14] mb-3">{feature.title}</h3>
+                        <p className="text-[#6b5c47] text-sm leading-relaxed mb-3">{feature.description}</p>
+                        <div className="text-xs text-[#b69777] font-medium bg-[#b69777]/10 px-3 py-1 rounded-full">
+                          {feature.benefit}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* Installation Benefits */}
-              <div className="bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-mocha-900 mb-6">Installation & Maintenance Benefits</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {installationBenefits.map((benefit, i) => (
-                    <div key={i} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                      <span className="text-mocha-700">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="protection" className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Choose Your Protection Level</h2>
-                <div className="grid lg:grid-cols-3 gap-8">
-                  {protectionLevels.map((level, i) => (
+              {/* Benefits List */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] rounded-3xl p-12 shadow-xl"
+              >
+                <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">Overall Benefits of Anti-Collision Panels</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {benefits.map((benefit, i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="bg-white border-2 border-taupe-200 hover:border-red-400 transition-all duration-300 hover:shadow-xl rounded-2xl p-8"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      className="flex items-center space-x-4"
                     >
-                      <div className="text-center mb-6">
-                        <h3 className="text-xl font-bold text-mocha-900 mb-2">{level.level}</h3>
-                        <div className="text-3xl font-extrabold text-red-600 mb-2">{level.thickness}</div>
-                        <Badge className="bg-red-100 text-red-700">{level.impactRating}</Badge>
-                      </div>
-                      
-                      <div className="space-y-4 mb-6">
-                        <h4 className="font-semibold text-mocha-900">Ideal for:</h4>
-                        {level.applications.map((app, idx) => (
-                          <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                            <span className="text-sm text-mocha-700">{app}</span>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-mocha-900 mb-4">{level.price}</div>
-                        <Button className="w-full bg-gradient-to-r from-red-500 to-orange-600 text-white hover:from-orange-600 hover:to-red-500">
-                          Select This Level
-                        </Button>
-                      </div>
+                      <CheckCircle className="w-6 h-6 text-[#b69777] flex-shrink-0" />
+                      <span className="text-[#231c14] font-medium">{benefit}</span>
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </TabsContent>
 
-            <TabsContent value="applications" className="space-y-8">
+            <TabsContent value="thicknesses" className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Industry Applications</h2>
-                <div className="grid lg:grid-cols-2 gap-8">
-                  {applications.map((app) => (
+                <motion.h2
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Available Thicknesses
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Choose the right level of protection for your specific needs and environment.
+                </p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {thicknesses.map((thickness, i) => (
                     <motion.div
-                      key={app.id}
-                      whileHover={{ scale: 1.02 }}
-                      className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
-                        selectedApplication === app.id
-                          ? 'border-red-500 bg-red-50'
-                          : 'border-taupe-200 bg-white hover:border-red-300'
+                      key={thickness.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      whileHover={{ scale: 1.05 }}
+                      className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-2xl ${
+                        selectedThickness === thickness.id
+                          ? 'border-[#b69777] bg-gradient-to-br from-[#faf7f3] to-white shadow-2xl'
+                          : 'border-[#e2d5c4] bg-white hover:border-[#b69777]'
                       }`}
-                      onClick={() => setSelectedApplication(app.id)}
+                      onClick={() => setSelectedThickness(thickness.id)}
                     >
-                      <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center mr-4">
-                          <app.icon className="text-white w-6 h-6" />
-                        </div>
-                        <h3 className="text-xl font-bold text-mocha-900">{app.name}</h3>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-4 text-white text-2xl font-extrabold shadow-lg">
+                        {thickness.id.replace('mm', '')}
                       </div>
-                      <p className="text-mocha-700 mb-4 leading-relaxed">{app.description}</p>
-                      <div className="space-y-2">
-                        {app.features.map((feature, idx) => (
-                          <div key={idx} className="flex items-center space-x-2">
-                            <CheckCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                            <span className="text-sm text-mocha-700">{feature}</span>
-                          </div>
-                        ))}
+                      <h3 className="text-xl font-bold text-[#231c14] mb-2">{thickness.name}</h3>
+                      <p className="text-[#6b5c47] mb-3">{thickness.description}</p>
+                      <div className="text-sm font-medium text-[#b69777]">
+                        Protection Level: {thickness.protection}
                       </div>
-                      {selectedApplication === app.id && (
-                        <div className="mt-4 flex items-center text-red-600">
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          <span className="text-sm font-medium">Selected Application</span>
-                        </div>
+                      {selectedThickness === thickness.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 flex items-center text-[#b69777]"
+                        >
+                          <CheckCircle className="w-5 h-5 mr-2" />
+                          <span className="text-sm font-semibold">Selected</span>
+                        </motion.div>
                       )}
                     </motion.div>
                   ))}
@@ -385,75 +392,344 @@ const AntiCollisionWallPanels = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="performance" className="space-y-8">
+            <TabsContent value="installation" className="space-y-8">
+              <div>
+                <motion.h2
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Installation Process
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Our panels are designed for straightforward installation, ensuring a secure and lasting fit.
+                </p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {installationSteps.map((step, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: i * 0.2 }}
+                      className="text-center p-8 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-6 text-white text-2xl font-extrabold shadow-lg">
+                        {step.step}
+                      </div>
+                      <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed mb-3">{step.description}</p>
+                      <div className="text-xs text-[#b69777] font-medium bg-[#b69777]/10 px-3 py-1 rounded-full inline-block">
+                        {step.time}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="specifications" className="space-y-8">
               <div className="grid lg:grid-cols-2 gap-12">
-                <div>
-                  <h2 className="text-3xl font-bold text-mocha-900 mb-8">Technical Specifications</h2>
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <h2 className="text-4xl font-extrabold text-[#231c14] mb-8">Technical Specifications</h2>
                   <div className="space-y-4">
                     {specifications.map((spec, i) => (
-                      <div key={i} className="flex justify-between items-center p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                        <span className="font-medium text-mocha-900">{spec.label}</span>
-                        <span className="text-mocha-700 font-semibold">{spec.value}</span>
-                      </div>
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                        className="flex justify-between items-center p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl"
+                      >
+                        <span className="font-semibold text-[#231c14]">{spec.label}</span>
+                        <span className="font-bold text-[#b69777]">{spec.value}</span>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-2xl font-bold text-mocha-900 mb-6">Performance Standards</h3>
-                  <div className="space-y-4">
-                    {performanceData.map((data, i) => (
-                      <div key={i} className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-semibold text-mocha-900">{data.metric}</h4>
-                          <span className="text-red-600 font-bold">{data.value}</span>
-                        </div>
-                        <p className="text-xs text-mocha-600">Tested to {data.standard}</p>
-                      </div>
-                    ))}
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">Key Advantages</h3>
+                  <div className="space-y-6">
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Cost-Effective Protection</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Significantly reduces long-term maintenance and repair costs by preventing wall damage.
+                      </p>
+                    </div>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Hygienic Surface</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Non-porous and easy to clean, making it ideal for environments requiring strict hygiene.
+                      </p>
+                    </div>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Versatile Design Integration</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Available in various colors and textures to complement any interior design scheme.
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </TabsContent>
           </Tabs>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <motion.div
+      {/* Applications Section */}
+      <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
           >
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">
-              Protect Your Investment
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8">
-              Don't let wall damage cost you thousands in repairs. Invest in anti-collision protection 
-              that pays for itself through reduced maintenance and extended wall life.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-red-500 to-orange-600 text-white hover:from-orange-600 hover:to-red-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+            Ideal for High-Traffic Environments
+          </motion.h2>
+          <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+            Our anti-collision panels are the perfect solution for areas requiring robust wall protection.
+          </p>
+          <div className="grid lg:grid-cols-3 gap-12">
+            {applications.map((app, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.2 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="group p-10 bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-500 hover:shadow-2xl rounded-2xl"
               >
-                <Phone className="mr-2 h-5 w-5" />
-                Get Protection Quote
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                Technical Consultation
-              </Button>
-            </div>
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <app.icon className="text-white w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-[#231c14] mb-4">{app.title}</h3>
+                <p className="text-[#6b5c47] mb-6 leading-relaxed">{app.description}</p>
+                <ul className="space-y-3">
+                  {app.examples.map((example, j) => (
+                    <li key={j} className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-[#b69777]"></div>
+                      <span className="text-sm font-medium text-[#231c14]">{example}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
+          >
+            Need Robust Wall{" "}
+            <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+              Protection?
+            </span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed"
+          >
+            Get a personalized quote for your anti-collision wall panel project. Our experts will help you choose
+            the ideal thickness and provide professional installation services.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <button
+              className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+              onClick={() => setIsQuoteModalOpen(true)}
+            >
+              Get Protection Quote <ArrowRight className="ml-3 h-6 w-6" />
+            </button>
+            <button
+              className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+            >
+              <Phone className="mr-3 h-6 w-6" />
+              Call Us Today
+            </button>
           </motion.div>
         </div>
       </section>
+
+      {/* Quote Modal */}
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#e2d5c4]"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-3xl font-extrabold text-[#231c14]">
+                Get Your Protection Quote
+              </h3>
+              <button
+                onClick={() => setIsQuoteModalOpen(false)}
+                className="rounded-full p-2 hover:bg-[#f8f6f3] transition-colors duration-200"
+              >
+                <X className="h-6 w-6 text-[#6b5c47]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuoteSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Full Name *
+                  </label>
+                  <Input
+                    required
+                    value={quoteForm.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Email Address *
+                  </label>
+                  <Input
+                    type="email"
+                    required
+                    value={quoteForm.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Phone Number
+                  </label>
+                  <Input
+                    value={quoteForm.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Project Type
+                  </label>
+                  <Select value={quoteForm.projectType} onValueChange={(value) => handleInputChange('projectType', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select project type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residential">Residential</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
+                      <SelectItem value="hospitality">Hospitality</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Project Address
+                </label>
+                <Input
+                  value={quoteForm.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                  placeholder="Enter project address"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Room Size (approx.)
+                  </label>
+                  <Input
+                    value={quoteForm.roomSize}
+                    onChange={(e) => handleInputChange('roomSize', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="e.g., 4m x 3m"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Preferred Thickness
+                  </label>
+                  <Select value={quoteForm.preferredThickness} onValueChange={(value) => handleInputChange('preferredThickness', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select thickness" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {thicknesses.map((thickness) => (
+                        <SelectItem key={thickness.id} value={thickness.id}>
+                          {thickness.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Additional Details
+                </label>
+                <Textarea
+                  value={quoteForm.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4 min-h-[120px]"
+                  placeholder="Tell us more about your project requirements..."
+                />
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="submit"
+                  className="flex-1 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Submit Quote Request
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsQuoteModalOpen(false)}
+                  className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-[#b69777] text-[#231c14] hover:bg-[#f8f6f3] transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       <Footer />
     </div>
@@ -461,4 +737,3 @@ const AntiCollisionWallPanels = () => {
 };
 
 export default AntiCollisionWallPanels;
-

@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-
 import { cn } from "@/lib/utils";
 
+// ── Root ────────────────────────────────────────────────────────────────
 const Tabs = TabsPrimitive.Root;
 
+// ── List (the rail) ─────────────────────────────────────────────────────
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
@@ -12,7 +13,9 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      // full-width, pill-shaped rail with a subtle inner shadow
+      "inline-flex w-full overflow-x-auto whitespace-nowrap rounded-full bg-gradient-to-r from-slate-100 to-slate-50 p-1 shadow-inner" +
+        " dark:from-slate-800 dark:to-slate-700",
       className,
     )}
     {...props}
@@ -20,6 +23,7 @@ const TabsList = React.forwardRef<
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
 
+// ── Trigger (each tab) ──────────────────────────────────────────────────
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
@@ -27,7 +31,14 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      // base
+      "relative inline-flex min-w-[120px] items-center justify-center rounded-full px-4 py-2 text-sm font-semibold" +
+        " text-slate-600 transition-colors duration-300 ease-out focus-visible:outline-none" +
+        " focus-visible:ring-2 focus-visible:ring-[#b89773]/60 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" +
+        // hover / active
+        " hover:text-slate-900 dark:hover:text-white" +
+        " data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-md" +
+        " dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-white",
       className,
     )}
     {...props}
@@ -35,6 +46,7 @@ const TabsTrigger = React.forwardRef<
 ));
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
+// ── Content (the panel) ────────────────────────────────────────────────
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
@@ -42,7 +54,8 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      // top-margin & focus ring in brand gold
+      "mt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b89773]/60 focus-visible:ring-offset-2",
       className,
     )}
     {...props}
@@ -50,4 +63,5 @@ const TabsContent = React.forwardRef<
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
+// ── Exports ─────────────────────────────────────────────────────────────
 export { Tabs, TabsList, TabsTrigger, TabsContent };

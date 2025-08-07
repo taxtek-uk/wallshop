@@ -20,7 +20,11 @@ import {
   Hotel,
   Zap,
   Clock,
-  Palette
+  Palette,
+  X,
+  User,
+  MapPin,
+  MessageSquare
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -28,9 +32,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const WPCWallPanels = () => {
   const [selectedFinish, setSelectedFinish] = useState('oak');
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    projectType: '',
+    roomSize: '',
+    preferredFinish: '',
+    message: ''
+  });
 
   const finishes = [
     { id: 'oak', name: 'Natural Oak', color: '#D2B48C', description: 'Warm, classic wood grain' },
@@ -140,14 +158,39 @@ const WPCWallPanels = () => {
     'Long-term cost savings over traditional materials'
   ];
 
+  const handleQuoteSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic here
+    console.log('Quote form submitted:', quoteForm);
+    setIsQuoteModalOpen(false);
+    // Reset form
+    setQuoteForm({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      projectType: '',
+      roomSize: '',
+      preferredFinish: '',
+      message: ''
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setQuoteForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-clay-50 to-taupe-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
+      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-clay-500/20 to-taupe-500/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
@@ -163,12 +206,17 @@ const WPCWallPanels = () => {
                 <span className="text-white">WPC Wall Panels</span>
               </nav>
               
-              <div className="bg-gradient-to-r from-clay-500 to-leather-600 text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+              <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
                 Premium WPC Collection
               </div>
+              
               <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                WPC Wall Panels
+                WPC Wall{" "}
+                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                  Panels
+                </span>
               </h1>
+              
               <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
                 Experience the perfect fusion of natural wood aesthetics and modern composite technology. 
                 Our WPC wall panels deliver exceptional durability, moisture resistance, and design versatility 
@@ -176,26 +224,24 @@ const WPCWallPanels = () => {
               </p>
               
               <div className="flex flex-wrap gap-4 mb-8">
-                <Badge className="bg-white/20 text-white border-white/30">From £45/m²</Badge>
                 <Badge className="bg-white/20 text-white border-white/30">15 Year Warranty</Badge>
                 <Badge className="bg-white/20 text-white border-white/30">Professional Installation</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">100% Waterproof</Badge>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-clay-500 to-leather-600 text-white hover:from-leather-600 hover:to-clay-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                <button
+                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                  onClick={() => setIsQuoteModalOpen(true)}
                 >
                   Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                </button>
+                <button
+                  className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
                 >
                   <Download className="mr-2 h-5 w-5" />
                   Download Brochure
-                </Button>
+                </button>
               </div>
             </motion.div>
 
@@ -216,19 +262,19 @@ const WPCWallPanels = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Droplets className="w-6 h-6 text-clay-400 mx-auto mb-2" />
+                    <Droplets className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">100% Waterproof</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Leaf className="w-6 h-6 text-clay-400 mx-auto mb-2" />
+                    <Leaf className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Eco-Friendly</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Wrench className="w-6 h-6 text-clay-400 mx-auto mb-2" />
+                    <Wrench className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Easy Install</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Award className="w-6 h-6 text-clay-400 mx-auto mb-2" />
+                    <Award className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">15 Year Warranty</p>
                   </div>
                 </div>
@@ -252,7 +298,17 @@ const WPCWallPanels = () => {
             <TabsContent value="overview" className="space-y-12">
               {/* Features Grid */}
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Key Features & Benefits</h2>
+                <motion.h2 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Key Features & Benefits
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Experience the perfect blend of natural beauty and modern technology with our premium WPC wall panels.
+                </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {features.map((feature, i) => (
                     <motion.div
@@ -260,186 +316,221 @@ const WPCWallPanels = () => {
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="text-center p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 hover:border-clay-400 transition-all duration-300 hover:shadow-lg rounded-xl"
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      className="group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clay-400 to-leather-500 flex items-center justify-center mx-auto mb-4">
-                        <feature.icon className="text-white w-6 h-6" />
+                      <div className="text-center p-8 h-full bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                          <feature.icon className="text-white w-8 h-8" />
+                        </div>
+                        <h3 className="text-xl font-bold text-[#231c14] mb-4">{feature.title}</h3>
+                        <p className="text-[#6b5c47] leading-relaxed">{feature.description}</p>
                       </div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{feature.title}</h3>
-                      <p className="text-mocha-700 text-sm leading-relaxed">{feature.description}</p>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
               {/* Benefits List */}
-              <div className="bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-mocha-900 mb-6">Why Choose WPC Wall Panels?</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] rounded-3xl p-12 shadow-xl"
+              >
+                <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">Why Choose WPC Wall Panels?</h3>
+                <div className="grid md:grid-cols-2 gap-6">
                   {benefits.map((benefit, i) => (
-                    <div key={i} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-clay-600 flex-shrink-0" />
-                      <span className="text-mocha-700">{benefit}</span>
-                    </div>
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      className="flex items-center space-x-4"
+                    >
+                      <CheckCircle className="w-6 h-6 text-[#b69777] flex-shrink-0" />
+                      <span className="text-[#231c14] font-medium">{benefit}</span>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="specifications" className="space-y-8">
               <div className="grid lg:grid-cols-2 gap-12">
-                <div>
-                  <h2 className="text-3xl font-bold text-mocha-900 mb-8">Technical Specifications</h2>
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <h2 className="text-4xl font-extrabold text-[#231c14] mb-8">Technical Specifications</h2>
                   <div className="space-y-4">
                     {specifications.map((spec, i) => (
-                      <div key={i} className="flex justify-between items-center p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                        <span className="font-medium text-mocha-900">{spec.label}</span>
-                        <span className="text-mocha-700 font-semibold">{spec.value}</span>
-                      </div>
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                        className="flex justify-between items-center p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl"
+                      >
+                        <span className="font-semibold text-[#231c14]">{spec.label}</span>
+                        <span className="font-bold text-[#b69777]">{spec.value}</span>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
                 
-                <div>
-                  <h3 className="text-2xl font-bold text-mocha-900 mb-6">Material Composition</h3>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Wood Fiber (60%)</h4>
-                      <p className="text-sm text-mocha-700">High-quality wood fibers provide natural appearance and texture</p>
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">Material Composition</h3>
+                  <div className="space-y-6">
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Wood Fiber (60%)</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        High-quality wood fibers provide natural appearance and texture
+                      </p>
                     </div>
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Plastic Polymer (35%)</h4>
-                      <p className="text-sm text-mocha-700">Recycled plastic ensures durability and moisture resistance</p>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Plastic Polymer (35%)</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Recycled plastic ensures durability and moisture resistance
+                      </p>
                     </div>
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Additives (5%)</h4>
-                      <p className="text-sm text-mocha-700">UV stabilizers, colorants, and performance enhancers</p>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Additives (5%)</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        UV stabilizers, colorants, and performance enhancers
+                      </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </TabsContent>
 
             <TabsContent value="finishes" className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Available Finishes</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {finishes.map((finish) => (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center">
+                  Available Finishes
+                </h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Choose from our premium collection of wood-inspired finishes to match your design vision.
+                </p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {finishes.map((finish, i) => (
                     <motion.div
                       key={finish.id}
-                      whileHover={{ scale: 1.02 }}
-                      className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      whileHover={{ scale: 1.05 }}
+                      className={`p-8 border-2 rounded-2xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-2xl ${
                         selectedFinish === finish.id
-                          ? 'border-clay-500 bg-clay-50'
-                          : 'border-taupe-200 bg-white hover:border-clay-300'
+                          ? 'border-[#b69777] bg-gradient-to-br from-[#faf7f3] to-white shadow-2xl'
+                          : 'border-[#e2d5c4] bg-white hover:border-[#b69777]'
                       }`}
                       onClick={() => setSelectedFinish(finish.id)}
                     >
                       <div 
-                        className="w-full h-24 rounded-lg mb-4 shadow-inner"
+                        className="w-full h-32 rounded-xl mb-6 shadow-inner border-2 border-[#e2d5c4]"
                         style={{ backgroundColor: finish.color }}
                       ></div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-2">{finish.name}</h3>
-                      <p className="text-sm text-mocha-700">{finish.description}</p>
+                      <h3 className="text-xl font-bold text-[#231c14] mb-3">{finish.name}</h3>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">{finish.description}</p>
                       {selectedFinish === finish.id && (
-                        <div className="mt-3 flex items-center text-clay-600">
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          <span className="text-sm font-medium">Selected</span>
-                        </div>
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 flex items-center text-[#b69777]"
+                        >
+                          <CheckCircle className="w-5 h-5 mr-2" />
+                          <span className="text-sm font-semibold">Selected</span>
+                        </motion.div>
                       )}
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="installation" className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Installation Process</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center">
+                  Installation Process
+                </h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Professional installation in just a few simple steps for a perfect finish every time.
+                </p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {installationSteps.map((step, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="text-center p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 rounded-xl"
+                      transition={{ duration: 0.6, delay: i * 0.2 }}
+                      className="text-center p-8 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-clay-400 to-leather-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-6 text-white text-2xl font-extrabold shadow-lg">
                         {step.step}
                       </div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{step.title}</h3>
-                      <p className="text-sm text-mocha-700 leading-relaxed">{step.description}</p>
+                      <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">{step.description}</p>
                     </motion.div>
                   ))}
                 </div>
-                
-                <div className="mt-12 p-8 bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl">
-                  <h3 className="text-2xl font-bold text-mocha-900 mb-4">Professional Installation Service</h3>
-                  <p className="text-mocha-700 mb-6 leading-relaxed">
-                    Our certified installation team ensures perfect results with every project. We provide comprehensive 
-                    installation services including site survey, preparation, and post-installation support.
-                  </p>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="flex items-center space-x-3">
-                      <Clock className="w-5 h-5 text-clay-600" />
-                      <span className="text-sm text-mocha-700">Typical installation: 1-2 days</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Award className="w-5 h-5 text-clay-600" />
-                      <span className="text-sm text-mocha-700">Certified installers</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Shield className="w-5 h-5 text-clay-600" />
-                      <span className="text-sm text-mocha-700">Installation warranty included</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             </TabsContent>
           </Tabs>
         </div>
       </section>
 
       {/* Applications Section */}
-      <section className="py-20 bg-gradient-to-br from-clay-50 to-taupe-50">
+      <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
         <div className="container mx-auto px-4 lg:px-8">
-          <motion.div
+          <motion.h2 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
           >
-            <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-clay-600 via-taupe-600 to-leather-600 bg-clip-text text-transparent mb-6">
-              Perfect Applications
-            </h2>
-            <p className="text-xl text-mocha-700 max-w-3xl mx-auto leading-relaxed">
-              WPC wall panels excel in diverse environments, offering versatility and performance for any project.
-            </p>
-          </motion.div>
-          
-          <div className="grid lg:grid-cols-3 gap-8">
+            Perfect for Every Space
+          </motion.h2>
+          <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+            Transform any environment with our versatile WPC wall panels, designed for residential, commercial, and hospitality applications.
+          </p>
+          <div className="grid lg:grid-cols-3 gap-12">
             {applications.map((app, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-white border border-taupe-200 hover:border-clay-400 transition-all duration-300 hover:shadow-xl rounded-2xl p-8"
+                transition={{ duration: 0.6, delay: i * 0.2 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="group p-10 bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-500 hover:shadow-2xl rounded-2xl"
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-clay-400 to-leather-500 flex items-center justify-center mb-6">
-                  <app.icon className="text-white w-8 h-8" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <app.icon className="text-white w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-bold text-mocha-900 mb-4">{app.title}</h3>
-                <p className="text-mocha-700 leading-relaxed mb-6">{app.description}</p>
-                <div className="space-y-2">
-                  {app.examples.map((example, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-clay-600 flex-shrink-0" />
-                      <span className="text-sm text-mocha-700">{example}</span>
-                    </div>
+                <h3 className="text-2xl font-extrabold text-[#231c14] mb-4">{app.title}</h3>
+                <p className="text-[#6b5c47] mb-6 leading-relaxed">{app.description}</p>
+                <ul className="space-y-3">
+                  {app.examples.map((example, j) => (
+                    <li key={j} className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-[#b69777]"></div>
+                      <span className="text-sm font-medium text-[#231c14]">{example}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </motion.div>
             ))}
           </div>
@@ -447,40 +538,207 @@ const WPCWallPanels = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <motion.div
+      <section className="py-20 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
+          <motion.h2 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
           >
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">
-              Ready to Transform Your Space?
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8">
-              Get expert consultation and professional installation for your WPC wall panel project. 
-              Contact us today for a free quote and design consultation.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-clay-500 to-leather-600 text-white hover:from-leather-600 hover:to-clay-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-              >
-                <Phone className="mr-2 h-5 w-5" />
-                Call for Quote
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                Email Enquiry
-              </Button>
-            </div>
+            Ready to Transform{" "}
+            <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+              Your Space?
+            </span>
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed"
+          >
+            Get a personalized quote for your WPC wall panel project. Our experts will help you choose 
+            the perfect finish and provide professional installation services.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <button
+              className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+              onClick={() => setIsQuoteModalOpen(true)}
+            >
+              Get Your Free Quote <ArrowRight className="ml-3 h-6 w-6" />
+            </button>
+            <button
+              className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+            >
+              <Phone className="mr-3 h-6 w-6" />
+              Call Us Today
+            </button>
           </motion.div>
         </div>
       </section>
+
+      {/* Quote Modal */}
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#e2d5c4]"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-3xl font-extrabold text-[#231c14]">
+                Get Your Free Quote
+              </h3>
+              <button
+                onClick={() => setIsQuoteModalOpen(false)}
+                className="rounded-full p-2 hover:bg-[#f8f6f3] transition-colors duration-200"
+              >
+                <X className="h-6 w-6 text-[#6b5c47]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuoteSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Full Name *
+                  </label>
+                  <Input
+                    required
+                    value={quoteForm.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Email Address *
+                  </label>
+                  <Input
+                    type="email"
+                    required
+                    value={quoteForm.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Phone Number
+                  </label>
+                  <Input
+                    value={quoteForm.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Project Type
+                  </label>
+                  <Select value={quoteForm.projectType} onValueChange={(value) => handleInputChange('projectType', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select project type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residential">Residential</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
+                      <SelectItem value="hospitality">Hospitality</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Project Address
+                </label>
+                <Input
+                  value={quoteForm.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                  placeholder="Enter project address"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Room Size (approx.)
+                  </label>
+                  <Input
+                    value={quoteForm.roomSize}
+                    onChange={(e) => handleInputChange('roomSize', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="e.g., 4m x 3m"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Preferred Finish
+                  </label>
+                  <Select value={quoteForm.preferredFinish} onValueChange={(value) => handleInputChange('preferredFinish', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select finish" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {finishes.map((finish) => (
+                        <SelectItem key={finish.id} value={finish.id}>
+                          {finish.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Additional Details
+                </label>
+                <Textarea
+                  value={quoteForm.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4 min-h-[120px]"
+                  placeholder="Tell us more about your project requirements..."
+                />
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="submit"
+                  className="flex-1 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Submit Quote Request
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsQuoteModalOpen(false)}
+                  className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-[#b69777] text-[#231c14] hover:bg-[#f8f6f3] transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       <Footer />
     </div>

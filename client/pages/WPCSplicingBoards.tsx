@@ -18,7 +18,11 @@ import {
   Settings,
   Home,
   Building,
-  Hotel
+  Hotel,
+  X,
+  User,
+  MapPin,
+  MessageSquare
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -26,9 +30,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const WPCSplicingBoards = () => {
   const [selectedPattern, setSelectedPattern] = useState('horizontal');
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    projectType: '',
+    roomSize: '',
+    preferredPattern: '',
+    message: ''
+  });
 
   const patterns = [
     {
@@ -173,14 +191,39 @@ const WPCSplicingBoards = () => {
     chevron: ['Dynamic, energetic feel', 'Contemporary design statement', 'Creates focal point']
   };
 
+  const handleQuoteSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic here
+    console.log('Quote form submitted:', quoteForm);
+    setIsQuoteModalOpen(false);
+    // Reset form
+    setQuoteForm({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      projectType: '',
+      roomSize: '',
+      preferredPattern: '',
+      message: ''
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setQuoteForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-clay-50 to-taupe-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
+      <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-clay-500/20 to-taupe-500/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
@@ -196,38 +239,41 @@ const WPCSplicingBoards = () => {
                 <span className="text-white">WPC Splicing Boards</span>
               </nav>
               
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+              <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
                 Modular Installation System
               </div>
+              
               <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                WPC Splicing Boards
+                WPC Splicing{" "}
+                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                  Boards
+                </span>
               </h1>
+              
               <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
                 Revolutionary interlocking system that creates seamless wall surfaces with professional-grade installation. 
                 Perfect alignment, no visible joints, and unlimited design possibilities.
               </p>
               
               <div className="flex flex-wrap gap-4 mb-8">
-                <Badge className="bg-white/20 text-white border-white/30">From £52/m²</Badge>
                 <Badge className="bg-white/20 text-white border-white/30">12 Year Warranty</Badge>
                 <Badge className="bg-white/20 text-white border-white/30">Tool-Free Installation</Badge>
+                <Badge className="bg-white/20 text-white border-white/30">Seamless Joints</Badge>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-purple-600 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                <button
+                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                  onClick={() => setIsQuoteModalOpen(true)}
                 >
-                  Get Installation Quote <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
+                  Get Protection Quote <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+                <button
+                  className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
                 >
                   <Download className="mr-2 h-5 w-5" />
                   Installation Guide
-                </Button>
+                </button>
               </div>
             </motion.div>
 
@@ -248,19 +294,19 @@ const WPCSplicingBoards = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Puzzle className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                    <Puzzle className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Seamless Joints</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Layers className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                    <Layers className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Modular Design</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Wrench className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                    <Wrench className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Tool-Free Install</p>
                   </div>
                   <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl shadow-sm border border-white/20">
-                    <Clock className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+                    <Clock className="w-6 h-6 text-[#b69777] mx-auto mb-2" />
                     <p className="text-xs font-medium text-white/90">Quick Assembly</p>
                   </div>
                 </div>
@@ -284,7 +330,17 @@ const WPCSplicingBoards = () => {
             <TabsContent value="features" className="space-y-12">
               {/* Features Grid */}
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Advanced Splicing Technology</h2>
+                <motion.h2 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Advanced Splicing Technology
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Experience seamless installation with our revolutionary interlocking system designed for professional results.
+                </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {features.map((feature, i) => (
                     <motion.div
@@ -292,15 +348,18 @@ const WPCSplicingBoards = () => {
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg rounded-xl"
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      className="group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mb-4">
-                        <feature.icon className="text-white w-6 h-6" />
-                      </div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{feature.title}</h3>
-                      <p className="text-mocha-700 text-sm leading-relaxed mb-3">{feature.description}</p>
-                      <div className="text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
-                        {feature.benefit}
+                      <div className="p-6 h-full bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                          <feature.icon className="text-white w-6 h-6" />
+                        </div>
+                        <h3 className="text-lg font-bold text-[#231c14] mb-3">{feature.title}</h3>
+                        <p className="text-[#6b5c47] text-sm leading-relaxed mb-3">{feature.description}</p>
+                        <div className="text-xs text-[#b69777] font-medium bg-[#b69777]/10 px-3 py-1 rounded-full">
+                          {feature.benefit}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
@@ -308,54 +367,82 @@ const WPCSplicingBoards = () => {
               </div>
 
               {/* Benefits List */}
-              <div className="bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-mocha-900 mb-6">Installation & Performance Benefits</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] rounded-3xl p-12 shadow-xl"
+              >
+                <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">Installation & Performance Benefits</h3>
+                <div className="grid md:grid-cols-2 gap-6">
                   {benefits.map((benefit, i) => (
-                    <div key={i} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                      <span className="text-mocha-700">{benefit}</span>
-                    </div>
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      className="flex items-center space-x-4"
+                    >
+                      <CheckCircle className="w-6 h-6 text-[#b69777] flex-shrink-0" />
+                      <span className="text-[#231c14] font-medium">{benefit}</span>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="patterns" className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Design Patterns & Layouts</h2>
+                <motion.h2 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Design Patterns & Layouts
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Choose from our collection of professional patterns to create the perfect aesthetic for your space.
+                </p>
                 <div className="grid lg:grid-cols-2 gap-8">
-                  {patterns.map((pattern) => (
+                  {patterns.map((pattern, i) => (
                     <motion.div
                       key={pattern.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
                       whileHover={{ scale: 1.02 }}
-                      className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                      className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 ${
                         selectedPattern === pattern.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-taupe-200 bg-white hover:border-blue-300'
+                          ? 'border-[#b69777] bg-gradient-to-br from-[#faf7f3] to-white shadow-2xl'
+                          : 'border-[#e2d5c4] bg-white hover:border-[#b69777]'
                       }`}
                       onClick={() => setSelectedPattern(pattern.id)}
                     >
-                      <div className="aspect-video bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                      <div className="aspect-video bg-[#f8f6f3] rounded-lg mb-4 overflow-hidden border border-[#e2d5c4]">
                         <img
                           src={pattern.image}
                           alt={pattern.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h3 className="text-xl font-bold text-mocha-900 mb-2">{pattern.name}</h3>
-                      <p className="text-mocha-700 mb-4">{pattern.description}</p>
+                      <h3 className="text-xl font-bold text-[#231c14] mb-2">{pattern.name}</h3>
+                      <p className="text-[#6b5c47] mb-4">{pattern.description}</p>
                       
                       {selectedPattern === pattern.id && (
-                        <div className="space-y-2">
-                          <h4 className="font-semibold text-mocha-900">Pattern Benefits:</h4>
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-2"
+                        >
+                          <h4 className="font-semibold text-[#231c14]">Pattern Benefits:</h4>
                           {patternBenefits[pattern.id as keyof typeof patternBenefits].map((benefit, idx) => (
                             <div key={idx} className="flex items-center space-x-2">
-                              <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                              <span className="text-sm text-mocha-700">{benefit}</span>
+                              <CheckCircle className="w-4 h-4 text-[#b69777] flex-shrink-0" />
+                              <span className="text-sm text-[#6b5c47]">{benefit}</span>
                             </div>
                           ))}
-                        </div>
+                        </motion.div>
                       )}
                     </motion.div>
                   ))}
@@ -365,83 +452,91 @@ const WPCSplicingBoards = () => {
 
             <TabsContent value="installation" className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold text-mocha-900 mb-8 text-center">Installation Process</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <motion.h2 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
+                >
+                  Installation Process
+                </motion.h2>
+                <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+                  Professional installation in four simple steps for perfect results every time.
+                </p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {installationSteps.map((step, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: i * 0.1 }}
-                      className="text-center p-6 bg-gradient-to-br from-clay-50 to-white border border-taupe-200 rounded-xl"
+                      transition={{ duration: 0.6, delay: i * 0.2 }}
+                      className="text-center p-8 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mx-auto mb-6 text-white text-2xl font-extrabold shadow-lg">
                         {step.step}
                       </div>
-                      <h3 className="text-lg font-bold text-mocha-900 mb-3">{step.title}</h3>
-                      <p className="text-sm text-mocha-700 leading-relaxed mb-3">{step.description}</p>
-                      <div className="text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                      <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed mb-3">{step.description}</p>
+                      <div className="text-xs text-[#b69777] font-medium bg-[#b69777]/10 px-3 py-1 rounded-full inline-block">
                         {step.time}
                       </div>
                     </motion.div>
                   ))}
-                </div>
-                
-                <div className="mt-12 p-8 bg-gradient-to-br from-clay-50 to-taupe-50 rounded-2xl">
-                  <h3 className="text-2xl font-bold text-mocha-900 mb-4">Professional Installation Service</h3>
-                  <p className="text-mocha-700 mb-6 leading-relaxed">
-                    Our certified installation team specializes in WPC splicing board systems. We ensure perfect 
-                    alignment, seamless joints, and professional results that exceed expectations.
-                  </p>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="flex items-center space-x-3">
-                      <Clock className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm text-mocha-700">Average installation: 4-6 hours</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Award className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm text-mocha-700">Certified splicing specialists</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Shield className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm text-mocha-700">Installation warranty included</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="specifications" className="space-y-8">
               <div className="grid lg:grid-cols-2 gap-12">
-                <div>
-                  <h2 className="text-3xl font-bold text-mocha-900 mb-8">Technical Specifications</h2>
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <h2 className="text-4xl font-extrabold text-[#231c14] mb-8">Technical Specifications</h2>
                   <div className="space-y-4">
                     {specifications.map((spec, i) => (
-                      <div key={i} className="flex justify-between items-center p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                        <span className="font-medium text-mocha-900">{spec.label}</span>
-                        <span className="text-mocha-700 font-semibold">{spec.value}</span>
-                      </div>
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                        className="flex justify-between items-center p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl"
+                      >
+                        <span className="font-semibold text-[#231c14]">{spec.label}</span>
+                        <span className="font-bold text-[#b69777]">{spec.value}</span>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
                 
-                <div>
-                  <h3 className="text-2xl font-bold text-mocha-900 mb-6">Interlocking System Details</h3>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Click-Lock Mechanism</h4>
-                      <p className="text-sm text-mocha-700">Precision-engineered tongue and groove system with secure locking tabs</p>
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <h3 className="text-3xl font-extrabold text-[#231c14] mb-8">System Advantages</h3>
+                  <div className="space-y-6">
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Precision Engineering</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Micro-precision manufacturing ensures perfect alignment and seamless joints every time.
+                      </p>
                     </div>
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Expansion Joints</h4>
-                      <p className="text-sm text-mocha-700">Built-in expansion allowance accommodates thermal movement</p>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Modular Flexibility</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Individual board replacement and creative pattern arrangements without system compromise.
+                      </p>
                     </div>
-                    <div className="p-4 bg-gradient-to-r from-clay-50 to-white border border-taupe-200 rounded-lg">
-                      <h4 className="font-semibold text-mocha-900 mb-2">Edge Profiles</h4>
-                      <p className="text-sm text-mocha-700">Micro-beveled edges create seamless appearance when installed</p>
+                    <div className="p-6 bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-lg rounded-xl">
+                      <h4 className="font-bold text-[#231c14] mb-3">Professional Results</h4>
+                      <p className="text-sm text-[#6b5c47] leading-relaxed">
+                        Consistent quality and appearance that meets commercial-grade standards.
+                      </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </TabsContent>
           </Tabs>
@@ -449,44 +544,42 @@ const WPCSplicingBoards = () => {
       </section>
 
       {/* Applications Section */}
-      <section className="py-20 bg-gradient-to-br from-clay-50 to-taupe-50">
+      <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
         <div className="container mx-auto px-4 lg:px-8">
-          <motion.div
+          <motion.h2 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 text-center"
           >
-            <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-clay-600 via-taupe-600 to-leather-600 bg-clip-text text-transparent mb-6">
-              Perfect Applications
-            </h2>
-            <p className="text-xl text-mocha-700 max-w-3xl mx-auto leading-relaxed">
-              WPC splicing boards excel in projects requiring seamless, professional finishes with design flexibility.
-            </p>
-          </motion.div>
-          
-          <div className="grid lg:grid-cols-3 gap-8">
+            Perfect for Every Application
+          </motion.h2>
+          <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
+            From residential feature walls to commercial installations, our splicing boards deliver professional results.
+          </p>
+          <div className="grid lg:grid-cols-3 gap-12">
             {applications.map((app, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-white border border-taupe-200 hover:border-blue-400 transition-all duration-300 hover:shadow-xl rounded-2xl p-8"
+                transition={{ duration: 0.6, delay: i * 0.2 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="group p-10 bg-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-500 hover:shadow-2xl rounded-2xl"
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mb-6">
-                  <app.icon className="text-white w-8 h-8" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#b69777] to-[#907252] flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <app.icon className="text-white w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-bold text-mocha-900 mb-4">{app.title}</h3>
-                <p className="text-mocha-700 leading-relaxed mb-6">{app.description}</p>
-                <div className="space-y-2">
-                  {app.examples.map((example, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <span className="text-sm text-mocha-700">{example}</span>
-                    </div>
+                <h3 className="text-2xl font-extrabold text-[#231c14] mb-4">{app.title}</h3>
+                <p className="text-[#6b5c47] mb-6 leading-relaxed">{app.description}</p>
+                <ul className="space-y-3">
+                  {app.examples.map((example, j) => (
+                    <li key={j} className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-[#b69777]"></div>
+                      <span className="text-sm font-medium text-[#231c14]">{example}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </motion.div>
             ))}
           </div>
@@ -494,40 +587,207 @@ const WPCSplicingBoards = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-mocha-950 via-leather-800 to-olive-900">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <motion.div
+      <section className="py-20 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
+          <motion.h2 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
           >
-            <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">
-              Create Seamless Perfection
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8">
-              Experience the precision and beauty of WPC splicing boards. Get professional installation 
-              and a flawless finish that transforms any space.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-purple-600 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-              >
-                <Phone className="mr-2 h-5 w-5" />
-                Get Installation Quote
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-white/10 backdrop-blur-sm text-white border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                Design Consultation
-              </Button>
-            </div>
+            Ready for Professional{" "}
+            <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+              Installation?
+            </span>
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed"
+          >
+            Get a personalized quote for your WPC splicing board project. Our experts will help you choose 
+            the perfect pattern and provide professional installation services.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <button
+              className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+              onClick={() => setIsQuoteModalOpen(true)}
+            >
+              Get Protection Quote <ArrowRight className="ml-3 h-6 w-6" />
+            </button>
+            <button
+              className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-12 py-6 text-xl rounded-full font-semibold flex items-center justify-center"
+            >
+              <Phone className="mr-3 h-6 w-6" />
+              Call Us Today
+            </button>
           </motion.div>
         </div>
       </section>
+
+      {/* Quote Modal */}
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#e2d5c4]"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-3xl font-extrabold text-[#231c14]">
+                Get Your Protection Quote
+              </h3>
+              <button
+                onClick={() => setIsQuoteModalOpen(false)}
+                className="rounded-full p-2 hover:bg-[#f8f6f3] transition-colors duration-200"
+              >
+                <X className="h-6 w-6 text-[#6b5c47]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuoteSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Full Name *
+                  </label>
+                  <Input
+                    required
+                    value={quoteForm.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Email Address *
+                  </label>
+                  <Input
+                    type="email"
+                    required
+                    value={quoteForm.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Phone Number
+                  </label>
+                  <Input
+                    value={quoteForm.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Project Type
+                  </label>
+                  <Select value={quoteForm.projectType} onValueChange={(value) => handleInputChange('projectType', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select project type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residential">Residential</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
+                      <SelectItem value="hospitality">Hospitality</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Project Address
+                </label>
+                <Input
+                  value={quoteForm.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                  placeholder="Enter project address"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Room Size (approx.)
+                  </label>
+                  <Input
+                    value={quoteForm.roomSize}
+                    onChange={(e) => handleInputChange('roomSize', e.target.value)}
+                    className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4"
+                    placeholder="e.g., 4m x 3m"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                    Preferred Pattern
+                  </label>
+                  <Select value={quoteForm.preferredPattern} onValueChange={(value) => handleInputChange('preferredPattern', value)}>
+                    <SelectTrigger className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4">
+                      <SelectValue placeholder="Select pattern" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {patterns.map((pattern) => (
+                        <SelectItem key={pattern.id} value={pattern.id}>
+                          {pattern.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[#231c14]">
+                  Additional Details
+                </label>
+                <Textarea
+                  value={quoteForm.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  className="rounded-xl border-2 border-[#e2d5c4] focus:border-[#b69777] p-4 min-h-[120px]"
+                  placeholder="Tell us more about your project requirements..."
+                />
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="submit"
+                  className="flex-1 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Submit Quote Request
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsQuoteModalOpen(false)}
+                  className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-[#b69777] text-[#231c14] hover:bg-[#f8f6f3] transition-all duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       <Footer />
     </div>
@@ -535,4 +795,3 @@ const WPCSplicingBoards = () => {
 };
 
 export default WPCSplicingBoards;
-
