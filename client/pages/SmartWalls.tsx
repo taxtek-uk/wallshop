@@ -1,9 +1,10 @@
-import { usimport { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // adjust import based on your setup
 import Navigation from '@/components/Navigation';
 import TextureSection from '@/components/TextureSection';
 import Footer from '@/components/Footer';
+import QuoteModal from '@/components/QuoteModal';
 
 import { 
   Lightbulb, 
@@ -56,9 +57,10 @@ import smartEvent from '/images/event-space.webp';
 
 function SmartWalls() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<{name?: string, price?: string}>({});
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string, price: string }>({ name: '', price: '' });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 

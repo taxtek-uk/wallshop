@@ -21,7 +21,6 @@ import {
   ThumbsUp,
   User,
 } from "lucide-react";
-
 // For page fade-in animation
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },

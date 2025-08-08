@@ -23,11 +23,13 @@ import {
   Thermometer,
   Volume2
 } from 'lucide-react';
+
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import QuoteModal from "@/components/QuoteModal";
 
 const WPCHollowSeamlessLockingBoards = () => {

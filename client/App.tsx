@@ -97,21 +97,21 @@ const App = () => (
             <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
             <Route path="/smart-devices" element={<SmartDevices />} />
             
-          {/* Wall Panel Routes */}
-          <Route path="/wall-panels" element={<WallPanels />} />
-          <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
-          <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
-          <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
-          <Route path="/wall-panels/wpc-hollow" element={<WPCHollowSeamlessLockingBoards />} />
-          <Route path="/wall-panels/fireproof" element={<ClassAFireproofBoards />} />
-          <Route path="/wall-panels/fluted" element={<FlutedWallPanels />} />
-          <Route path="/wall-panels/aluminum-fitting" element={<AluminumAlloyFitting />} />
-          <Route path="/wall-panels/wpc-hd-printing" element={<WPCHDPrintingWallPanel />} />
-          <Route path="/wall-panels/spc-background" element={<SPCBackgroundWall />} />
-          <Route path="/wall-panels/uhd-continuous" element={<UHDContinuousPattern />} />
-          <Route path="/wall-panels/spc-waterproof" element={<SPCWaterproofWallPanel />} />
-          <Route path="/wall-panels/spc-stone-crystal" element={<SPCStoneCrystalFlooring />} />
-          <Route path="/wall-panels/plastic-wood" element={<PlasticWoodFlooring />} />
+            {/* Wall Panel Routes */}
+            <Route path="/wall-panels" element={<WallPanels />} />
+            <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
+            <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
+            <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
+            <Route path="/wall-panels/wpc-hollow" element={<WPCHollowSeamlessLockingBoards />} />
+            <Route path="/wall-panels/fireproof" element={<ClassAFireproofBoards />} />
+            <Route path="/wall-panels/fluted" element={<FlutedWallPanels />} />
+            <Route path="/wall-panels/aluminum-fittings" element={<AluminumAlloyFitting />} />
+            <Route path="/wall-panels/wpc-hd-printing" element={<WPCHDPrintingWallPanel />} />
+            <Route path="/wall-panels/spc-background" element={<SPCBackgroundWall />} />
+            <Route path="/wall-panels/uhd-continuous" element={<UHDContinuousPattern />} />
+            <Route path="/wall-panels/spc-waterproof" element={<SPCWaterproofWallPanel />} />
+            <Route path="/wall-panels/spc-stone-crystal" element={<SPCStoneCrystalFlooring />} />
+            <Route path="/wall-panels/plastic-wood" element={<PlasticWoodFlooring />} />
           
             {/* Catch-all for 404 */}
             <Route path="*" element={<NotFound />} />

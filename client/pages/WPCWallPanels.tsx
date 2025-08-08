@@ -151,7 +151,7 @@ const WPCWallPanels = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#231c14]/90 to-[#231c14]/70"></div>
         <div className="absolute inset-0">
           <img 
-            src="/images/walls/01.jpg" 
+            src="#" 
             alt="WPC Wall Panels Installation" 
             className="w-full h-full object-cover"
           />
