@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { HelmetProvider } from "react-helmet-async";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -28,6 +29,14 @@ const LuxuryWallpapers = lazy(() => import("./pages/LuxuryWallpapers"));
 const AcousticPanels = lazy(() => import("./pages/AcousticPanels"));
 const CarbonRockBoards = lazy(() => import("./pages/CarbonRockBoards"));
 const SmartWallConstructionPage = lazy(() => import('./pages/SmartWallConstructionPage'));
+
+// ORVIBO Smart Device Category Pages - lazy loaded
+const SmartControlPanels = lazy(() => import("./pages/SmartControlPanels"));
+const SmartSwitches = lazy(() => import("./pages/SmartSwitches"));
+const SmartLighting = lazy(() => import("./pages/SmartLighting"));
+const SecuritySensors = lazy(() => import("./pages/SecuritySensors"));
+const SmartShading = lazy(() => import("./pages/SmartShading"));
+const SmartHVAC = lazy(() => import("./pages/SmartHVAC"));
 
 // Wall Panel Pages - lazy loaded
 const WallPanels = lazy(() => import("./pages/WallPanels"));
@@ -71,9 +80,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
+        <HelmetProvider>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
             <Route path="/" element={<Index />} />
 
             {/* Legal Pages */}
@@ -97,6 +107,14 @@ const App = () => (
             <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
             <Route path="/smart-devices" element={<SmartDevices />} />
             
+            {/* ORVIBO Smart Device Category Routes */}
+            <Route path="/smart-devices/orvibo/control-panels" element={<SmartControlPanels />} />
+            <Route path="/smart-devices/orvibo/switches" element={<SmartSwitches />} />
+            <Route path="/smart-devices/orvibo/lighting" element={<SmartLighting />} />
+            <Route path="/smart-devices/orvibo/security-sensors" element={<SecuritySensors />} />
+            <Route path="/smart-devices/orvibo/shading" element={<SmartShading />} />
+            <Route path="/smart-devices/orvibo/hvac" element={<SmartHVAC />} />
+            
             {/* Wall Panel Routes */}
             <Route path="/wall-panels" element={<WallPanels />} />
             <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
@@ -117,6 +135,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </HelmetProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
