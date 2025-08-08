@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import TextureSection from "@/components/TextureSection"
 import Footer from "@/components/Footer";
+import QuoteModal from "@/components/QuoteModal";
 import { Button } from "@/components/ui/button";
 import {
   Shield,
@@ -50,7 +51,7 @@ const AIChatWidget = () => (
 
 const CarbonRockBoards = () => {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<{name?: string, price?: string}>({});
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string }>({ name: "", price: "" });
   // --- SEO and Schema ---
   useEffect(() => {
     document.title =
