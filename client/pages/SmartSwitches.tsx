@@ -1,13 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import QuoteModal from '@/components/QuoteModal';
 import SEOHead from '../components/SEOHead';
 import { smartSwitchesSEO } from '../utils/seoData';
-import { ArrowRight, Zap, Palette, Smartphone, CheckCircle, Star, Filter, Grid, List } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Zap, 
+  Palette, 
+  Smartphone, 
+  CheckCircle, 
+  Star, 
+  Filter, 
+  Grid, 
+  List,
+  Play,
+  Users,
+  Layers,
+  Settings,
+  Home,
+  Building2,
+  Bed,
+  Bath,
+  ChefHat,
+  Wrench,
+  MousePointer,
+  Plug
+} from 'lucide-react';
 
 const SmartSwitches: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string, price: string }>({ name: '', price: '' });
+  const [activeStep, setActiveStep] = useState(0);
+
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 4);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const switches = [
     {
@@ -33,7 +72,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["Matte Black", "Champagne Gold", "Pearl White", "Graphite"],
       rating: 4.8,
-      reviews: 124
+      reviews: 124,
+      highlight: true
     },
     {
       id: 2,
@@ -58,7 +98,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["Classic White", "Warm Gold", "Cool Silver"],
       rating: 4.7,
-      reviews: 89
+      reviews: 89,
+      highlight: false
     },
     {
       id: 3,
@@ -83,7 +124,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["Midnight Black", "Rose Gold", "Titanium", "Copper"],
       rating: 4.9,
-      reviews: 156
+      reviews: 156,
+      highlight: false
     },
     {
       id: 4,
@@ -108,7 +150,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["White", "Black"],
       rating: 4.5,
-      reviews: 67
+      reviews: 67,
+      highlight: false
     },
     {
       id: 5,
@@ -133,7 +176,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["White", "Ivory", "Black"],
       rating: 4.6,
-      reviews: 92
+      reviews: 92,
+      highlight: false
     },
     {
       id: 6,
@@ -158,7 +202,8 @@ const SmartSwitches: React.FC = () => {
       },
       colors: ["Piano Black", "Pearl White"],
       rating: 4.8,
-      reviews: 143
+      reviews: 143,
+      highlight: false
     }
   ];
 
@@ -166,22 +211,26 @@ const SmartSwitches: React.FC = () => {
     {
       room: "Living Room",
       image: "/images/living-room-switches.jpg",
-      description: "Elegant control in luxury settings"
+      description: "Elegant control in luxury settings",
+      icon: Home
     },
     {
       room: "Kitchen",
       image: "/images/kitchen-switches.jpg",
-      description: "Functional beauty for culinary spaces"
+      description: "Functional beauty for culinary spaces",
+      icon: ChefHat
     },
     {
       room: "Bedroom",
       image: "/images/bedroom-switches.jpg",
-      description: "Sophisticated ambiance control"
+      description: "Sophisticated ambiance control",
+      icon: Bed
     },
     {
       room: "Bathroom",
       image: "/images/bathroom-switches.jpg",
-      description: "Moisture-resistant luxury"
+      description: "Moisture-resistant luxury",
+      icon: Bath
     }
   ];
 
@@ -199,6 +248,64 @@ const SmartSwitches: React.FC = () => {
     { id: 'mixpad', name: 'MixPad Series', count: switches.filter(s => s.series === 'mixpad').length }
   ];
 
+  const installationSteps = [
+    {
+      icon: Wrench,
+      title: "1. Remove Old Switch",
+      description: "Simply unscrew your existing switch - no special tools required",
+      detail: "Standard screwdriver is all you need",
+      active: activeStep === 0
+    },
+    {
+      icon: MousePointer,
+      title: "2. Connect Wires",
+      description: "Use existing wiring - no rewiring needed for most installations",
+      detail: "Clear instructions included with every switch",
+      active: activeStep === 1
+    },
+    {
+      icon: Plug,
+      title: "3. Install Switch",
+      description: "Secure the new smart switch in place using standard mounting",
+      detail: "Fits standard UK electrical boxes",
+      active: activeStep === 2
+    },
+    {
+      icon: Zap,
+      title: "4. Connect & Control",
+      description: "Pair with app and start controlling your lights intelligently",
+      detail: "Instant smart home integration",
+      active: activeStep === 3
+    }
+  ];
+
+  const professionalSteps = [
+    {
+      icon: Users,
+      title: "1. Design Consultation",
+      description: "Expert assessment of your switch placement and smart home needs",
+      detail: "Personalized recommendations for optimal control"
+    },
+    {
+      icon: Settings,
+      title: "2. System Configuration",
+      description: "Pre-configure switches with scenes and automation schedules",
+      detail: "Custom setup tailored to your lifestyle"
+    },
+    {
+      icon: Layers,
+      title: "3. Professional Installation",
+      description: "Certified electricians ensure safe and perfect installation",
+      detail: "Seamless integration with smart wall systems"
+    },
+    {
+      icon: Zap,
+      title: "4. System Activation",
+      description: "Complete testing and training on your new switch system",
+      detail: "Immediate smart control functionality"
+    }
+  ];
+
   return (
     <>
       <SEOHead
@@ -209,435 +316,476 @@ const SmartSwitches: React.FC = () => {
         ogImage={smartSwitchesSEO.ogImage}
         structuredData={smartSwitchesSEO.structuredData}
       />
-      <div className="min-h-screen bg-black text-white">
-      {/* Breadcrumb Navigation */}
-      <div className="bg-gray-900 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-4">
-              <li>
-                <Link to="/" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li>
-                <Link to="/smart-devices" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                  Smart Devices
-                </Link>
-              </li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li><span className="text-gray-400">Orvibo</span></li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li><span className="text-[#D4AF37]">Switches</span></li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+        {/* Navigation */}
+        <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-gray-900 to-black"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-[#D4AF37] to-yellow-300 bg-clip-text text-transparent">
-                Orvibo Smart Switches
-              </h1>
-              <h2 className="text-2xl lg:text-3xl text-gray-300 mb-8">
-                Where Technology Meets Artistry
-              </h2>
-              <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Upgrade your walls with intelligent switches that blend seamlessly into luxury interiors. 
-                Experience the perfect fusion of form and function with Orvibo's award-winning switch collection.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-[#D4AF37] text-black px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105">
-                  Shop Smart Switches
-                </button>
-                <button className="border border-[#D4AF37] text-[#D4AF37] px-8 py-4 rounded-lg font-semibold hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
-                  See Installation Guide
-                </button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-800 rounded-2xl p-6">
-                  <img src="/images/traditional-switch.jpg" alt="Traditional switch" className="w-full h-32 object-cover rounded-lg mb-4" />
-                  <p className="text-gray-400 text-center">Traditional Switch</p>
-                </div>
-                <div className="bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-2xl p-6">
-                  <img src="/images/orvibo-smart-switch.jpg" alt="Orvibo smart switch" className="w-full h-32 object-cover rounded-lg mb-4" />
-                  <p className="text-[#D4AF37] text-center font-semibold">Orvibo Smart Switch</p>
-                </div>
-              </div>
-            </div>
+        {/* Breadcrumb Navigation */}
+        <div className="pt-24 pb-4 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <nav className="flex" aria-label="Breadcrumb">
+              <ol className="flex items-center space-x-4">
+                <li>
+                  <Link to="/" className="text-white/70 hover:text-[#b69777] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <Link to="/smart-devices" className="text-white/70 hover:text-[#b69777] transition-colors">
+                    Smart Devices
+                  </Link>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <span className="text-white/70">Orvibo</span>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <span className="text-[#b69777]">Switches</span>
+                </li>
+              </ol>
+            </nav>
           </div>
         </div>
-      </section>
 
-      {/* Problem/Solution Section */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Transform Any Room in Minutes</h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Revolutionary installation process that requires no rewiring for most setups
-            </p>
+        {/* Hero Section */}
+        <section className="pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="bg-[#D4AF37] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-black font-bold text-xl">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">Remove Old Switch</h3>
-              <p className="text-gray-400">Simply unscrew your existing switch</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#D4AF37] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-black font-bold text-xl">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">Connect Wires</h3>
-              <p className="text-gray-400">Use existing wiring - no rewiring needed</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#D4AF37] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-black font-bold text-xl">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">Install Switch</h3>
-              <p className="text-gray-400">Secure the new smart switch in place</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#D4AF37] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-black font-bold text-xl">4</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">Connect & Control</h3>
-              <p className="text-gray-400">Pair with app and start controlling</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Product Showcase */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Featured Switch Series</h2>
-            <p className="text-xl text-gray-400">Discover our premium collections designed for every style and need</p>
-          </div>
-          
-          {/* Series Filter and View Toggle */}
-          <div className="flex flex-col lg:flex-row justify-between items-center mb-12 gap-4">
-            <div className="flex flex-wrap gap-2">
-              {series.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSelectedSeries(s.id)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedSeries === s.id
-                      ? 'bg-[#D4AF37] text-black'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
-                >
-                  {s.name} ({s.count})
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-[#D4AF37] text-black' : 'bg-gray-800 text-gray-300'}`}
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
               >
-                <Grid className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-[#D4AF37] text-black' : 'bg-gray-800 text-gray-300'}`}
-              >
-                <List className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Products Grid/List */}
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
-            : "space-y-6"
-          }>
-            {filteredSwitches.map((switchItem) => (
-              <div key={switchItem.id} className={`bg-gray-900 rounded-2xl overflow-hidden hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 group ${
-                viewMode === 'list' ? 'flex' : ''
-              }`}>
-                <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-64 flex-shrink-0' : ''}`}>
-                  <img 
-                    src={switchItem.image} 
-                    alt={switchItem.name}
-                    className={`object-cover group-hover:scale-110 transition-transform duration-300 ${
-                      viewMode === 'list' ? 'w-full h-full' : 'w-full h-64'
-                    }`}
-                  />
-                  <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">
-                    {switchItem.priceRange}
-                  </div>
-                  <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
-                    <Star className="w-4 h-4 text-[#D4AF37] fill-current mr-1" />
-                    <span className="text-white text-sm">{switchItem.rating}</span>
-                    <span className="text-gray-300 text-sm ml-1">({switchItem.reviews})</span>
-                  </div>
+                <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+                  Orvibo Smart Switches
                 </div>
-                <div className="p-6 flex-1">
-                  <h3 className="text-2xl font-bold mb-2 text-white">{switchItem.name}</h3>
-                  <p className="text-[#D4AF37] mb-4">{switchItem.subtitle}</p>
-                  
-                  <div className="mb-4">
-                    {switchItem.features.slice(0, viewMode === 'list' ? 5 : 3).map((feature, index) => (
-                      <div key={index} className="flex items-center mb-2">
-                        <CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2 flex-shrink-0" />
-                        <span className="text-gray-400 text-sm">{feature}</span>
-                      </div>
+                <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+                  Where Technology{" "}
+                  <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                    Meets Artistry
+                  </span>
+                </h1>
+                <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+                  Upgrade your walls with intelligent switches that blend seamlessly into luxury interiors. 
+                  Experience the perfect fusion of form and function with Orvibo's award-winning switch collection.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                    onClick={() => setIsQuoteModalOpen(true)}
+                  >
+                    Shop Smart Switches <ArrowRight className="ml-2 h-5 w-5" />
+                  </button>
+
+                  <button
+                    className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                    onClick={() =>
+                      document.getElementById("installation")?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  >
+                    See Installation Guide <Play className="ml-2 h-5 w-5" />
+                  </button>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative"
+              >
+                <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white/5 rounded-2xl p-4 text-center">
+                      <img src="/images/traditional-switch.jpg" alt="Traditional switch" className="w-full h-24 object-cover rounded-lg mb-2" />
+                      <p className="text-white/70 text-sm">Traditional Switch</p>
+                    </div>
+                    <div className="bg-[#b69777]/20 rounded-2xl p-4 text-center border border-[#b69777]/50">
+                      <img src="/images/orvibo-smart-switch.jpg" alt="Orvibo smart switch" className="w-full h-24 object-cover rounded-lg mb-2" />
+                      <p className="text-[#b69777] text-sm font-semibold">Orvibo Smart Switch</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {installationSteps.map((step, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 + i * 0.1 }}
+                        className={`text-center p-3 rounded-xl shadow-sm border transition-all duration-300 ${
+                          step.active 
+                            ? 'bg-[#b69777]/20 border-[#b69777]/50' 
+                            : 'bg-white/10 border-white/20'
+                        }`}
+                      >
+                        <step.icon className={`w-6 h-6 mx-auto mb-2 transition-colors duration-300 ${
+                          step.active ? 'text-[#b69777]' : 'text-white/70'
+                        }`} />
+                        <p className="text-xs font-medium text-white/90">{step.title.split('. ')[1]}</p>
+                      </motion.div>
                     ))}
                   </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
-                  {/* Color Options */}
-                  <div className="mb-4">
-                    <p className="text-gray-500 text-sm mb-2">Available Colors:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {switchItem.colors.map((color, index) => (
-                        <span key={index} className="bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs">
-                          {color}
-                        </span>
-                      ))}
+        {/* Installation Process Section */}
+        <section id="installation" className="py-20 bg-white">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Transform Any Room in Minutes
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                Revolutionary installation process that requires no rewiring for most setups.
+              </p>
+            </motion.div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {installationSteps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="bg-gradient-to-br from-[#b69777] to-[#907252] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <step.icon className="text-white w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                  <p className="text-[#6b5c47] mb-2">{step.description}</p>
+                  <p className="text-sm text-[#b69777] font-medium">{step.detail}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Product Showcase */}
+        <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Featured Switch Series
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                Discover our premium collections designed for every style and need.
+              </p>
+            </motion.div>
+            
+            {/* Series Filter and View Toggle */}
+            <div className="flex flex-col lg:flex-row justify-between items-center mb-12 gap-4">
+              <div className="flex flex-wrap gap-2">
+                {series.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedSeries(s.id)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                      selectedSeries === s.id
+                        ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white'
+                        : 'bg-white border border-[#e2d5c4] text-[#6b5c47] hover:border-[#b69777]'
+                    }`}
+                  >
+                    {s.name} ({s.count})
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'grid' 
+                      ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white' 
+                      : 'bg-white border border-[#e2d5c4] text-[#6b5c47]'
+                  }`}
+                >
+                  <Grid className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'list' 
+                      ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white' 
+                      : 'bg-white border border-[#e2d5c4] text-[#6b5c47]'
+                  }`}
+                >
+                  <List className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Products Grid/List */}
+            <div className={viewMode === 'grid' 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+              : "space-y-6"
+            }>
+              {filteredSwitches.map((switchItem, index) => (
+                <motion.div
+                  key={switchItem.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  className={`group relative ${
+                    switchItem.highlight 
+                      ? 'bg-gradient-to-br from-[#b69777]/10 to-[#907252]/5 border-2 border-[#b69777]' 
+                      : 'bg-white border border-[#e2d5c4]'
+                  } rounded-2xl overflow-hidden hover:border-[#b69777] transition-all duration-300 hover:shadow-xl ${
+                    viewMode === 'list' ? 'flex' : ''
+                  }`}
+                >
+                  {switchItem.highlight && (
+                    <div className="absolute top-4 left-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-64 flex-shrink-0' : ''}`}>
+                    <img 
+                      src={switchItem.image} 
+                      alt={switchItem.name}
+                      className={`object-cover group-hover:scale-110 transition-transform duration-300 ${
+                        viewMode === 'list' ? 'w-full h-full' : 'w-full h-64'
+                      }`}
+                    />
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {switchItem.priceRange}
+                    </div>
+                    <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
+                      <Star className="w-4 h-4 text-[#b69777] fill-current mr-1" />
+                      <span className="text-white text-sm">{switchItem.rating}</span>
+                      <span className="text-white/70 text-sm ml-1">({switchItem.reviews})</span>
                     </div>
                   </div>
-
-                  {viewMode === 'list' && (
-                    <div className="border-t border-gray-700 pt-4 mb-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                  
+                  <div className="p-6 flex-1">
+                    <h3 className="text-2xl font-bold mb-2 text-[#231c14]">{switchItem.name}</h3>
+                    <p className="text-[#b69777] mb-4 font-medium">{switchItem.subtitle}</p>
+                    
+                    <div className="mb-4">
+                      {switchItem.features.slice(0, viewMode === 'list' ? 5 : 3).map((feature, index) => (
+                        <div key={index} className="flex items-center mb-2">
+                          <CheckCircle className="w-4 h-4 text-[#b69777] mr-2 flex-shrink-0" />
+                          <span className="text-[#6b5c47] text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="border-t border-[#e2d5c4] pt-4 mb-4">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <span className="text-gray-500">Protocol:</span>
-                          <p className="text-white">{switchItem.specs.protocol}</p>
+                          <span className="text-[#6b5c47]">Protocol:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{switchItem.specs.protocol}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">Power:</span>
-                          <p className="text-white">{switchItem.specs.power}</p>
+                          <span className="text-[#6b5c47]">Power:</span>
+                          <p className="text-[#231c14] font-medium">{switchItem.specs.power}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">Installation:</span>
-                          <p className="text-white">{switchItem.specs.installation}</p>
+                          <span className="text-[#6b5c47]">Installation:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{switchItem.specs.installation}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">Finish:</span>
-                          <p className="text-white">{switchItem.specs.finish}</p>
+                          <span className="text-[#6b5c47]">Finish:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{switchItem.specs.finish}</p>
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <button className="flex-1 bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">
-                      View Details
-                    </button>
-                    <button className="px-4 py-3 border border-[#D4AF37] text-[#D4AF37] rounded-lg hover:bg-[#D4AF37] hover:text-black transition-colors">
-                      Compare
+                    
+                    <div className="mb-4">
+                      <span className="text-[#6b5c47] text-sm">Available Colors:</span>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {switchItem.colors.map((color, i) => (
+                          <span key={i} className="text-xs bg-[#b69777]/10 text-[#b69777] px-2 py-1 rounded">
+                            {color}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="w-full bg-gradient-to-r from-[#b69777] to-[#907252] text-white py-3 rounded-lg font-semibold hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 transform hover:scale-105"
+                      onClick={() => {
+                        setSelectedProduct({ name: switchItem.name, price: switchItem.price });
+                        setIsQuoteModalOpen(true);
+                      }}
+                    >
+                      Get Quote
                     </button>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Compatibility Matrix */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Smart Wall Compatibility</h2>
-            <p className="text-xl text-gray-400">See which switches work with different smart wall configurations</p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="bg-black rounded-2xl p-8">
-              <Zap className="w-12 h-12 text-[#D4AF37] mb-4" />
-              <h3 className="text-2xl font-bold mb-4 text-white">Protocol Compatibility</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Zigbee 3.0</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />WiFi 2.4GHz</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Matter Protocol</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />RF 433MHz</li>
-              </ul>
-            </div>
-            <div className="bg-black rounded-2xl p-8">
-              <Palette className="w-12 h-12 text-[#D4AF37] mb-4" />
-              <h3 className="text-2xl font-bold mb-4 text-white">Design Integration</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Flush wall mounting</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Multiple finish options</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Custom color matching</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Seamless integration</li>
-              </ul>
-            </div>
-            <div className="bg-black rounded-2xl p-8">
-              <Smartphone className="w-12 h-12 text-[#D4AF37] mb-4" />
-              <h3 className="text-2xl font-bold mb-4 text-white">Smart Features</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Voice control</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />App control</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Scene automation</li>
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />Energy monitoring</li>
-              </ul>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Design Gallery */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Design Gallery</h2>
-            <p className="text-xl text-gray-400">See our switches in beautiful room settings</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {designGallery.map((room, index) => (
-              <div key={index} className="group relative overflow-hidden rounded-2xl">
-                <img 
-                  src={room.image} 
-                  alt={room.room}
-                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-bold text-white mb-2">{room.room}</h3>
-                  <p className="text-gray-300 text-sm">{room.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Installation & Support */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-6 text-white">Professional Installation & Support</h2>
-              <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Our certified technicians ensure perfect installation and provide comprehensive support for your smart switch upgrade.
+        {/* Design Gallery */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Design Gallery
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                See how our smart switches enhance different room aesthetics.
               </p>
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-[#D4AF37] mr-3" />
-                  <span className="text-gray-300">Certified electrician installation</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-[#D4AF37] mr-3" />
-                  <span className="text-gray-300">Comprehensive setup and configuration</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-[#D4AF37] mr-3" />
-                  <span className="text-gray-300">24/7 technical support</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-[#D4AF37] mr-3" />
-                  <span className="text-gray-300">2-year warranty on all products</span>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-[#D4AF37] text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">
-                  Book Installation
-                </button>
-                <button className="border border-[#D4AF37] text-[#D4AF37] px-6 py-3 rounded-lg font-semibold hover:bg-[#D4AF37] hover:text-black transition-colors">
-                  DIY Installation Guide
-                </button>
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src="/images/professional-installation.jpg" 
-                alt="Professional installation service"
-                className="w-full h-auto rounded-2xl shadow-2xl"
-              />
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {designGallery.map((room, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="group"
+                >
+                  <div className="bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl overflow-hidden">
+                    <div className="relative overflow-hidden">
+                      <img 
+                        src={room.image} 
+                        alt={`${room.room} switches`}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                    
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <room.icon className="w-8 h-8 text-[#b69777] mr-3" />
+                        <h3 className="text-xl font-bold text-[#231c14]">{room.room}</h3>
+                      </div>
+                      <p className="text-[#6b5c47] leading-relaxed">{room.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Comparison Tool */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Why Choose Orvibo?</h2>
-            <p className="text-xl text-gray-400">See how we compare to traditional and competitor switches</p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full bg-gray-900 rounded-2xl overflow-hidden">
-              <thead className="bg-[#D4AF37] text-black">
-                <tr>
-                  <th className="px-6 py-4 text-left font-semibold">Feature</th>
-                  <th className="px-6 py-4 text-center font-semibold">Traditional Switch</th>
-                  <th className="px-6 py-4 text-center font-semibold">Competitor</th>
-                  <th className="px-6 py-4 text-center font-semibold">Orvibo Switch</th>
-                </tr>
-              </thead>
-              <tbody className="text-white">
-                <tr className="bg-gray-800">
-                  <td className="px-6 py-4 font-semibold">Smart Control</td>
-                  <td className="px-6 py-4 text-center text-red-400">✗</td>
-                  <td className="px-6 py-4 text-center text-yellow-400">Basic</td>
-                  <td className="px-6 py-4 text-center text-[#D4AF37]">Advanced</td>
-                </tr>
-                <tr className="bg-gray-900">
-                  <td className="px-6 py-4 font-semibold">Voice Control</td>
-                  <td className="px-6 py-4 text-center text-red-400">✗</td>
-                  <td className="px-6 py-4 text-center text-yellow-400">Limited</td>
-                  <td className="px-6 py-4 text-center text-[#D4AF37]">Full Support</td>
-                </tr>
-                <tr className="bg-gray-800">
-                  <td className="px-6 py-4 font-semibold">Design Quality</td>
-                  <td className="px-6 py-4 text-center text-yellow-400">Basic</td>
-                  <td className="px-6 py-4 text-center text-yellow-400">Good</td>
-                  <td className="px-6 py-4 text-center text-[#D4AF37]">Premium</td>
-                </tr>
-                <tr className="bg-gray-900">
-                  <td className="px-6 py-4 font-semibold">Installation</td>
-                  <td className="px-6 py-4 text-center text-yellow-400">Simple</td>
-                  <td className="px-6 py-4 text-center text-red-400">Complex</td>
-                  <td className="px-6 py-4 text-center text-[#D4AF37]">Easy</td>
-                </tr>
-                <tr className="bg-gray-800">
-                  <td className="px-6 py-4 font-semibold">Energy Monitoring</td>
-                  <td className="px-6 py-4 text-center text-red-400">✗</td>
-                  <td className="px-6 py-4 text-center text-red-400">✗</td>
-                  <td className="px-6 py-4 text-center text-[#D4AF37]">✓</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+        {/* Professional Installation */}
+        <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Professional Installation Service
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                For complex installations or complete smart wall integration, our certified professionals ensure perfect results.
+              </p>
+            </motion.div>
 
-      {/* Footer CTA */}
-      <section className="py-20 bg-gradient-to-r from-[#D4AF37] to-yellow-400">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-black">Ready to Upgrade Your Switches?</h2>
-          <p className="text-xl text-black/80 mb-8">
-            Transform your home with intelligent switches that combine luxury design with smart functionality.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-black text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
-              Shop All Switches
-            </button>
-            <button className="border-2 border-black text-black px-8 py-4 rounded-lg font-semibold hover:bg-black hover:text-white transition-colors">
-              Get Professional Quote
-            </button>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {professionalSteps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="bg-gradient-to-br from-[#b69777] to-[#907252] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <step.icon className="text-white w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                  <p className="text-[#6b5c47] mb-2">{step.description}</p>
+                  <p className="text-sm text-[#b69777] font-medium">{step.detail}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410] relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
+                Ready to Upgrade Your{" "}
+                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                  Wall Controls?
+                </span>
+              </h2>
+              <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Transform your home with intelligent switches that combine luxury design with smart functionality.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                  onClick={() => setIsQuoteModalOpen(true)}
+                >
+                  Get Free Design Consultation <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+                <button className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center">
+                  <Play className="mr-2 h-5 w-5" />
+                  Watch Installation Video
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <Footer />
+
+        {/* Quote Modal */}
+        {isQuoteModalOpen && (
+          <QuoteModal
+            isOpen={isQuoteModalOpen}
+            onClose={() => setIsQuoteModalOpen(false)}
+            selectedProduct={selectedProduct}
+          />
+        )}
       </div>
     </>
   );
 };
 
 export default SmartSwitches;
-

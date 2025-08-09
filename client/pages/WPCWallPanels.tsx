@@ -149,13 +149,7 @@ const WPCWallPanels = () => {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#231c14]/90 to-[#231c14]/70"></div>
-        <div className="absolute inset-0">
-          <img 
-            src="#" 
-            alt="WPC Wall Panels Installation" 
-            className="w-full h-full object-cover"
-          />
-        </div>
+       
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-6">

@@ -1,12 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import QuoteModal from '@/components/QuoteModal';
 import SEOHead from '../components/SEOHead';
 import { securitySensorsSEO } from '../utils/seoData';
-import { ArrowRight, Shield, Camera, Lock, AlertTriangle, Thermometer, Eye, Bell, CheckCircle, Star, Phone, Wifi } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Shield, 
+  Camera, 
+  Lock, 
+  AlertTriangle, 
+  Thermometer, 
+  Eye, 
+  Bell, 
+  CheckCircle, 
+  Star, 
+  Phone, 
+  Wifi,
+  Play,
+  Users,
+  Layers,
+  Zap,
+  Home,
+  Building2,
+  ShieldCheck
+} from 'lucide-react';
 
 const SecuritySensors: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string, price: string }>({ name: '', price: '' });
+  const [activeLayer, setActiveLayer] = useState(0);
+
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveLayer((prev) => (prev + 1) % 4);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const securityProducts = [
     {
@@ -30,7 +67,8 @@ const SecuritySensors: React.FC = () => {
         security: "AI Recognition"
       },
       rating: 4.9,
-      reviews: 234
+      reviews: 234,
+      highlight: true
     },
     {
       id: 2,
@@ -53,7 +91,8 @@ const SecuritySensors: React.FC = () => {
         security: "Encryption"
       },
       rating: 4.7,
-      reviews: 189
+      reviews: 189,
+      highlight: false
     },
     {
       id: 3,
@@ -76,7 +115,8 @@ const SecuritySensors: React.FC = () => {
         security: "Biometric"
       },
       rating: 4.6,
-      reviews: 156
+      reviews: 156,
+      highlight: false
     },
     {
       id: 4,
@@ -99,7 +139,8 @@ const SecuritySensors: React.FC = () => {
         security: "PIN + App"
       },
       rating: 4.5,
-      reviews: 143
+      reviews: 143,
+      highlight: false
     },
     {
       id: 5,
@@ -122,7 +163,8 @@ const SecuritySensors: React.FC = () => {
         security: "WPA2"
       },
       rating: 4.4,
-      reviews: 198
+      reviews: 198,
+      highlight: false
     },
     {
       id: 6,
@@ -145,7 +187,8 @@ const SecuritySensors: React.FC = () => {
         security: "Encrypted"
       },
       rating: 4.6,
-      reviews: 267
+      reviews: 267,
+      highlight: false
     },
     {
       id: 7,
@@ -168,7 +211,8 @@ const SecuritySensors: React.FC = () => {
         security: "Encrypted"
       },
       rating: 4.5,
-      reviews: 178
+      reviews: 178,
+      highlight: false
     },
     {
       id: 8,
@@ -191,7 +235,8 @@ const SecuritySensors: React.FC = () => {
         security: "Certified"
       },
       rating: 4.8,
-      reviews: 145
+      reviews: 145,
+      highlight: false
     },
     {
       id: 9,
@@ -214,7 +259,8 @@ const SecuritySensors: React.FC = () => {
         security: "IP67 Rated"
       },
       rating: 4.7,
-      reviews: 123
+      reviews: 123,
+      highlight: false
     },
     {
       id: 10,
@@ -237,7 +283,8 @@ const SecuritySensors: React.FC = () => {
         security: "Priority Alert"
       },
       rating: 4.6,
-      reviews: 89
+      reviews: 89,
+      highlight: false
     }
   ];
 
@@ -246,34 +293,42 @@ const SecuritySensors: React.FC = () => {
       layer: "Perimeter Security",
       description: "First line of defense with door/window sensors and outdoor cameras",
       products: ["Door Window Sensor", "IP Camera S2"],
-      icon: <Shield className="w-8 h-8 text-[#D4AF37]" />
+      icon: Shield,
+      color: "from-[#b69777] to-[#907252]",
+      active: activeLayer === 0
     },
     {
       layer: "Access Control",
       description: "Smart locks and biometric authentication for authorized entry",
       products: ["Smart Lock V5 Face", "Smart Door Lock S2"],
-      icon: <Lock className="w-8 h-8 text-[#D4AF37]" />
+      icon: Lock,
+      color: "from-blue-400 to-cyan-500",
+      active: activeLayer === 1
     },
     {
       layer: "Interior Monitoring",
       description: "Indoor cameras and motion sensors for comprehensive coverage",
       products: ["1080P IP Camera", "Motion Sensors"],
-      icon: <Eye className="w-8 h-8 text-[#D4AF37]" />
+      icon: Eye,
+      color: "from-purple-400 to-pink-500",
+      active: activeLayer === 2
     },
     {
       layer: "Environmental Safety",
       description: "Smoke, water, and gas sensors for hazard detection",
       products: ["Smoke Sensor", "Water Sensor", "Gas Sensor"],
-      icon: <AlertTriangle className="w-8 h-8 text-[#D4AF37]" />
+      icon: AlertTriangle,
+      color: "from-green-400 to-emerald-500",
+      active: activeLayer === 3
     }
   ];
 
   const categories = [
-    { id: 'all', name: 'All Products', icon: <Shield className="w-5 h-5" /> },
-    { id: 'access', name: 'Access Control', icon: <Lock className="w-5 h-5" /> },
-    { id: 'surveillance', name: 'Surveillance', icon: <Camera className="w-5 h-5" /> },
-    { id: 'environmental', name: 'Environmental', icon: <Thermometer className="w-5 h-5" /> },
-    { id: 'emergency', name: 'Emergency', icon: <AlertTriangle className="w-5 h-5" /> }
+    { id: 'all', name: 'All Products', icon: Shield },
+    { id: 'access', name: 'Access Control', icon: Lock },
+    { id: 'surveillance', name: 'Surveillance', icon: Camera },
+    { id: 'environmental', name: 'Environmental', icon: Thermometer },
+    { id: 'emergency', name: 'Emergency', icon: AlertTriangle }
   ];
 
   const filteredProducts = selectedCategory === 'all' 
@@ -290,7 +345,8 @@ const SecuritySensors: React.FC = () => {
         "Cloud storage (7 days)",
         "Email notifications",
         "Basic support"
-      ]
+      ],
+      popular: false
     },
     {
       name: "Advanced Security",
@@ -302,7 +358,8 @@ const SecuritySensors: React.FC = () => {
         "SMS + Email alerts",
         "Priority support",
         "Video verification"
-      ]
+      ],
+      popular: true
     },
     {
       name: "Premium Protection",
@@ -315,7 +372,35 @@ const SecuritySensors: React.FC = () => {
         "Dedicated support",
         "AI threat detection",
         "Insurance discounts"
-      ]
+      ],
+      popular: false
+    }
+  ];
+
+  const installationSteps = [
+    {
+      icon: Users,
+      title: "1. Security Assessment",
+      description: "Professional evaluation of your home's security needs and vulnerabilities",
+      detail: "Comprehensive security audit and recommendations"
+    },
+    {
+      icon: Layers,
+      title: "2. System Design",
+      description: "Custom security system design tailored to your property layout",
+      detail: "Strategic sensor and camera placement planning"
+    },
+    {
+      icon: Zap,
+      title: "3. Professional Installation",
+      description: "Expert installation with minimal disruption to your daily routine",
+      detail: "Certified technicians ensure optimal performance"
+    },
+    {
+      icon: ShieldCheck,
+      title: "4. System Activation",
+      description: "Complete testing and activation with comprehensive training",
+      detail: "24/7 monitoring begins immediately"
     }
   ];
 
@@ -329,308 +414,456 @@ const SecuritySensors: React.FC = () => {
         ogImage={securitySensorsSEO.ogImage}
         structuredData={securitySensorsSEO.structuredData}
       />
-      <div className="min-h-screen bg-black text-white">
-      {/* Breadcrumb Navigation */}
-      <div className="bg-gray-900 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-4">
-              <li>
-                <Link to="/" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li>
-                <Link to="/smart-devices" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                  Smart Devices
-                </Link>
-              </li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li><span className="text-gray-400">Orvibo</span></li>
-              <li><ArrowRight className="w-4 h-4 text-gray-400" /></li>
-              <li><span className="text-[#D4AF37]">Security & Sensors</span></li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+        {/* Navigation */}
+        <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-gray-900 to-black"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-[#D4AF37] to-yellow-300 bg-clip-text text-transparent">
-                Orvibo Security & Sensors
-              </h1>
-              <h2 className="text-2xl lg:text-3xl text-gray-300 mb-8">
-                Protect What Matters Most
-              </h2>
-              <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Advanced AI-powered security systems that integrate seamlessly with your smart walls. 
-                Experience comprehensive protection with intelligent monitoring and instant alerts.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-[#D4AF37] text-black px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105">
-                  Secure My Home
-                </button>
-                <button className="border border-[#D4AF37] text-[#D4AF37] px-8 py-4 rounded-lg font-semibold hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
-                  View Security Plans
-                </button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-3xl p-8">
-                <img 
-                  src="/images/security-hero.jpg" 
-                  alt="Smart security system with lock and camera"
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
-              </div>
-            </div>
+        {/* Breadcrumb Navigation */}
+        <div className="pt-24 pb-4 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <nav className="flex" aria-label="Breadcrumb">
+              <ol className="flex items-center space-x-4">
+                <li>
+                  <Link to="/" className="text-white/70 hover:text-[#b69777] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <Link to="/smart-devices" className="text-white/70 hover:text-[#b69777] transition-colors">
+                    Smart Devices
+                  </Link>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <span className="text-white/70">Orvibo</span>
+                </li>
+                <li>
+                  <ArrowRight className="w-4 h-4 text-white/50" />
+                </li>
+                <li>
+                  <span className="text-[#b69777]">Security & Sensors</span>
+                </li>
+              </ol>
+            </nav>
           </div>
         </div>
-      </section>
 
-      {/* Security Categories */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Complete Security Ecosystem</h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From smart locks to environmental sensors, protect every aspect of your home with our integrated security solutions.
-            </p>
+        {/* Hero Section */}
+        <section className="pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
           </div>
-          
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
-                  selectedCategory === category.id
-                    ? 'bg-[#D4AF37] text-black transform scale-105'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
+
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
               >
-                {category.icon}
-                {category.name}
-              </button>
-            ))}
-          </div>
+                <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+                  Orvibo Security Systems
+                </div>
+                <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+                  Protect What{" "}
+                  <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                    Matters Most
+                  </span>
+                </h1>
+                <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+                  Advanced AI-powered security systems that integrate seamlessly with your smart walls. 
+                  Experience comprehensive protection with intelligent monitoring and instant alerts.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                    onClick={() => setIsQuoteModalOpen(true)}
+                  >
+                    Secure My Home <ArrowRight className="ml-2 h-5 w-5" />
+                  </button>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-black rounded-2xl overflow-hidden hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 group">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-3 py-1 rounded-full text-sm font-semibold">
-                    {product.price}
+                  <button
+                    className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                    onClick={() =>
+                      document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  >
+                    View Security Plans <Play className="ml-2 h-5 w-5" />
+                  </button>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative"
+              >
+                <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+                  <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
+                    <img
+                      src="/images/security-hero.jpg"
+                      alt="Smart security system with lock and camera"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
-                    <Star className="w-4 h-4 text-[#D4AF37] fill-current mr-1" />
-                    <span className="text-white text-sm">{product.rating}</span>
-                    <span className="text-gray-300 text-sm ml-1">({product.reviews})</span>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {securityLayers.map((layer, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 + i * 0.1 }}
+                        className={`text-center p-3 rounded-xl shadow-sm border transition-all duration-300 ${
+                          layer.active 
+                            ? 'bg-[#b69777]/20 border-[#b69777]/50' 
+                            : 'bg-white/10 border-white/20'
+                        }`}
+                      >
+                        <layer.icon className={`w-6 h-6 mx-auto mb-2 transition-colors duration-300 ${
+                          layer.active ? 'text-[#b69777]' : 'text-white/70'
+                        }`} />
+                        <p className="text-xs font-medium text-white/90">{layer.layer}</p>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2 text-white">{product.name}</h3>
-                  <p className="text-[#D4AF37] mb-4">{product.subtitle}</p>
-                  <div className="mb-4">
-                    {product.features.slice(0, 3).map((feature, index) => (
-                      <div key={index} className="flex items-center mb-2">
-                        <CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />
-                        <span className="text-gray-400 text-sm">{feature}</span>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Security Layers Section */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Complete Security Ecosystem
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                From smart locks to environmental sensors, protect every aspect of your home with our integrated security solutions.
+              </p>
+            </motion.div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {securityLayers.map((layer, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="group"
+                >
+                  <div className="text-center p-8 h-full bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl">
+                    <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${layer.color} flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      <layer.icon className="text-white w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#231c14] mb-4">{layer.layer}</h3>
+                    <p className="text-[#6b5c47] leading-relaxed mb-4">{layer.description}</p>
+                    <div className="text-sm text-[#b69777] font-medium">
+                      {layer.products.join(", ")}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Product Categories */}
+        <section id="products" className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Security Product Collection
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                Comprehensive security solutions designed to integrate seamlessly with your smart wall system.
+              </p>
+            </motion.div>
+            
+            {/* Category Filter */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+                    selectedCategory === category.id
+                      ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white transform scale-105'
+                      : 'bg-white border border-[#e2d5c4] text-[#6b5c47] hover:border-[#b69777]'
+                  }`}
+                >
+                  <category.icon className="w-5 h-5" />
+                  {category.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  className={`group relative ${
+                    product.highlight 
+                      ? 'bg-gradient-to-br from-[#b69777]/10 to-[#907252]/5 border-2 border-[#b69777]' 
+                      : 'bg-white border border-[#e2d5c4]'
+                  } rounded-2xl overflow-hidden hover:border-[#b69777] transition-all duration-300 hover:shadow-xl`}
+                >
+                  {product.highlight && (
+                    <div className="absolute top-4 left-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {product.price}
+                    </div>
+                    <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
+                      <Star className="w-4 h-4 text-[#b69777] fill-current mr-1" />
+                      <span className="text-white text-sm">{product.rating}</span>
+                      <span className="text-white/70 text-sm ml-1">({product.reviews})</span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold mb-2 text-[#231c14]">{product.name}</h3>
+                    <p className="text-[#b69777] mb-4 font-medium">{product.subtitle}</p>
+                    
+                    <div className="mb-4">
+                      {product.features.slice(0, 3).map((feature, index) => (
+                        <div key={index} className="flex items-center mb-2">
+                          <CheckCircle className="w-4 h-4 text-[#b69777] mr-2 flex-shrink-0" />
+                          <span className="text-[#6b5c47] text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="border-t border-[#e2d5c4] pt-4 mb-4">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-[#6b5c47]">Power:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{product.specs.power}</p>
+                        </div>
+                        <div>
+                          <span className="text-[#6b5c47]">Connectivity:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{product.specs.connectivity}</p>
+                        </div>
+                        <div>
+                          <span className="text-[#6b5c47]">Installation:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{product.specs.installation}</p>
+                        </div>
+                        <div>
+                          <span className="text-[#6b5c47]">Security:</span>
+                          <p className="text-[#231c14] font-medium text-xs">{product.specs.security}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="w-full bg-gradient-to-r from-[#b69777] to-[#907252] text-white py-3 rounded-lg font-semibold hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 transform hover:scale-105"
+                      onClick={() => {
+                        setSelectedProduct({ name: product.name, price: product.price });
+                        setIsQuoteModalOpen(true);
+                      }}
+                    >
+                      Get Quote
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Installation Process */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Professional Installation Process
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                From security assessment to system activation, our expert team ensures comprehensive protection.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {installationSteps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="bg-gradient-to-br from-[#b69777] to-[#907252] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <step.icon className="text-white w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+                  <p className="text-[#6b5c47] mb-2">{step.description}</p>
+                  <p className="text-sm text-[#b69777] font-medium">{step.detail}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Monitoring Plans */}
+        <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
+                Professional Monitoring Plans
+              </h2>
+              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
+                Choose the level of protection that's right for your home and family.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {monitoringPlans.map((plan, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={`relative ${
+                    plan.popular 
+                      ? 'bg-gradient-to-br from-[#b69777]/10 to-[#907252]/5 border-2 border-[#b69777] transform scale-105' 
+                      : 'bg-white border border-[#e2d5c4]'
+                  } rounded-2xl p-8 hover:border-[#b69777] transition-all duration-300 hover:shadow-xl`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-6 py-2 rounded-full text-sm font-semibold">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold text-[#231c14] mb-4">{plan.name}</h3>
+                    <div className="text-4xl font-extrabold text-[#b69777] mb-2">{plan.price}</div>
+                  </div>
+                  
+                  <div className="space-y-4 mb-8">
+                    {plan.features.map((feature, i) => (
+                      <div key={i} className="flex items-center">
+                        <CheckCircle className="w-5 h-5 text-[#b69777] mr-3 flex-shrink-0" />
+                        <span className="text-[#6b5c47]">{feature}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="border-t border-gray-700 pt-4 mb-4">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-gray-500">Power:</span>
-                        <p className="text-white text-xs">{product.specs.power}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Connectivity:</span>
-                        <p className="text-white text-xs">{product.specs.connectivity}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Installation:</span>
-                        <p className="text-white text-xs">{product.specs.installation}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Security:</span>
-                        <p className="text-white text-xs">{product.specs.security}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="w-full bg-[#D4AF37] text-black py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">
-                    View Details
+                  
+                  <button 
+                    className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777]'
+                        : 'border border-[#b69777] text-[#b69777] hover:bg-[#b69777] hover:text-white'
+                    }`}
+                    onClick={() => {
+                      setSelectedProduct({ name: plan.name, price: plan.price });
+                      setIsQuoteModalOpen(true);
+                    }}
+                  >
+                    Choose Plan
                   </button>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Layered Security Approach */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Multi-Layer Security Protection</h2>
-            <p className="text-xl text-gray-400">Comprehensive security through multiple integrated defense layers</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {securityLayers.map((layer, index) => (
-              <div key={index} className="bg-gray-900 rounded-2xl p-8 hover:bg-gray-800 transition-all duration-300 transform hover:scale-105">
-                <div className="mb-6">{layer.icon}</div>
-                <h3 className="text-2xl font-bold mb-4 text-white">{layer.layer}</h3>
-                <p className="text-gray-400 mb-6 leading-relaxed">{layer.description}</p>
-                <div className="space-y-2">
-                  {layer.products.map((product, idx) => (
-                    <div key={idx} className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-[#D4AF37] mr-2" />
-                      <span className="text-gray-300 text-sm">{product}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410] relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
           </div>
           
-          {/* Security Diagram */}
-          <div className="mt-16 bg-gray-900 rounded-3xl p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold mb-4 text-white">How Our Security Layers Work Together</h3>
-              <p className="text-gray-400">Visual representation of integrated security coverage</p>
-            </div>
-            <div className="relative">
-              <img 
-                src="/images/security-layers-diagram.jpg" 
-                alt="Security layers diagram"
-                className="w-full h-auto rounded-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Peace of Mind Features */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Advanced Security Features</h2>
-            <p className="text-xl text-gray-400">Cutting-edge technology for ultimate peace of mind</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-black rounded-2xl p-8 text-center hover:bg-gray-800 transition-colors">
-              <Bell className="w-12 h-12 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">24/7 Monitoring</h3>
-              <p className="text-gray-400">Professional monitoring service with instant emergency response</p>
-            </div>
-            <div className="bg-black rounded-2xl p-8 text-center hover:bg-gray-800 transition-colors">
-              <Phone className="w-12 h-12 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">Mobile Alerts</h3>
-              <p className="text-gray-400">Instant notifications on your smartphone for all security events</p>
-            </div>
-            <div className="bg-black rounded-2xl p-8 text-center hover:bg-gray-800 transition-colors">
-              <Wifi className="w-12 h-12 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">Cloud Storage</h3>
-              <p className="text-gray-400">Secure cloud backup for all recordings and security data</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Professional Monitoring Plans */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Professional Monitoring Plans</h2>
-            <p className="text-xl text-gray-400">Choose the level of protection that's right for your home</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {monitoringPlans.map((plan, index) => (
-              <div key={index} className={`rounded-2xl p-8 ${index === 1 ? 'bg-[#D4AF37] text-black' : 'bg-gray-900 text-white'} hover:scale-105 transition-all duration-300`}>
-                <h3 className={`text-2xl font-bold mb-4 ${index === 1 ? 'text-black' : 'text-white'}`}>{plan.name}</h3>
-                <div className={`text-4xl font-bold mb-6 ${index === 1 ? 'text-black' : 'text-[#D4AF37]'}`}>{plan.price}</div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center">
-                      <CheckCircle className={`w-5 h-5 mr-3 ${index === 1 ? 'text-black' : 'text-[#D4AF37]'}`} />
-                      <span className={index === 1 ? 'text-black' : 'text-gray-300'}>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                  index === 1 
-                    ? 'bg-black text-white hover:bg-gray-800' 
-                    : 'bg-[#D4AF37] text-black hover:bg-yellow-400'
-                }`}>
-                  Choose Plan
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight">
+                Ready to Secure Your{" "}
+                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                  Smart Home?
+                </span>
+              </h2>
+              <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Get a free security assessment and professional installation for complete peace of mind.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                  onClick={() => setIsQuoteModalOpen(true)}
+                >
+                  Get Free Security Assessment <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+                <button className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center">
+                  <Phone className="mr-2 h-5 w-5" />
+                  Call Now: +44 141 739 3377
                 </button>
               </div>
-            ))}
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Compliance & Certifications */}
-      <section className="py-20 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Compliance & Certifications</h2>
-            <p className="text-xl text-gray-400">Meeting the highest security standards and regulations</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-black rounded-2xl p-8 text-center">
-              <Shield className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">UK Security Standards</h3>
-              <p className="text-gray-400">Fully compliant with British security regulations and standards</p>
-            </div>
-            <div className="bg-black rounded-2xl p-8 text-center">
-              <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">Insurance Partnerships</h3>
-              <p className="text-gray-400">Approved by major insurance companies for premium discounts</p>
-            </div>
-            <div className="bg-black rounded-2xl p-8 text-center">
-              <Star className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-4 text-white">Professional Certifications</h3>
-              <p className="text-gray-400">Certified by leading security organizations and authorities</p>
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* Footer */}
+        <Footer />
 
-      {/* Footer CTA */}
-      <section className="py-20 bg-gradient-to-r from-[#D4AF37] to-yellow-400">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-black">Secure Your Home Today</h2>
-          <p className="text-xl text-black/80 mb-8">
-            Don't wait for a security incident. Protect your family and property with our advanced security solutions.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-black text-white px-8 py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
-              Get Security Assessment
-            </button>
-            <button className="border-2 border-black text-black px-8 py-4 rounded-lg font-semibold hover:bg-black hover:text-white transition-colors">
-              View All Products
-            </button>
-          </div>
-        </div>
-      </section>
+        {/* Quote Modal */}
+        {isQuoteModalOpen && (
+          <QuoteModal
+            isOpen={isQuoteModalOpen}
+            onClose={() => setIsQuoteModalOpen(false)}
+            selectedProduct={selectedProduct}
+          />
+        )}
       </div>
     </>
   );
 };
 
 export default SecuritySensors;
-
