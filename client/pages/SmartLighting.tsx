@@ -48,194 +48,200 @@ const SmartLighting: React.FC = () => {
   }, []);
 
   const lightingProducts = [
-    {
-      id: 1,
-      name: "Sky Dome Pro Ceiling Light",
-      category: "ceiling",
-      subtitle: "Natural Lighting, Ultimate Aesthetics",
-      image: "/images/sky_dome_pro_ceiling_light.webp",
-      price: "£299",
-      features: [
-        "Four lighting modes",
-        "Blue-sky optical technology",
-        "RG0 grade no-blue light",
-        "Quick installation patented technology",
-        "Circadian rhythm support"
-      ],
-      specs: {
-        power: "36W",
-        colorTemp: "2700K-6500K",
-        brightness: "3600lm",
-        control: "App, Voice, Panel"
-      },
-      rating: 4.9,
-      reviews: 187,
-      highlight: true
+  {
+    id: 1,
+    name: "Sky Dome Pro Ceiling Light",
+    category: "ceiling",
+    subtitle: "Natural Lighting, Ultimate Aesthetics",
+    image: "/images/products/sky-dome.png",  // matched "sky-dome.jpg"
+    price: "£299",
+    features: [
+      "Four lighting modes",
+      "Blue-sky optical technology",
+      "RG0 grade no-blue light",
+      "Quick installation patented technology",
+      "Circadian rhythm support"
+    ],
+    specs: {
+      power: "36W",
+      colorTemp: "2700K-6500K",
+      brightness: "3600lm",
+      control: "App, Voice, Panel"
     },
-    {
-      id: 2,
-      name: "SOPRO Smart Decorative Lights",
-      category: "decorative",
-      subtitle: "Zigbee smart lights",
-      image: "/images/sopro_smart_decorative_lights.webp",
-      price: "£149",
-      features: [
-        "Multiple decorative styles",
-        "RGB color changing",
-        "Scene synchronization",
-        "Energy efficient LED",
-        "Easy installation"
-      ],
-      specs: {
-        power: "12W",
-        colorTemp: "RGB + Warm White",
-        brightness: "1200lm",
-        control: "App, Voice"
-      },
-      rating: 4.7,
-      reviews: 143,
-      highlight: false
+    rating: 4.9,
+    reviews: 187,
+    highlight: true
+  },
+  {
+    id: 2,
+    name: "SOPRO Smart Decorative Lights",
+    category: "decorative",
+    subtitle: "Zigbee smart lights",
+    image: "/images/products/sopro.png",  // matched "sopro.jpg"
+    price: "£149",
+    features: [
+      "Multiple decorative styles",
+      "RGB color changing",
+      "Scene synchronization",
+      "Energy efficient LED",
+      "Easy installation"
+    ],
+    specs: {
+      power: "12W",
+      colorTemp: "RGB + Warm White",
+      brightness: "1200lm",
+      control: "App, Voice"
     },
-    {
-      id: 3,
-      name: "S Series Smart Lights",
-      category: "professional",
-      subtitle: "Professional smart home lighting",
-      image: "/images/s_series_smart_lights.webp",
-      price: "£89",
-      features: [
-        "Professional grade quality",
-        "Tunable white technology",
-        "Dimming capabilities",
-        "Long lifespan",
-        "Smart home integration"
-      ],
-      specs: {
-        power: "9W",
-        colorTemp: "2700K-5000K",
-        brightness: "900lm",
-        control: "App, Switch, Voice"
-      },
-      rating: 4.6,
-      reviews: 98,
-      highlight: false
+    rating: 4.7,
+    reviews: 143,
+    highlight: false
+  },
+  {
+    id: 3,
+    name: "S Series Smart Lights",
+    category: "professional",
+    subtitle: "Professional smart home lighting",
+    image: "/images/products/s-series-smart-light.jpg",  // best match "mixpad-s.jpg"
+    price: "£89",
+    features: [
+      "Professional grade quality",
+      "Tunable white technology",
+      "Dimming capabilities",
+      "Long lifespan",
+      "Smart home integration"
+    ],
+    specs: {
+      power: "9W",
+      colorTemp: "2700K-5000K",
+      brightness: "900lm",
+      control: "App, Switch, Voice"
     },
-    {
-      id: 4,
-      name: "Smart LED Light",
-      category: "bulbs",
-      subtitle: "First choice for full house lighting, restore true colors",
-      image: "/images/smart_led_light.webp",
-      price: "£29",
-      features: [
-        "True color restoration",
-        "Energy efficient",
-        "Long lasting",
-        "Easy replacement",
-        "Multiple base types"
-      ],
-      specs: {
-        power: "9W",
-        colorTemp: "2700K-6500K",
-        brightness: "800lm",
-        control: "App, Voice"
-      },
-      rating: 4.5,
-      reviews: 234,
-      highlight: false
+    rating: 4.6,
+    reviews: 98,
+    highlight: false
+  },
+  {
+    id: 4,
+    name: "Smart LED Light",
+    category: "bulbs",
+    subtitle: "First choice for full house lighting, restore true colors",
+    image: "/images/products/smart-led-light.jpg",  // matched "smart-led-light.jpg"
+    price: "£29",
+    features: [
+      "True color restoration",
+      "Energy efficient",
+      "Long lasting",
+      "Easy replacement",
+      "Multiple base types"
+    ],
+    specs: {
+      power: "9W",
+      colorTemp: "2700K-6500K",
+      brightness: "800lm",
+      control: "App, Voice"
     },
-    {
-      id: 5,
-      name: "MixDimmer",
-      category: "control",
-      subtitle: "ORVIBO Smart Dimmer Switch with Touchscreen",
-      image: "/images/mixdimmer.jpg",
-      price: "£119",
-      features: [
-        "Touchscreen control",
-        "Smooth dimming",
-        "Scene presets",
-        "Voice control",
-        "Energy monitoring"
-      ],
-      specs: {
-        power: "300W Load",
-        colorTemp: "Variable",
-        brightness: "0-100%",
-        control: "Touch, App, Voice"
-      },
-      rating: 4.8,
-      reviews: 156,
-      highlight: false
+    rating: 4.5,
+    reviews: 234,
+    highlight: false
+  },
+  {
+    id: 5,
+    name: "MixDimmer",
+    category: "control",
+    subtitle: "ORVIBO Smart Dimmer Switch with Touchscreen",
+    image: "/images/products/mix-dimmer.jpg",  // closest match "mixpad-d1-switch.jpg"
+    price: "£119",
+    features: [
+      "Touchscreen control",
+      "Smooth dimming",
+      "Scene presets",
+      "Voice control",
+      "Energy monitoring"
+    ],
+    specs: {
+      power: "300W Load",
+      colorTemp: "Variable",
+      brightness: "0-100%",
+      control: "Touch, App, Voice"
     },
-    {
-      id: 6,
-      name: "ZigBee RGB Relay",
-      category: "control",
-      subtitle: "Change temperature and brightness of RGB lights with APP",
-      image: "/images/zigbee-rgb-relay.jpg",
-      price: "£79",
-      features: [
-        "RGB color control",
-        "Brightness adjustment",
-        "Temperature control",
-        "App integration",
-        "Scene automation"
-      ],
-      specs: {
-        power: "144W Load",
-        colorTemp: "RGB Full Spectrum",
-        brightness: "0-100%",
-        control: "App, Voice, Panel"
-      },
-      rating: 4.6,
-      reviews: 89,
-      highlight: false
-    }
-  ];
+    rating: 4.8,
+    reviews: 156,
+    highlight: false
+  },
+  {
+    id: 6,
+    name: "ZigBee RGB Relay",
+    category: "control",
+    subtitle: "Change temperature and brightness of RGB lights with APP",
+    image: "/images/products/zigbee.jpg",  // matched "orvibo-zigbee.jpg"
+    price: "£79",
+    features: [
+      "RGB color control",
+      "Brightness adjustment",
+      "Temperature control",
+      "App integration",
+      "Scene automation"
+    ],
+    specs: {
+      power: "144W Load",
+      colorTemp: "RGB Full Spectrum",
+      brightness: "0-100%",
+      control: "App, Voice, Panel"
+    },
+    rating: 4.6,
+    reviews: 89,
+    highlight: false
+  }
+];
 
-  const lightingScenes = [
-    {
-      id: 'morning',
-      name: 'Morning Energize',
-      description: 'Bright, cool lighting to start your day',
-      color: 'from-blue-400 to-white',
-      temperature: '6500K',
-      brightness: '100%',
-      mood: 'Energizing',
-      icon: Sunrise
-    },
-    {
-      id: 'evening',
-      name: 'Evening Relax',
-      description: 'Warm, dim lighting for relaxation',
-      color: 'from-orange-400 to-yellow-300',
-      temperature: '2700K',
-      brightness: '30%',
-      mood: 'Relaxing',
-      icon: Sunset
-    },
-    {
-      id: 'entertainment',
-      name: 'Entertainment Mode',
-      description: 'Dynamic, colorful lighting for fun',
-      color: 'from-purple-500 to-pink-500',
-      temperature: 'RGB',
-      brightness: '80%',
-      mood: 'Dynamic',
-      icon: Palette
-    },
-    {
-      id: 'security',
-      name: 'Security Mode',
-      description: 'Automated lighting patterns for security',
-      color: 'from-red-500 to-orange-500',
-      temperature: '4000K',
-      brightness: 'Variable',
-      mood: 'Protective',
-      icon: Zap
-    }
-  ];
+
+  
+const lightingScenes = [
+  {
+    id: "morning",
+    name: "Morning Energize",
+    description: "Bright, cool lighting to start your day",
+    color: "from-blue-400 to-white",
+    temperature: "6500K",
+    brightness: "100%",
+    mood: "Energizing",
+    icon: Sunrise,
+    video: "/videos/active-cooling.mp4"
+  },
+  {
+    id: "evening",
+    name: "Evening Relax",
+    description: "Warm, dim lighting for relaxation",
+    color: "from-orange-400 to-yellow-300",
+    temperature: "2700K",
+    brightness: "30%",
+    mood: "Relaxing",
+    icon: Sunset,
+    video: "/videos/dinning-mode.mp4"
+  },
+  {
+    id: "entertainment",
+    name: "Entertainment Mode",
+    description: "Dynamic, colorful lighting for fun",
+    color: "from-purple-500 to-pink-500",
+    temperature: "RGB",
+    brightness: "80%",
+    mood: "Dynamic",
+    icon: Palette,
+    video: "/videos/movie-viewing-mode.mp4"
+  },
+  {
+    id: "security",
+    name: "Security Mode",
+    description: "Automated lighting patterns for security",
+    color: "from-red-500 to-orange-500",
+    temperature: "4000K",
+    brightness: "Variable",
+    mood: "Protective",
+    icon: Zap,
+    video: "/videos/go-home-at-night.mp4"
+  }
+];
 
   const roomSolutions = [
     {
@@ -367,186 +373,241 @@ const SmartLighting: React.FC = () => {
         </div>
 
         {/* Hero Section */}
-        <section className="pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
-          </div>
+       <section className="pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+            {/* Soft texture overlay */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
+            </div>
 
-          <div className="container mx-auto px-4 lg:px-8 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
-                  Orvibo Smart Lighting
-                </div>
-                <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-                  Illuminate Your World{" "}
-                  <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
-                    Intelligently
-                  </span>
-                </h1>
-                <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
-                  From natural daylight simulation to mood-perfect ambiance, control every photon in your home. 
-                  Experience lighting that adapts to your lifestyle and enhances your wellbeing.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button
-                    className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
-                    onClick={() => setIsQuoteModalOpen(true)}
-                  >
-                    Discover Lighting Solutions <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
+            <div className="container mx-auto px-4 lg:px-8 relative z-10">
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                {/* LEFT COLUMN */}
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+                    Orvibo Smart Lighting
+                  </div>
+                  <h1 className="text-4xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+                    Illuminate Your World{" "}
+                    <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                      Intelligently
+                    </span>
+                  </h1>
+                  <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+                    From natural daylight simulation to mood-perfect ambiance, control every photon in your home. 
+                    Experience lighting that adapts to your lifestyle and enhances your wellbeing.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                      onClick={() => setIsQuoteModalOpen(true)}
+                    >
+                      Discover Lighting Solutions <ArrowRight className="ml-2 h-5 w-5" />
+                    </button>
 
-                  <button
-                    className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
-                    onClick={() =>
-                      document.getElementById("scenes")?.scrollIntoView({ behavior: "smooth" })
-                    }
-                  >
-                    Design My Lighting <Play className="ml-2 h-5 w-5" />
-                  </button>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative"
-              >
-                <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                  <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md relative">
-                    <img
-                      src="/images/smart-lighting-hero.jpg"
-                      alt="Smart lighting showcase"
-                      className="w-full h-full object-cover"
-                    />
-                    <button className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl hover:bg-black/50 transition-colors group">
-                      <Play className="w-16 h-16 text-[#b69777] group-hover:scale-110 transition-transform" />
+                    <button
+                      className="bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center"
+                      onClick={() =>
+                        document.getElementById("scenes")?.scrollIntoView({ behavior: "smooth" })
+                      }
+                    >
+                      Design My Lighting <Play className="ml-2 h-5 w-5" />
                     </button>
                   </div>
+                </motion.div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    {roomSolutions.map((room, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 + i * 0.1 }}
-                        className={`text-center p-3 rounded-xl shadow-sm border transition-all duration-300 ${
-                          room.active 
-                            ? 'bg-[#b69777]/20 border-[#b69777]/50' 
-                            : 'bg-white/10 border-white/20'
-                        }`}
-                      >
-                        <room.icon className={`w-6 h-6 mx-auto mb-2 transition-colors duration-300 ${
-                          room.active ? 'text-[#b69777]' : 'text-white/70'
-                        }`} />
-                        <p className="text-xs font-medium text-white/90">{room.room}</p>
-                      </motion.div>
-                    ))}
+                {/* RIGHT COLUMN - VIDEO */}
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="relative"
+                >
+                  <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+                    <div className="aspect-video bg-black/20 rounded-2xl overflow-hidden mb-6 shadow-md relative group">
+                      <video
+                        className="w-full h-full object-cover"
+                        src="/videos/dinning-mode.mp4"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      ></video>
+
+                      {/* Play overlay on hover (optional) */}
+                     
+                    </div>
+
+                    {/* ROOM SOLUTIONS */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {roomSolutions.map((room, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.4 + i * 0.1 }}
+                          className={`text-center p-3 rounded-xl shadow-sm border transition-all duration-300 ${
+                            room.active 
+                              ? 'bg-[#b69777]/20 border-[#b69777]/50' 
+                              : 'bg-white/10 border-white/20'
+                          }`}
+                        >
+                          <room.icon
+                            className={`w-6 h-6 mx-auto mb-2 transition-colors duration-300 ${
+                              room.active ? 'text-[#b69777]' : 'text-white/70'
+                            }`}
+                          />
+                          <p className="text-xs font-medium text-white/90">{room.room}</p>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+
 
         {/* Lighting Scenes Interactive Section */}
-        <section id="scenes" className="py-20 bg-white">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+     <section
+  id="scenes"
+  className="relative py-20 bg-black overflow-hidden"
+>
+  {/* Fullscreen Background Video */}
+  {selectedScene && (
+    <video
+      key={selectedScene}
+      src={lightingScenes.find((s) => s.id === selectedScene)?.video}
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="absolute inset-0 w-full h-full object-cover z-0"
+    />
+  )}
+
+  {/* Dark overlay for readability */}
+  <div className="absolute inset-0 bg-black/50 z-0"></div>
+
+  {/* Foreground Content */}
+  <div className="container mx-auto px-4 lg:px-8 relative z-10">
+    {/* Heading */}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="text-center mb-16 text-white"
+    >
+      <h2 className="text-4xl lg:text-5xl font-extrabold mb-6">
+        Interactive Lighting Scenes
+      </h2>
+      <p className="text-xl max-w-3xl mx-auto leading-relaxed">
+        Experience how different lighting scenes transform your space throughout the day.
+      </p>
+    </motion.div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Scene Selector Buttons */}
+      <div>
+        <div className="space-y-4">
+          {lightingScenes.map((scene) => (
+            <button
+              key={scene.id}
+              onClick={() => setSelectedScene(scene.id)}
+              className={`w-full text-left p-6 rounded-2xl transition-all duration-300 ${
+                selectedScene === scene.id
+                  ? "bg-gradient-to-r " +
+                    scene.color +
+                    " text-white shadow-xl transform scale-105"
+                  : "bg-gradient-to-br from-white/20 to-white/10 border border-white/30 text-white hover:border-white/60"
+              }`}
             >
-              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-                Interactive Lighting Scenes
-              </h2>
-              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                Experience how different lighting scenes transform your space throughout the day.
+              <div className="flex items-center mb-3">
+                <scene.icon
+                  className={`w-8 h-8 mr-4 ${
+                    selectedScene === scene.id
+                      ? "text-white"
+                      : "text-[#f3e2cf]"
+                  }`}
+                />
+                <h3 className="text-xl font-bold">{scene.name}</h3>
+              </div>
+              <p
+                className={`mb-4 ${
+                  selectedScene === scene.id
+                    ? "text-white/90"
+                    : "text-white/70"
+                }`}
+              >
+                {scene.description}
               </p>
-            </motion.div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="space-y-4">
-                  {lightingScenes.map((scene) => (
-                    <button
-                      key={scene.id}
-                      onClick={() => setSelectedScene(scene.id)}
-                      className={`w-full text-left p-6 rounded-2xl transition-all duration-300 ${
-                        selectedScene === scene.id
-                          ? 'bg-gradient-to-r ' + scene.color + ' text-white shadow-xl transform scale-105'
-                          : 'bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] text-[#231c14] hover:border-[#b69777]'
-                      }`}
-                    >
-                      <div className="flex items-center mb-3">
-                        <scene.icon className={`w-8 h-8 mr-4 ${
-                          selectedScene === scene.id ? 'text-white' : 'text-[#b69777]'
-                        }`} />
-                        <h3 className="text-xl font-bold">{scene.name}</h3>
-                      </div>
-                      <p className={`mb-4 ${
-                        selectedScene === scene.id ? 'text-white/90' : 'text-[#6b5c47]'
-                      }`}>
-                        {scene.description}
-                      </p>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className={selectedScene === scene.id ? 'text-white/70' : 'text-[#6b5c47]'}>
-                            Temperature:
-                          </span>
-                          <p className="font-semibold">{scene.temperature}</p>
-                        </div>
-                        <div>
-                          <span className={selectedScene === scene.id ? 'text-white/70' : 'text-[#6b5c47]'}>
-                            Brightness:
-                          </span>
-                          <p className="font-semibold">{scene.brightness}</p>
-                        </div>
-                        <div>
-                          <span className={selectedScene === scene.id ? 'text-white/70' : 'text-[#6b5c47]'}>
-                            Mood:
-                          </span>
-                          <p className="font-semibold">{scene.mood}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span
+                    className={
+                      selectedScene === scene.id
+                        ? "text-white/70"
+                        : "text-white/60"
+                    }
+                  >
+                    Temperature:
+                  </span>
+                  <p className="font-semibold">{scene.temperature}</p>
+                </div>
+                <div>
+                  <span
+                    className={
+                      selectedScene === scene.id
+                        ? "text-white/70"
+                        : "text-white/60"
+                    }
+                  >
+                    Brightness:
+                  </span>
+                  <p className="font-semibold">{scene.brightness}</p>
+                </div>
+                <div>
+                  <span
+                    className={
+                      selectedScene === scene.id
+                        ? "text-white/70"
+                        : "text-white/60"
+                    }
+                  >
+                    Mood:
+                  </span>
+                  <p className="font-semibold">{scene.mood}</p>
                 </div>
               </div>
-              
-              <motion.div
-                key={selectedScene}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="relative"
-              >
-                <div className={`bg-gradient-to-br ${lightingScenes.find(s => s.id === selectedScene)?.color} rounded-3xl p-8 shadow-2xl`}>
-                  <img 
-                    src={`/images/lighting-scene-${selectedScene}.jpg`}
-                    alt={`${selectedScene} lighting scene`}
-                    className="w-full h-80 object-cover rounded-2xl shadow-lg"
-                  />
-                  <div className="mt-6 text-center">
-                    <h4 className="text-2xl font-bold text-white mb-2">
-                      {lightingScenes.find(s => s.id === selectedScene)?.name}
-                    </h4>
-                    <p className="text-white/90">
-                      {lightingScenes.find(s => s.id === selectedScene)?.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Scene Text */}
+      <motion.div
+        key={selectedScene}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative p-8 rounded-3xl bg-black/40 text-center text-white shadow-2xl"
+      >
+        <h4 className="text-2xl font-bold mb-2">
+          {lightingScenes.find((s) => s.id === selectedScene)?.name}
+        </h4>
+        <p className="text-white/90">
+          {lightingScenes.find((s) => s.id === selectedScene)?.description}
+        </p>
+      </motion.div>
+    </div>
+  </div>
+</section>
+
+
+
 
         {/* Product Categories */}
         <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
@@ -608,16 +669,16 @@ const SmartLighting: React.FC = () => {
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-74 object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    {/* <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
                       {product.price}
-                    </div>
-                    <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
+                    </div> */}
+                    {/* <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
                       <Star className="w-4 h-4 text-[#b69777] fill-current mr-1" />
                       <span className="text-white text-sm">{product.rating}</span>
                       <span className="text-white/70 text-sm ml-1">({product.reviews})</span>
-                    </div>
+                    </div> */}
                   </div>
                   
                   <div className="p-6">
@@ -670,74 +731,23 @@ const SmartLighting: React.FC = () => {
           </div>
         </section>
 
-        {/* Room Solutions */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-                Room-by-Room Solutions
-              </h2>
-              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                Tailored lighting packages designed for every space in your home.
-              </p>
-            </motion.div>
+       
+      <section className="relative min-h-[1080px] py-20 overflow-hidden">
+  {/* Background video */}
+  <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="absolute top-0 left-0 w-full h-full object-cover object-[70%_center] sm:object-center"
+    src="/videos/light-2.mp4"
+  />
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {roomSolutions.map((room, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="group"
-                >
-                  <div className="bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] transition-all duration-300 hover:shadow-xl rounded-2xl overflow-hidden">
-                    <div className="relative overflow-hidden">
-                      <img 
-                        src={room.image} 
-                        alt={`${room.room} lighting`}
-                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        {room.price}
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <div className="flex items-center mb-4">
-                        <room.icon className="w-8 h-8 text-[#b69777] mr-3" />
-                        <h3 className="text-xl font-bold text-[#231c14]">{room.room}</h3>
-                      </div>
-                      
-                      <p className="text-[#6b5c47] mb-4 leading-relaxed">{room.description}</p>
-                      
-                      <div className="mb-4">
-                        <span className="text-[#6b5c47] text-sm">Includes:</span>
-                        <p className="text-[#b69777] font-medium text-sm">{room.products.join(", ")}</p>
-                      </div>
-                      
-                      <button 
-                        className="w-full bg-gradient-to-r from-[#b69777] to-[#907252] text-white py-3 rounded-lg font-semibold hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 transform hover:scale-105"
-                        onClick={() => {
-                          setSelectedProduct({ name: `${room.room} Lighting Package`, price: room.price });
-                          setIsQuoteModalOpen(true);
-                        }}
-                      >
-                        Design {room.room}
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+  {/* Dark gradient overlay for text readability */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</section>
+
+
 
         {/* Installation Process */}
         <section className="py-20 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">

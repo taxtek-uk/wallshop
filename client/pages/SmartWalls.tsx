@@ -581,18 +581,18 @@ function SmartWalls() {
             className="bg-gradient-to-r from-[#b69777]/5 to-[#907252]/5 rounded-3xl p-8 border border-[#e2d5c4]"
           >
             <div className="text-center">
-              <h3 className="text-3xl font-bold text-[#231c14] mb-4">Endless Possibilities</h3>
+              <h3 className="text-3xl font-bold text-[#231c14]">Endless Possibilities</h3>
               <p className="text-xl text-[#6b5c47] mb-8 max-w-3xl mx-auto">
                 Each environment is fully customizable with your choice of features, finishes, and smart integrations. Create the perfect atmosphere for every room in your home.
               </p>
-              <button
+              {/* <button
                 className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center mx-auto"
                 onClick={() =>
                   document.getElementById("inquiry")?.scrollIntoView({ behavior: "smooth" })
                 }
               >
                 Design Your Space <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
+              </button> */}
             </div>
           </motion.div>
         </div>

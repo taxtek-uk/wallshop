@@ -46,247 +46,247 @@ const SecuritySensors: React.FC = () => {
   }, []);
 
   const securityProducts = [
-    {
-      id: 1,
-      name: "Smart Lock V5 Face",
-      category: "access",
-      subtitle: "Fully Automatic Visual Smart Door Lock",
-      image: "/images/smart_lock_v5_face.webp",
-      price: "£599",
-      features: [
-        "AI face recognition 3.0",
-        "4-inch IPS HD internal screen",
-        "Visual door viewer",
-        "365 days battery life",
-        "3 years replacement warranty"
-      ],
-      specs: {
-        power: "Rechargeable Battery",
-        connectivity: "WiFi, Bluetooth",
-        installation: "Standard Door",
-        security: "AI Recognition"
-      },
-      rating: 4.9,
-      reviews: 234,
-      highlight: true
+  {
+    id: 1,
+    name: "Smart Lock V5 Face",
+    category: "access",
+    subtitle: "Fully Automatic Visual Smart Door Lock",
+    image: "/images/products/security/smart-lock-v5-face.jpg",
+    price: "£599",
+    features: [
+      "AI face recognition 3.0",
+      "4-inch IPS HD internal screen",
+      "Visual door viewer",
+      "365 days battery life",
+      "3 years replacement warranty"
+    ],
+    specs: {
+      power: "Rechargeable Battery",
+      connectivity: "WiFi, Bluetooth",
+      installation: "Standard Door",
+      security: "AI Recognition"
     },
-    {
-      id: 2,
-      name: "2K Wireless Smart IP Camera S2",
-      category: "surveillance",
-      subtitle: "Smart Security Linkage for the Full House",
-      image: "/images/ip_camera_s2.webp",
-      price: "£199",
-      features: [
-        "2K HD resolution",
-        "360° pan and tilt",
-        "Night vision",
-        "Two-way audio",
-        "Smart motion detection"
-      ],
-      specs: {
-        power: "DC 12V / PoE",
-        connectivity: "WiFi, Ethernet",
-        installation: "Indoor/Outdoor",
-        security: "Encryption"
-      },
-      rating: 4.7,
-      reviews: 189,
-      highlight: false
+    rating: 4.9,
+    reviews: 234,
+    highlight: true
+  },
+  {
+    id: 2,
+    name: "2K Wireless Smart IP Camera S2",
+    category: "surveillance",
+    subtitle: "Smart Security Linkage for the Full House",
+    image: "/images/products/security/2k-wireless-smart-ip-camera.jpg",
+    price: "£199",
+    features: [
+      "2K HD resolution",
+      "360° pan and tilt",
+      "Night vision",
+      "Two-way audio",
+      "Smart motion detection"
+    ],
+    specs: {
+      power: "DC 12V / PoE",
+      connectivity: "WiFi, Ethernet",
+      installation: "Indoor/Outdoor",
+      security: "Encryption"
     },
-    {
-      id: 3,
-      name: "Smart Door Lock S2",
-      category: "access",
-      subtitle: "More Safe And More Advanced",
-      image: "/images/smart-door-lock-s2.jpg",
-      price: "£399",
-      features: [
-        "Multiple unlock methods",
-        "Fingerprint recognition",
-        "PIN code access",
-        "Mobile app control",
-        "Emergency key backup"
-      ],
-      specs: {
-        power: "AA Batteries",
-        connectivity: "Zigbee, Bluetooth",
-        installation: "Standard Door",
-        security: "Biometric"
-      },
-      rating: 4.6,
-      reviews: 156,
-      highlight: false
+    rating: 4.7,
+    reviews: 189,
+    highlight: false
+  },
+  {
+    id: 3,
+    name: "Smart Door Lock S2",
+    category: "access",
+    subtitle: "More Safe And More Advanced",
+    image: "/images/products/security/smart-door-lock-s2.jpg",
+    price: "£399",
+    features: [
+      "Multiple unlock methods",
+      "Fingerprint recognition",
+      "PIN code access",
+      "Mobile app control",
+      "Emergency key backup"
+    ],
+    specs: {
+      power: "AA Batteries",
+      connectivity: "Zigbee, Bluetooth",
+      installation: "Standard Door",
+      security: "Biometric"
     },
-    {
-      id: 4,
-      name: "Smart Door Lock C1",
-      category: "access",
-      subtitle: "More Smart And Keep Your Home Safe",
-      image: "/images/smart-door-lock-c1.jpg",
-      price: "£299",
-      features: [
-        "Smart keypad entry",
-        "Remote access control",
-        "Auto-lock function",
-        "Low battery alert",
-        "Weather resistant"
-      ],
-      specs: {
-        power: "AA Batteries",
-        connectivity: "WiFi, Bluetooth",
-        installation: "Standard Door",
-        security: "PIN + App"
-      },
-      rating: 4.5,
-      reviews: 143,
-      highlight: false
+    rating: 4.6,
+    reviews: 156,
+    highlight: false
+  },
+  {
+    id: 4,
+    name: "Smart Door Lock C1",
+    category: "access",
+    subtitle: "More Smart And Keep Your Home Safe",
+    image: "/images/products/security/smart-door-lock-c1.jpg",
+    price: "£299",
+    features: [
+      "Smart keypad entry",
+      "Remote access control",
+      "Auto-lock function",
+      "Low battery alert",
+      "Weather resistant"
+    ],
+    specs: {
+      power: "AA Batteries",
+      connectivity: "WiFi, Bluetooth",
+      installation: "Standard Door",
+      security: "PIN + App"
     },
-    {
-      id: 5,
-      name: "1080P IP Camera",
-      category: "surveillance",
-      subtitle: "HD camera monitor by 360° full-view navigation",
-      image: "/images/1080p-ip-camera.jpg",
-      price: "£129",
-      features: [
-        "1080P HD recording",
-        "360° rotation",
-        "Motion tracking",
-        "Cloud storage",
-        "Mobile alerts"
-      ],
-      specs: {
-        power: "DC 12V",
-        connectivity: "WiFi",
-        installation: "Indoor",
-        security: "WPA2"
-      },
-      rating: 4.4,
-      reviews: 198,
-      highlight: false
+    rating: 4.5,
+    reviews: 143,
+    highlight: false
+  },
+  {
+    id: 5,
+    name: "1080P IP Camera",
+    category: "surveillance",
+    subtitle: "HD camera monitor by 360° full-view navigation",
+    image: "/images/products/security/1080p-ip-camera.jpg",
+    price: "£129",
+    features: [
+      "1080P HD recording",
+      "360° rotation",
+      "Motion tracking",
+      "Cloud storage",
+      "Mobile alerts"
+    ],
+    specs: {
+      power: "DC 12V",
+      connectivity: "WiFi",
+      installation: "Indoor",
+      security: "WPA2"
     },
-    {
-      id: 6,
-      name: "Door Window Sensor",
-      category: "environmental",
-      subtitle: "Real-time monitor the door & window status",
-      image: "/images/door-window-sensor.jpg",
-      price: "£29",
-      features: [
-        "Instant notifications",
-        "Long battery life",
-        "Easy installation",
-        "Smart home integration",
-        "Tamper detection"
-      ],
-      specs: {
-        power: "CR2032 Battery",
-        connectivity: "Zigbee",
-        installation: "Adhesive Mount",
-        security: "Encrypted"
-      },
-      rating: 4.6,
-      reviews: 267,
-      highlight: false
+    rating: 4.4,
+    reviews: 198,
+    highlight: false
+  },
+  {
+    id: 6,
+    name: "Door Window Sensor",
+    category: "environmental",
+    subtitle: "Real-time monitor the door & window status",
+    image: "/images/products/security/door-window-sensor.jpg",
+    price: "£29",
+    features: [
+      "Instant notifications",
+      "Long battery life",
+      "Easy installation",
+      "Smart home integration",
+      "Tamper detection"
+    ],
+    specs: {
+      power: "CR2032 Battery",
+      connectivity: "Zigbee",
+      installation: "Adhesive Mount",
+      security: "Encrypted"
     },
-    {
-      id: 7,
-      name: "Temperature Humidity Sensor",
-      category: "environmental",
-      subtitle: "Real-time detect & adjust temperature & humidity",
-      image: "/images/temp-humidity-sensor.jpg",
-      price: "£39",
-      features: [
-        "Precise measurements",
-        "Historical data",
-        "Smart automation",
-        "Mobile notifications",
-        "Compact design"
-      ],
-      specs: {
-        power: "CR2032 Battery",
-        connectivity: "Zigbee",
-        installation: "Wall Mount",
-        security: "Encrypted"
-      },
-      rating: 4.5,
-      reviews: 178,
-      highlight: false
+    rating: 4.6,
+    reviews: 267,
+    highlight: false
+  },
+  {
+    id: 7,
+    name: "Temperature Humidity Sensor",
+    category: "environmental",
+    subtitle: "Real-time detect & adjust temperature & humidity",
+    image: "/images/products/security/temprature-humidity-sensor.jpg",
+    price: "£39",
+    features: [
+      "Precise measurements",
+      "Historical data",
+      "Smart automation",
+      "Mobile notifications",
+      "Compact design"
+    ],
+    specs: {
+      power: "CR2032 Battery",
+      connectivity: "Zigbee",
+      installation: "Wall Mount",
+      security: "Encrypted"
     },
-    {
-      id: 8,
-      name: "Zigbee Smoke Sensor",
-      category: "emergency",
-      subtitle: "Real-time monitor smoke to avoid potential risk",
-      image: "/images/smoke-sensor.jpg",
-      price: "£49",
-      features: [
-        "Early smoke detection",
-        "Loud alarm",
-        "Mobile alerts",
-        "Self-testing",
-        "10-year battery"
-      ],
-      specs: {
-        power: "Lithium Battery",
-        connectivity: "Zigbee",
-        installation: "Ceiling Mount",
-        security: "Certified"
-      },
-      rating: 4.8,
-      reviews: 145,
-      highlight: false
+    rating: 4.5,
+    reviews: 178,
+    highlight: false
+  },
+  {
+    id: 8,
+    name: "Zigbee Smoke Sensor",
+    category: "emergency",
+    subtitle: "Real-time monitor smoke to avoid potential risk",
+    image: "/images/products/security/smoke-sensor.jpg",
+    price: "£49",
+    features: [
+      "Early smoke detection",
+      "Loud alarm",
+      "Mobile alerts",
+      "Self-testing",
+      "10-year battery"
+    ],
+    specs: {
+      power: "Lithium Battery",
+      connectivity: "Zigbee",
+      installation: "Ceiling Mount",
+      security: "Certified"
     },
-    {
-      id: 9,
-      name: "Zigbee Water Leakage Sensor",
-      category: "emergency",
-      subtitle: "Real-time monitor water leakage",
-      image: "/images/water-sensor.jpg",
-      price: "£35",
-      features: [
-        "Water detection",
-        "Instant alerts",
-        "Flood prevention",
-        "Easy placement",
-        "Long battery life"
-      ],
-      specs: {
-        power: "CR2032 Battery",
-        connectivity: "Zigbee",
-        installation: "Floor Placement",
-        security: "IP67 Rated"
-      },
-      rating: 4.7,
-      reviews: 123,
-      highlight: false
+    rating: 4.8,
+    reviews: 145,
+    highlight: false
+  },
+  {
+    id: 9,
+    name: "Zigbee Water Leakage Sensor",
+    category: "emergency",
+    subtitle: "Real-time monitor water leakage",
+    image: "/images/products/security/water-leakage-sensor.jpg",
+    price: "£35",
+    features: [
+      "Water detection",
+      "Instant alerts",
+      "Flood prevention",
+      "Easy placement",
+      "Long battery life"
+    ],
+    specs: {
+      power: "CR2032 Battery",
+      connectivity: "Zigbee",
+      installation: "Floor Placement",
+      security: "IP67 Rated"
     },
-    {
-      id: 10,
-      name: "Zigbee Emergency Button",
-      category: "emergency",
-      subtitle: "One-key alarm trigger for SOS purpose",
-      image: "/images/emergency-button.jpg",
-      price: "£25",
-      features: [
-        "Panic button",
-        "Instant alerts",
-        "Portable design",
-        "Easy activation",
-        "Emergency contacts"
-      ],
-      specs: {
-        power: "CR2032 Battery",
-        connectivity: "Zigbee",
-        installation: "Portable/Wall",
-        security: "Priority Alert"
-      },
-      rating: 4.6,
-      reviews: 89,
-      highlight: false
-    }
-  ];
+    rating: 4.7,
+    reviews: 123,
+    highlight: false
+  },
+  {
+    id: 10,
+    name: "Zigbee Emergency Button",
+    category: "emergency",
+    subtitle: "One-key alarm trigger for SOS purpose",
+    image: "/images/products/security/emergency-button.jpg",
+    price: "£25",
+    features: [
+      "Panic button",
+      "Instant alerts",
+      "Portable design",
+      "Easy activation",
+      "Emergency contacts"
+    ],
+    specs: {
+      power: "CR2032 Battery",
+      connectivity: "Zigbee",
+      installation: "Portable/Wall",
+      security: "Priority Alert"
+    },
+    rating: 4.6,
+    reviews: 89,
+    highlight: false
+  }
+];
 
   const securityLayers = [
     {
@@ -455,7 +455,7 @@ const SecuritySensors: React.FC = () => {
         </div>
 
         {/* Hero Section */}
-        <section className="pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+        <section className="pt-14 pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
           </div>
@@ -508,7 +508,7 @@ const SecuritySensors: React.FC = () => {
                 <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                   <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                     <img
-                      src="/images/security-hero.jpg"
+                      src="/images/products/security.png"
                       alt="Smart security system with lock and camera"
                       className="w-full h-full object-cover"
                     />
@@ -643,16 +643,16 @@ const SecuritySensors: React.FC = () => {
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-74 object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    {/* <div className="absolute top-4 right-4 bg-gradient-to-r from-[#b69777] to-[#907252] text-white px-3 py-1 rounded-full text-sm font-semibold">
                       {product.price}
-                    </div>
-                    <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
+                    </div> */}
+                    {/* <div className="absolute bottom-4 left-4 flex items-center bg-black/70 rounded-full px-3 py-1">
                       <Star className="w-4 h-4 text-[#b69777] fill-current mr-1" />
                       <span className="text-white text-sm">{product.rating}</span>
                       <span className="text-white/70 text-sm ml-1">({product.reviews})</span>
-                    </div>
+                    </div> */}
                   </div>
                   
                   <div className="p-6">

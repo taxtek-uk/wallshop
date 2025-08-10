@@ -77,7 +77,7 @@ const SmartHVAC: React.FC = () => {
       name: "Central A/C Control Panel",
       category: "control",
       subtitle: "Adjust temperature by remote control A/C",
-      image: "/images/central_ac_control_panel.webp",
+      image: "/images/products/smart-hvac.jpg",
       price: "£299",
       features: [
         "Remote temperature control",
@@ -101,7 +101,7 @@ const SmartHVAC: React.FC = () => {
       name: "Smart Thermostat Pro",
       category: "thermostat",
       subtitle: "AI-powered climate control with learning algorithms",
-      image: "/images/smart-thermostat-pro.jpg",
+      image: "/images/placeholder.jpg",
       price: "£249",
       features: [
         "AI learning algorithms",
@@ -125,7 +125,7 @@ const SmartHVAC: React.FC = () => {
       name: "Multi-Zone Climate Controller",
       category: "control",
       subtitle: "Advanced multi-zone temperature management",
-      image: "/images/multi-zone-controller.jpg",
+      image: "/images/placeholder.jpg",
       price: "£499",
       features: [
         "Independent zone control",
@@ -149,7 +149,7 @@ const SmartHVAC: React.FC = () => {
       name: "Smart Ventilation System",
       category: "ventilation",
       subtitle: "Intelligent air quality and ventilation management",
-      image: "/images/smart-ventilation.jpg",
+      image: "/images/placeholder.jpg",
       price: "£399",
       features: [
         "Air quality monitoring",
@@ -173,7 +173,7 @@ const SmartHVAC: React.FC = () => {
       name: "Heat Pump Controller",
       category: "heating",
       subtitle: "Efficient heat pump management and optimization",
-      image: "/images/heat-pump-controller.jpg",
+      image: "/images/placeholder.jpg",
       price: "£349",
       features: [
         "Heat pump optimization",
@@ -197,7 +197,7 @@ const SmartHVAC: React.FC = () => {
       name: "Smart Radiator Valves",
       category: "heating",
       subtitle: "Individual room temperature control",
-      image: "/images/smart-radiator-valves.jpg",
+      image: "/images/placeholder.jpg",
       price: "£89",
       features: [
         "Individual room control",
@@ -568,207 +568,232 @@ const SmartHVAC: React.FC = () => {
         </section>
 
         {/* Smart Features */}
-        <section id="features" className="py-20 bg-white">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+        <section id="features" className="py-28 bg-white">
+  <div className="container mx-auto px-6 lg:px-12">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-center mb-20 max-w-4xl mx-auto"
+    >
+      <h2 className="text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 tracking-tight">
+        Intelligent Climate Features
+      </h2>
+      <p className="text-xl lg:text-2xl text-[#6b5c47] leading-relaxed tracking-wide max-w-3xl mx-auto">
+        Advanced AI technology that makes your HVAC system truly smart, learning your preferences and optimizing for comfort and efficiency.
+      </p>
+    </motion.div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+      {/* Features List */}
+      <div className="space-y-6">
+        {smartFeatures.map((feature) => (
+          <motion.button
+  key={feature.id}
+  onClick={() => setSelectedFeature(feature.id)}
+  whileHover={{ scale: 1.03 }}
+  className={`w-full text-left p-7 rounded-3xl transition-all duration-300 shadow-md
+    ${
+      selectedFeature === feature.id
+        ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white shadow-xl'
+        : 'bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] text-[#231c14] hover:border-[#b69777] hover:shadow-lg'
+    }
+  `}
+>
+  <div className="flex items-center mb-5">
+    <div className={`text-4xl flex-shrink-0 ${
+      selectedFeature === feature.id ? 'text-white drop-shadow-md' : 'text-[#b69777]'
+    }`}>
+      {feature.icon}
+    </div>
+    <h3
+      className={`text-2xl font-bold ml-5 leading-tight ${
+        selectedFeature === feature.id ? 'text-white drop-shadow-md' : 'text-[#231c14]'
+      }`}
+    >
+      {feature.title}
+    </h3>
+  </div>
+  <p className={`mb-5 leading-relaxed ${
+    selectedFeature === feature.id ? 'text-white font-semibold drop-shadow-sm' : 'text-[#6b5c47]'
+  }`}>
+    {feature.description}
+  </p>
+
+  {selectedFeature === feature.id && (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      transition={{ duration: 0.4 }}
+      className="space-y-3"
+    >
+      {feature.details.map((detail, i) => (
+        <div key={i} className="flex items-center text-white text-sm drop-shadow-sm">
+          <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+          <span>{detail}</span>
+        </div>
+      ))}
+      <div className="mt-6 p-4 bg-white/20 rounded-xl border border-white/30 backdrop-blur-sm">
+        <div className="text-sm font-semibold mb-3 text-white drop-shadow-sm">Key Benefit</div>
+        <div className="text-lg font-extrabold text-white drop-shadow-md">{feature.benefit}</div>
+        <div className="grid grid-cols-3 gap-4 mt-4 text-xs text-white uppercase tracking-wider font-semibold drop-shadow-sm">
+          {Object.entries(feature.stats).map(([key, value]) => (
+            <div key={key} className="text-center">
+              <div className="text-[#b89773] text-lg font-bold drop-shadow-sm">{value}</div>
+              <div>{key.replace(/_/g, ' ')}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  )}
+</motion.button>
+        ))}
+      </div>
+
+      {/* Feature Details Panel */}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7 }}
+        className="relative rounded-3xl shadow-2xl border border-[#e2d5c4] overflow-hidden bg-gradient-to-br from-[#faf7f3] to-white p-10"
+      >
+        {smartFeatures.map((feature) => (
+          <motion.div
+            key={feature.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: selectedFeature === feature.id ? 1 : 0 }}
+            className={`${selectedFeature === feature.id ? 'block' : 'hidden'}`}
+          >
+            <div
+              className={`aspect-video bg-gradient-to-br ${feature.color} rounded-3xl p-8 mb-8 relative overflow-hidden`}
             >
-              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-                Intelligent Climate Features
-              </h2>
-              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                Advanced AI technology that makes your HVAC system truly smart, learning your preferences and optimizing for comfort and efficiency.
-              </p>
-            </motion.div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="space-y-4">
-                  {smartFeatures.map((feature) => (
-                    <motion.button
-                      key={feature.id}
-                      onClick={() => setSelectedFeature(feature.id)}
-                      whileHover={{ scale: 1.02 }}
-                      className={`w-full text-left p-6 rounded-2xl transition-all duration-300 ${
-                        selectedFeature === feature.id
-                          ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white shadow-xl'
-                          : 'bg-gradient-to-br from-[#faf7f3] to-white border border-[#e2d5c4] hover:border-[#b69777] text-[#231c14] hover:shadow-lg'
-                      }`}
-                    >
-                      <div className="flex items-center mb-4">
-                        {feature.icon}
-                        <h3 className="text-xl font-bold ml-4">{feature.title}</h3>
-                      </div>
-                      <p className={`mb-4 ${selectedFeature === feature.id ? 'text-white/90' : 'text-[#6b5c47]'}`}>
-                        {feature.description}
-                      </p>
-                      {selectedFeature === feature.id && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          className="space-y-2"
-                        >
-                          {feature.details.map((detail, i) => (
-                            <div key={i} className="flex items-center text-white/80">
-                              <CheckCircle className="w-4 h-4 mr-2 flex-shrink-0" />
-                              <span className="text-sm">{detail}</span>
-                            </div>
-                          ))}
-                          <div className="mt-4 p-3 bg-white/10 rounded-lg">
-                            <div className="text-sm font-semibold text-white">{feature.benefit}</div>
-                            <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
-                              {Object.entries(feature.stats).map(([key, value]) => (
-                                <div key={key} className="text-center">
-                                  <div className="font-bold text-[#b89773]">{value}</div>
-                                  <div className="text-white/60 capitalize">{key}</div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </motion.button>
-                  ))}
+              <div className="absolute inset-0 bg-black/25"></div>
+              <div className="relative z-10 text-white h-full flex flex-col justify-center">
+                <div className="flex items-center mb-5">
+                  <div className="text-5xl mr-5">{feature.icon}</div>
+                  <h3 className="text-3xl font-extrabold">{feature.title}</h3>
+                </div>
+                <p className="text-white/90 text-lg max-w-xl">{feature.description}</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-5 mt-8 max-w-md">
+                  <div className="text-sm font-semibold mb-2">Key Benefit</div>
+                  <div className="text-2xl font-extrabold">{feature.benefit}</div>
                 </div>
               </div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="relative"
-              >
-                <div className="bg-gradient-to-br from-[#faf7f3] to-white rounded-3xl p-8 shadow-2xl border border-[#e2d5c4]">
-                  {smartFeatures.map((feature) => (
-                    <motion.div
-                      key={feature.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: selectedFeature === feature.id ? 1 : 0 }}
-                      className={`${selectedFeature === feature.id ? 'block' : 'hidden'}`}
-                    >
-                      <div className={`aspect-video bg-gradient-to-br ${feature.color} rounded-2xl p-6 mb-6 text-white relative overflow-hidden`}>
-                        <div className="absolute inset-0 bg-black/20"></div>
-                        <div className="relative z-10">
-                          <div className="flex items-center mb-4">
-                            {feature.icon}
-                            <h3 className="text-2xl font-bold ml-4">{feature.title}</h3>
-                          </div>
-                          <p className="text-white/90 mb-6">{feature.description}</p>
-                          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                            <div className="text-sm font-semibold mb-2">Key Benefit</div>
-                            <div className="text-lg font-bold">{feature.benefit}</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {feature.details.map((detail, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex items-center p-3 bg-gradient-to-r from-[#faf7f3] to-[#f5f2ef] rounded-lg border border-[#e2d5c4]"
-                          >
-                            <CheckCircle className="w-5 h-5 text-[#b69777] mr-3 flex-shrink-0" />
-                            <span className="text-[#231c14]">{detail}</span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
             </div>
-          </div>
-        </section>
 
-        {/* Energy Efficiency Stats */}
-        <section className="py-20 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410] relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
-          </div>
-          
-          <div className="container mx-auto px-4 lg:px-8 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">
-                Proven Energy{" "}
-                <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
-                  Efficiency
-                </span>
-              </h2>
-              <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-                Real data from thousands of installations showing significant energy savings and improved comfort.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {efficiencyStats.map((stat, i) => (
+            <div className="space-y-4">
+              {feature.details.map((detail, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                  className="text-center p-8 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.15 }}
+                  className="flex items-center p-4 bg-gradient-to-r from-[#faf7f3] to-[#f5f2ef] rounded-xl border border-[#e2d5c4]"
                 >
-                  <div className="mb-6">
-                    {stat.icon}
-                  </div>
-                  <div className="text-4xl font-extrabold text-white mb-2">{stat.metric}</div>
-                  <div className="text-lg font-semibold text-[#b69777] mb-2">{stat.description}</div>
-                  <div className="text-sm text-white/70">{stat.detail}</div>
+                  <CheckCircle className="w-6 h-6 text-[#b69777] mr-4 flex-shrink-0" />
+                  <span className="text-[#231c14] text-lg font-medium">{detail}</span>
                 </motion.div>
               ))}
             </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  </div>
+</section>
 
-            {/* Interactive Energy Calculator */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-16 bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20"
-            >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white mb-4">Calculate Your Potential Savings</h3>
-                <p className="text-white/80">See how much you could save with smart HVAC automation</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#b69777] mb-2">£1,200</div>
-                  <div className="text-white/80">Current Annual Cost</div>
-                </div>
-                <div className="text-center">
-                  <ArrowRight className="w-8 h-8 text-white/60 mx-auto mb-2" />
-                  <div className="text-white/60">Smart Optimization</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-2">£750</div>
-                  <div className="text-white/80">Optimized Annual Cost</div>
-                  <div className="text-sm text-green-400 mt-1">Save £450/year</div>
-                </div>
-              </div>
-              
-              <div className="text-center mt-8">
-                <button
-                  className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-                  onClick={() => setIsQuoteModalOpen(true)}
-                >
-                  Get Personalized Quote
-                </button>
-              </div>
-            </motion.div>
+
+        {/* Energy Efficiency Stats */}
+        <section className="py-28 bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410] relative overflow-hidden">
+  <div className="absolute inset-0 opacity-15">
+    <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/25 to-[#907252]/25"></div>
+  </div>
+
+  <div className="container mx-auto px-6 lg:px-12 relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-center mb-20 max-w-4xl mx-auto"
+    >
+      <h2 className="text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+        Proven Energy{' '}
+        <span className="bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+          Efficiency
+        </span>
+      </h2>
+      <p className="text-xl lg:text-2xl text-white/90 leading-relaxed tracking-wide">
+        Real data from thousands of installations showing significant energy savings and improved comfort.
+      </p>
+    </motion.div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+      {efficiencyStats.map((stat, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: i * 0.15 }}
+          whileHover={{ scale: 1.07, boxShadow: '0 20px 40px rgba(182, 151, 119, 0.35)' }}
+          className="text-center p-10 bg-white/15 backdrop-blur-xl rounded-3xl border border-white/25 shadow-lg transition-all duration-300 cursor-pointer"
+        >
+          <div className="mb-8 text-[#b69777] flex justify-center text-[3.5rem]">
+            {stat.icon}
           </div>
-        </section>
+          <div className="text-5xl font-extrabold text-white mb-3 tracking-tight">{stat.metric}</div>
+          <div className="text-xl font-semibold text-[#b69777] mb-3">{stat.description}</div>
+          <div className="text-sm text-white/75 max-w-[260px] mx-auto leading-relaxed">{stat.detail}</div>
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Interactive Energy Calculator */}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.5 }}
+      className="mt-24 bg-white/15 backdrop-blur-xl rounded-3xl p-10 border border-white/25 shadow-xl max-w-5xl mx-auto"
+    >
+      <div className="text-center mb-10">
+        <h3 className="text-3xl lg:text-4xl font-bold text-white mb-5 tracking-wide">
+          Calculate Your Potential Savings
+        </h3>
+        <p className="text-white/80 text-lg max-w-xl mx-auto leading-relaxed">
+          See how much you could save with smart HVAC automation
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+        <div className="text-center">
+          <div className="text-4xl font-extrabold text-[#b69777] mb-3">£1,200</div>
+          <div className="text-white/85 font-medium text-lg">Current Annual Cost</div>
+        </div>
+        <div className="text-center">
+          <ArrowRight className="w-10 h-10 text-white/60 mx-auto mb-3" />
+          <div className="text-white/60 uppercase tracking-wide font-semibold text-sm">Smart Optimization</div>
+        </div>
+        <div className="text-center">
+          <div className="text-4xl font-extrabold text-green-400 mb-3">£750</div>
+          <div className="text-white/85 font-medium text-lg">Optimized Annual Cost</div>
+          <div className="text-sm text-green-400 mt-2 font-semibold">Save £450/year</div>
+        </div>
+      </div>
+
+      <div className="text-center mt-12">
+        <button
+          className="bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 px-10 py-5 text-xl rounded-full font-semibold text-white"
+          onClick={() => setIsQuoteModalOpen(true)}
+        >
+          Get Personalized Quote
+        </button>
+      </div>
+    </motion.div>
+  </div>
+</section>
+
 
         {/* Product Categories */}
         <section id="products" className="py-20 bg-gradient-to-br from-[#faf7f3] to-white">
@@ -832,18 +857,18 @@ const SmartHVAC: React.FC = () => {
                       alt={product.name}
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-bold text-[#231c14]">
+                    {/* <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-bold text-[#231c14]">
                       {product.price}
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-xl font-bold text-[#231c14]">{product.name}</h3>
-                      <div className="flex items-center">
+                      {/* <div className="flex items-center">
                         <Star className="w-4 h-4 text-yellow-400 fill-current" />
                         <span className="text-sm text-[#6b5c47] ml-1">{product.rating}</span>
-                      </div>
+                      </div> */}
                     </div>
                     
                     <p className="text-[#6b5c47] mb-4 text-sm">{product.subtitle}</p>
@@ -887,122 +912,140 @@ const SmartHVAC: React.FC = () => {
           </div>
         </section>
 
-        {/* Installation Process */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-                Professional Installation
-              </h2>
-              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                Our certified technicians ensure seamless installation and optimal performance of your smart HVAC system.
-              </p>
-            </motion.div>
+       {/* Installation Process */}
+<section className="py-28 bg-white">
+  <div className="container mx-auto px-6 lg:px-12">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-center mb-20 max-w-4xl mx-auto"
+    >
+      <h2 className="text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 tracking-tight">
+        Professional Installation
+      </h2>
+      <p className="text-xl lg:text-2xl text-[#6b5c47] leading-relaxed tracking-wide max-w-3xl mx-auto">
+        Our certified technicians ensure seamless installation and optimal performance of your smart HVAC system.
+      </p>
+    </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {installationSteps.map((step, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="text-center relative"
-                >
-                  <div className="bg-gradient-to-br from-[#faf7f3] to-white rounded-2xl p-8 shadow-lg border border-[#e2d5c4] hover:shadow-xl transition-shadow duration-300">
-                    <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                      {step.step}
-                    </div>
-                    
-                    <div className="mb-6">
-                      {step.icon}
-                    </div>
-                    
-                    <h3 className="text-xl font-bold text-[#231c14] mb-3">{step.title}</h3>
-                    <p className="text-[#6b5c47] mb-4">{step.description}</p>
-                    
-                    <div className="bg-gradient-to-r from-[#b69777]/10 to-[#907252]/10 rounded-lg p-3">
-                      <div className="text-sm font-semibold text-[#b69777]">Duration: {step.duration}</div>
-                    </div>
-                  </div>
-                  
-                  {i < installationSteps.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                      <ArrowRight className="w-8 h-8 text-[#b69777]/30" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative">
+      {installationSteps.map((step, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: i * 0.15 }}
+          whileHover={{ scale: 1.05, boxShadow: '0 0 0 rgba(182, 151, 119, 0.25)' }}
+          className="text-center relative cursor-pointer"
+        >
+          <div className="bg-gradient-to-br from-[#faf7f3] to-white rounded-3xl p-10 shadow-lg border border-[#e2d5c4] transition-shadow duration-300 flex flex-col items-center">
+            <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white rounded-full w-20 h-20 flex items-center justify-center mb-8 text-3xl font-extrabold select-none">
+              {step.step}
+            </div>
+
+            <div className="mb-8 text-[#b69777] text-6xl flex justify-center">
+              {step.icon}
+            </div>
+
+            <h3 className="text-2xl font-bold text-[#231c14] mb-4">{step.title}</h3>
+            <p className="text-[#6b5c47] mb-6 leading-relaxed max-w-sm mx-auto">{step.description}</p>
+
+            <div className="bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20 rounded-lg px-5 py-3">
+              <div className="text-sm font-semibold text-[#b69777] tracking-wide select-none">
+                Duration: {step.duration}
+              </div>
             </div>
           </div>
-        </section>
+
+          {/* Arrow connecting steps on large screens */}
+          {i < installationSteps.length - 1 && (
+            <div className="hidden lg:flex absolute top-1/2 -right-10 transform -translate-y-1/2 z-0">
+              <ArrowRight className="w-10 h-10 text-[#b69777]/40" />
+            </div>
+          )}
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
         {/* Government Incentives */}
-        <section className="py-20 bg-gradient-to-br from-[#faf7f3] to-white">
-          <div className="container mx-auto px-4 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6">
-                Government Incentives
-              </h2>
-              <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed">
-                Take advantage of available grants and incentives to reduce the cost of your smart HVAC upgrade.
-              </p>
-            </motion.div>
+<section className="py-28 bg-gradient-to-br from-[#faf7f3] to-white">
+  <div className="container mx-auto px-6 lg:px-12">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      viewport={{ once: true }}
+      className="text-center mb-20 max-w-4xl mx-auto"
+    >
+      <h2 className="text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent mb-6 tracking-tight">
+        Government Incentives
+      </h2>
+      <p className="text-xl lg:text-2xl text-[#6b5c47] leading-relaxed tracking-wide">
+        Take advantage of available grants and incentives to reduce the cost of your smart HVAC upgrade.
+      </p>
+    </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {governmentIncentives.map((incentive, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-[#e2d5c4]"
-                >
-                  <div className="flex items-center mb-6">
-                    {incentive.icon}
-                    <h3 className="text-xl font-bold text-[#231c14] ml-3">{incentive.program}</h3>
-                  </div>
-                  
-                  <p className="text-[#6b5c47] mb-4">{incentive.description}</p>
-                  
-                  <div className="bg-gradient-to-br from-[#faf7f3] to-[#f5f2ef] rounded-lg p-4 mb-4 border border-[#e2d5c4]">
-                    <div className="text-sm text-[#6b5c47] mb-1">Eligibility</div>
-                    <div className="font-semibold text-[#231c14]">{incentive.eligibility}</div>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-[#b69777] mb-1">{incentive.savings}</div>
-                    <div className="text-sm text-[#6b5c47]">Potential Savings</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-center mt-12"
-            >
-              <button
-                className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold"
-                onClick={() => setIsQuoteModalOpen(true)}
-              >
-                Check My Eligibility
-              </button>
-            </motion.div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      {governmentIncentives.map((incentive, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: i * 0.15 }}
+          whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(182, 151, 119, 0.2)' }}
+          className="bg-white rounded-3xl p-8 shadow-lg border border-[#e2d5c4] transition-all duration-300 cursor-pointer flex flex-col"
+        >
+          <div className="flex items-center mb-8">
+            <div className="text-4xl text-[#b69777]">{incentive.icon}</div>
+            <h3 className="text-2xl font-bold text-[#231c14] ml-5 leading-tight">
+              {incentive.program}
+            </h3>
           </div>
-        </section>
+
+          <p className="text-[#6b5c47] mb-8 flex-grow leading-relaxed">
+            {incentive.description}
+          </p>
+
+          <div className="bg-gradient-to-br from-[#faf7f3] to-[#f5f2ef] rounded-lg p-5 mb-6 border border-[#e2d5c4]">
+            <div className="text-sm text-[#6b5c47] mb-1 font-semibold tracking-wide uppercase">
+              Eligibility
+            </div>
+            <div className="font-semibold text-[#231c14]">{incentive.eligibility}</div>
+          </div>
+
+          <div className="text-center mt-auto">
+            <div className="text-3xl font-extrabold text-[#b69777] mb-1">
+              {incentive.savings}
+            </div>
+            <div className="text-sm text-[#6b5c47] uppercase tracking-wide font-semibold">
+              Potential Savings
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.5 }}
+      className="text-center mt-16"
+    >
+      <button
+        className="bg-gradient-to-r from-[#b69777] to-[#907252] hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 px-10 py-4 text-lg rounded-full font-semibold text-white"
+        onClick={() => setIsQuoteModalOpen(true)}
+      >
+        Check My Eligibility
+      </button>
+    </motion.div>
+  </div>
+</section>
+
 
         {/* Footer */}
         <Footer />

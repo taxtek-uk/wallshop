@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, X, ChevronDown, ChevronRight, ChevronUp } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronRight, ChevronUp, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import useScrollPosition from '@/hooks/useScrollPosition';
@@ -15,6 +15,15 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { name: 'Home', to: '/' },
   { name: 'Smart Walls', to: '/smart-walls' },
+  { name: 'Smart Devices', to: '/smart-devices', children: [
+      { name: 'Control Panels', to: '/smart-devices/orvibo/control-panels' },
+      { name: 'Switches', to: '/smart-devices/orvibo/switches' },
+      { name: 'Lighting', to: '/smart-devices/orvibo/lighting' },
+      { name: 'Security & Sensors', to: '/smart-devices/orvibo/security-sensors' },
+      { name: 'Shading', to: '/smart-devices/orvibo/shading' },
+      { name: 'HVAC', to: '/smart-devices/orvibo/hvac' },
+  ] },
+  
   { name: 'Wall Panels', to: '/wall-panels', children: [
       { name: 'WPC', to: '/wall-panels/wpc' },
       { name: 'Anti-Collision', to: '/wall-panels/anti-collision' },
@@ -37,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
       { name: 'Plastic Wood', to: '/wall-panels/plastic-wood' },
   ]},
   { name: 'Carbon Rock', to: '/carbon-rock-boards' },
-  { name: 'Smart Devices', to: '/smart-devices' },
+  
   { name: 'Warranty', to: '/warranty' },
   { name: 'Contact', to: '/contact', isHash: false },
 ];
@@ -73,6 +82,10 @@ export default function Navigation() {
   const closeMobileMenu = () => {
     setMobileOpen(false);
     setMobileExpandedItems(new Set());
+  };
+
+  const handleSmartWallBuilderClick = () => {
+    window.open('https://builder.thewallshop.co.uk/', '_blank', 'noopener,noreferrer');
   };
 
   useEffect(() => () => clearTimeout(dropdownTimeout.current), []);
@@ -242,6 +255,15 @@ export default function Navigation() {
               </div>
             );
           })}
+          
+          {/* Smart Wall Builder Button - Desktop */}
+          <Button
+            onClick={handleSmartWallBuilderClick}
+            className="bg-[#b89773] hover:bg-[#a08666] text-white px-6 py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2 ml-4"
+          >
+            <span>Smart Wall Builder</span>
+            <ExternalLink size={16} className="opacity-80" />
+          </Button>
         </div>
 
         {/* Mobile Toggle Button */}
@@ -276,6 +298,22 @@ export default function Navigation() {
                 <MobileMenuItem key={item.name} item={item} />
               ))}
               
+              {/* Smart Wall Builder Button - Mobile */}
+              <div className="border-b border-gray-100">
+                <button
+                  onClick={() => {
+                    handleSmartWallBuilderClick();
+                    closeMobileMenu();
+                  }}
+                  className="w-full flex items-center justify-between py-4 px-4 text-white bg-[#b89773] hover:bg-[#a08666] font-semibold transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">Smart Wall Builder</span>
+                    <ExternalLink size={18} className="opacity-80" />
+                  </div>
+                </button>
+              </div>
+              
               {/* Call to Action Button */}
               <div className="p-4 bg-gray-50 border-t border-gray-200">
                 <Button
@@ -295,4 +333,3 @@ export default function Navigation() {
     </nav>
   );
 }
-
