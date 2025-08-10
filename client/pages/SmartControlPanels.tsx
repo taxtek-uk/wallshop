@@ -433,7 +433,7 @@ const SmartControlPanels: React.FC = () => {
           </div>
         </section>
 
-        {/* Featured Products Grid */}
+        
       <section
       id="products"
       ref={ref}
