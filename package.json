@@ -12,8 +12,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:client",
+    "build": "npm run build:client && npm run post-build-fix",
     "build:client": "vite build",
+    "post-build-fix": "node scripts/post-build-fix.js",
     "build:server": "vite build --config vite.config.server.ts",
     "build:full": "npm run build:client && npm run build:server",
     "start": "node dist/server/node-build.mjs",
