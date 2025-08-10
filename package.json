@@ -12,15 +12,18 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm run build:client",
     "build:client": "vite build",
     "build:server": "vite build --config vite.config.server.ts",
+    "build:full": "npm run build:client && npm run build:server",
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
     "deploy:check": "node scripts/deploy-check.js",
-    "deploy:verify": "npm run build && npm run deploy:check"
+    "deploy:verify": "npm run build && npm run deploy:check",
+    "vercel:debug": "node scripts/vercel-debug.js",
+    "test:deploy": "node scripts/test-deployment.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
