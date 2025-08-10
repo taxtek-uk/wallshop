@@ -259,7 +259,7 @@ export default function Navigation() {
           {/* Smart Wall Builder Button - Desktop */}
           <Button
             onClick={handleSmartWallBuilderClick}
-            className="bg-[#b89773] hover:bg-[#a08666] text-white px-6 py-3 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2 ml-4"
+            className="bg-black hover:bg-[#a08666] text-white px-6 py-3 font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2 ml-4"
           >
             <span>Smart Wall Builder</span>
             <ExternalLink size={16} className="opacity-80" />
@@ -299,19 +299,19 @@ export default function Navigation() {
               ))}
               
               {/* Smart Wall Builder Button - Mobile */}
-              <div className="border-b border-gray-100">
-                <button
+              <div className="p-4 bg-gray-50 border-t border-gray-200">
+                <Button
                   onClick={() => {
                     handleSmartWallBuilderClick();
                     closeMobileMenu();
                   }}
-                  className="w-full flex items-center justify-between py-4 px-4 text-white bg-[#b89773] hover:bg-[#a08666] font-semibold transition-colors"
+                  className="w-full bg-black hover:bg-[#a08666] text-white py-4 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                 >
                   <div className="flex items-center space-x-2">
                     <span className="text-base">Smart Wall Builder</span>
                     <ExternalLink size={18} className="opacity-80" />
                   </div>
-                </button>
+                </Button>
               </div>
               
               {/* Call to Action Button */}

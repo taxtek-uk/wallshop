@@ -563,7 +563,7 @@ export default function SmartDevices() {
                           ))}
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold text-slate-800">{category.priceRange}</div>
+                          {/* <div className="text-lg font-bold text-slate-800">{category.priceRange}</div> */}
                           <div className="flex items-center text-amber-500 text-sm font-medium">
                             Explore <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                           </div>
