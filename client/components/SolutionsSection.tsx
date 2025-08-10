@@ -157,6 +157,36 @@ const SolutionsSection = () => {
           </Button>
         </div> */}
       </div>
+
+      {/* End images */}
+       {/* Two-column image row */}
+      {/* <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 px-4 lg:px-8">
+        <img
+          src="/images/products/smart-device-1.webp"
+          alt="Smart Living Showcase"
+          width={1436}
+          height={725}
+          className="w-full h-auto rounded-xl shadow-lg object-cover"
+        />
+        <img
+          src="/images/products/mixpadmini.jpg"
+          alt="Smart Device Display"
+          width={725}
+          height={725}
+          className="w-full h-auto rounded-xl shadow-lg object-cover"
+        />
+      </div> */}
+
+      <div className="mt-16 flex justify-center">
+        <img
+          src="/images/devices-img.webp"
+          alt="Smart Living Solutions"
+          width={1275}
+          height={199}
+          className="rounded-xl shadow-lg"
+        />
+      </div>
+
     </section>
   );
 };
