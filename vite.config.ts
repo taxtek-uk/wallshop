@@ -15,65 +15,87 @@ export default defineConfig(({ mode }) => ({
     outDir: "dist/spa",
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
-          'radix-vendor': [
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-radio-group',
-            '@radix-ui/react-label',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-progress',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-hover-card',
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-menubar',
-            '@radix-ui/react-context-menu',
-            '@radix-ui/react-collapsible',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-aspect-ratio',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-toggle',
-            '@radix-ui/react-toggle-group'
-          ],
-          'query-vendor': ['@tanstack/react-query'],
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          // Page chunks
-          'smart-walls': ['./client/pages/SmartWalls.tsx'],
-          'smart-devices': ['./client/pages/SmartDevices.tsx'],
-          'wall-panels': [
-            './client/pages/WallPanels.tsx',
-            './client/pages/WPCWallPanels.tsx',
-            './client/pages/AntiCollisionWallPanels.tsx',
-            './client/pages/WPCSplicingBoards.tsx'
-          ]
-        }
+        manualChunks: (id) => {
+          // Core React libraries
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            return 'react-vendor';
+          }
+          
+          // UI libraries
+          if (id.includes('framer-motion') || id.includes('lucide-react')) {
+            return 'ui-vendor';
+          }
+          
+          // Radix UI components
+          if (id.includes('@radix-ui')) {
+            return 'radix-vendor';
+          }
+          
+          // Query library
+          if (id.includes('@tanstack/react-query')) {
+            return 'query-vendor';
+          }
+          
+          // Three.js and related
+          if (id.includes('three') || id.includes('@react-three')) {
+            return 'three-vendor';
+          }
+          
+          // Large utility libraries
+          if (id.includes('date-fns') || id.includes('clsx') || id.includes('class-variance-authority')) {
+            return 'utils-vendor';
+          }
+          
+          // Node modules (other vendors)
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+        // Optimize asset naming
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          if (/woff2?|eot|ttf|otf/i.test(ext)) {
+            return `assets/fonts/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js'
       }
     },
     // Optimize chunk size
     chunkSizeWarningLimit: 500,
-    // Enable minification
+    // Enable minification with optimized settings
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
-        pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : []
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.warn'] : [],
+        passes: 2,
+        unsafe_arrows: true,
+        unsafe_methods: true,
+        unsafe_proto: true
+      },
+      mangle: {
+        safari10: true
+      },
+      format: {
+        comments: false
       }
     },
     // Enable source maps for debugging
-    sourcemap: mode === 'development'
+    sourcemap: mode === 'development',
+    // Optimize CSS
+    cssMinify: true,
+    // Enable compression
+    reportCompressedSize: true,
+    // Target modern browsers for better optimization
+    target: ['es2020', 'chrome80', 'firefox78', 'safari14', 'edge88']
   },
   plugins: [
     react(), 
@@ -100,8 +122,24 @@ export default defineConfig(({ mode }) => ({
       'react-router-dom',
       'framer-motion',
       'lucide-react',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      'clsx',
+      'class-variance-authority',
+      'tailwind-merge'
+    ],
+    exclude: [
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei'
     ]
+  },
+  // Enable experimental features for better performance
+  esbuild: {
+    target: 'es2020',
+    legalComments: 'none',
+    minifyIdentifiers: mode === 'production',
+    minifySyntax: mode === 'production',
+    minifyWhitespace: mode === 'production'
   }
 }));
 

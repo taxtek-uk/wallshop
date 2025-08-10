@@ -1,14 +1,16 @@
 {
-  "name": "The Wall Shop",
+  "name": "The Wall Shop - Luxury Wall Coverings & Smart Systems",
   "short_name": "Wall Shop",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "description": "Luxury wall coverings and smart wall systems. Acoustic panels, premium wallpapers, and tech-integrated solutions from The Wall Shop.",
-  "orientation": "portrait",
+  "background_color": "#f8f6f3",
+  "theme_color": "#b69777",
+  "description": "Transform your space with premium wall coverings and revolutionary smart wall systems. Luxury wallpapers, acoustic panels, and integrated technology solutions.",
+  "orientation": "any",
   "lang": "en-GB",
   "dir": "ltr",
+  "scope": "/",
+  "categories": ["business", "lifestyle", "shopping"],
 
   "icons": [
     {

@@ -44,6 +44,111 @@
     to   { opacity: 1; translate: 0 0; }
   }
   .fade-in { animation: fadeIn 0.35s ease-out; }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .animate-shimmer { animation: shimmer 2s infinite; }
+  
+  /* Performance optimizations */
+  .will-change-transform { will-change: transform; }
+  .will-change-opacity { will-change: opacity; }
+  .gpu-accelerated { transform: translateZ(0); }
+  
+  /* Optimize animations for 60fps */
+  .smooth-animation {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Reduce paint complexity */
+  .contain-layout { contain: layout; }
+  .contain-paint { contain: paint; }
+  .contain-size { contain: size; }
+  .contain-style { contain: style; }
+  
+  /* Critical above-the-fold styles */
+  .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Optimize for Core Web Vitals */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Prevent layout shift for images */
+  .aspect-ratio-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .aspect-ratio-container::before {
+    content: '';
+    display: block;
+    padding-top: var(--aspect-ratio, 56.25%); /* 16:9 default */
+  }
+  
+  .aspect-ratio-container > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Accessibility improvements */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .gradient-text-luxury,
+    .gradient-text-platinum,
+    .gradient-text-gold {
+      background: none;
+      color: currentColor;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
   .dark {
@@ -80,21 +185,27 @@
     @apply border-border;
   }
 
-/* Prevent horizontal scroll */
-html, body {
+/* Critical performance optimizations */
+html {
+  scroll-behavior: smooth;
+  /* Prevent layout shifts */
   overflow-x: hidden;
   max-width: 100%;
 }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    @apply bg-background text-foreground font-luxury antialiased;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+body {
+  @apply bg-background text-foreground font-luxury antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal scroll */
+  overflow-x: hidden;
+  max-width: 100%;
+  /* Optimize font rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  /* Improve scrolling performance */
+  -webkit-overflow-scrolling: touch;
+}
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-luxury;

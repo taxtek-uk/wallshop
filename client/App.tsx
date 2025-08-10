@@ -6,13 +6,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, memo } from "react";
 import { HelmetProvider } from "react-helmet-async";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
 import ScrollToTop from "./components/ScrollToTop";
 import NotFound from "./pages/NotFound";
+import usePerformanceMonitor from "./hooks/usePerformanceMonitor";
 
 // Lazy-loaded pages for better performance
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
@@ -54,35 +55,53 @@ const SPCWaterproofWallPanel = lazy(() => import("./pages/SPCWaterproofWallPanel
 const SPCStoneCrystalFlooring = lazy(() => import("./pages/SPCStoneCrystalFlooring"));
 const PlasticWoodFlooring = lazy(() => import("./pages/PlasticWoodFlooring"));
 
-// Loading component
-const PageLoader = () => (
+// Optimized Loading component with memo
+const PageLoader = memo(() => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b69777] mx-auto mb-4"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b69777] mx-auto mb-4 will-change-transform"></div>
       <p className="text-[#6b5c47] font-medium">Loading...</p>
     </div>
   </div>
-);
+));
+
+PageLoader.displayName = 'PageLoader';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error instanceof Error && 'status' in error && (error as any).status >= 400 && (error as any).status < 500) {
+          return false;
+        }
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
+      refetchOnReconnect: 'always',
+      networkMode: 'online',
+    },
+    mutations: {
+      retry: 1,
+      networkMode: 'online',
     },
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <HelmetProvider>
-          <ScrollToTop />
-          <Suspense fallback={<PageLoader />}>
+const App = () => {
+  // Initialize performance monitoring
+  usePerformanceMonitor();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <HelmetProvider>
+            <ScrollToTop />
+            <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Index />} />
 
@@ -139,6 +158,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 createRoot(document.getElementById("root")!).render(<App />);

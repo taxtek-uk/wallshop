@@ -32,13 +32,29 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_GB" />
 
-    <!-- Fonts -->
+    <!-- Critical Resource Hints -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- Optimized Font Loading with font-display: swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Preload critical assets -->
+    <link rel="modulepreload" href="/client/App.tsx" />
+    
+    <!-- Resource hints for better performance -->
+    <link rel="prefetch" href="/images/smart-wall-1.jpg" />
+    <link rel="prefetch" href="/images/luxury-living-room.webp" />
   </head>
 
   <body>
+    <!-- Skip to main content for screen readers -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50">
+      Skip to main content
+    </a>
+    
     <div id="root"></div>
 
     <!-- If you’re dynamically rendering the contact info in the UI, consider adding this visually too -->
@@ -55,5 +71,20 @@
     -->
 
     <script type="module" src="/client/App.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
