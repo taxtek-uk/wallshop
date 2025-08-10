@@ -39,7 +39,7 @@
       
       if ((ext === '.js' || ext === '.mjs') && 
           contentType && 
-          contentType.includes('application/octet-stream')) {
+          contentType.includes('application/javascript')) {
         
         console.warn(`🔧 Fixing MIME type for: ${url}`);
         

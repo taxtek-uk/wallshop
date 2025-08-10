@@ -18,7 +18,7 @@ export default function handler(req, res) {
   }
 
   // Determine content type
-  let contentType = 'application/octet-stream';
+  let contentType = 'application/javascript';
   if (safePath.endsWith('.js')) {
     contentType = 'application/javascript; charset=utf-8';
   } else if (safePath.endsWith('.css')) {

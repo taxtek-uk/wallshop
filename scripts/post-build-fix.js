@@ -46,7 +46,7 @@ allFiles.forEach(filePath => {
   const ext = path.extname(filePath);
   
   // Determine correct MIME type
-  let mimeType = 'application/octet-stream';
+  let mimeType = 'application/javascript';
   switch (ext) {
     case '.js':
     case '.mjs':
