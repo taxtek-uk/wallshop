@@ -18,7 +18,9 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "deploy:check": "node scripts/deploy-check.js",
+    "deploy:verify": "npm run build && npm run deploy:check"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
