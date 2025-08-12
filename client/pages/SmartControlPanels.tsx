@@ -433,17 +433,17 @@ const SmartControlPanels: React.FC = () => {
           </div>
         </section>
 
-        
+        {/* Featured Products Grid */}
       <section
       id="products"
       ref={ref}
       className="relative py-24 bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3] overflow-hidden"
     >
       {/* Parallax Pattern Overlay */}
-      {/* <motion.div
+      <motion.div
         style={{ y }}
         className="absolute inset-0 opacity-[0.04] bg-[url('/patterns/diagonal-lines.svg')] bg-repeat pointer-events-none"
-      ></motion.div> */}
+      ></motion.div>
 
       <div className="container relative mx-auto px-4 lg:px-8">
         {/* Heading */}
