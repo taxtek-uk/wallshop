@@ -5,7 +5,6 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  root: 'client',
   server: {
     host: "::",
     port: 8080,
@@ -14,6 +13,10 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/spa",
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        app: path.resolve(__dirname, 'client/App.tsx'),
+      },
       output: {
         manualChunks: {
           // Vendor chunks
