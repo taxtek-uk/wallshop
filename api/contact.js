@@ -1,6 +1,5 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Import Resend only when needed to avoid potential import issues
+let resend = null;
 
 // HTML escape function
 const esc = (str) => {
@@ -174,6 +173,15 @@ export default async function handler(req, res) {
       </html>
     `;
 
+    // Import Resend dynamically to avoid potential import issues
+    if (!resend) {
+      console.log('Importing Resend dynamically...');
+      const { Resend } = await import('resend');
+      resend = new Resend(process.env.RESEND_API_KEY);
+      console.log('Resend initialized successfully');
+    }
+
+    console.log('Sending email via Resend...');
     const { data, error } = await resend.emails.send({
       from: 'The Wall Shop <contact@thewallshop.co.uk>',
       to: ["stephen@thewallshop.co.uk"],
@@ -181,6 +189,7 @@ export default async function handler(req, res) {
       subject: `Contact Form: ${reason} - ${name}`,
       html,
     });
+    console.log('Email send result:', { data, error });
 
     if (error) {
       console.error('Resend error:', error);

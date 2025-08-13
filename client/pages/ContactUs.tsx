@@ -101,6 +101,9 @@ export default function ContactUs() {
     setError("");
     
     try {
+      console.log('Submitting form to /api/contact...');
+      console.log('Form data:', form);
+      
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -109,12 +112,22 @@ export default function ContactUs() {
         body: JSON.stringify(form),
       });
 
-      // Parse JSON response safely
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      // Get response as text first to see what we're actually receiving
+      const responseText = await response.text();
+      console.log('Raw response text:', responseText);
+
+      // Try to parse as JSON
       let result;
       try {
-        result = await response.json();
+        result = JSON.parse(responseText);
+        console.log('Parsed JSON result:', result);
       } catch (jsonError) {
-        throw new Error('Invalid response from server');
+        console.error('JSON parse error:', jsonError);
+        console.error('Response text was:', responseText);
+        throw new Error(`Invalid response from server: ${responseText.substring(0, 100)}...`);
       }
 
       if (!response.ok) {
@@ -307,6 +320,76 @@ export default function ContactUs() {
                     required
                   />
                 </div>
+
+                {/* Debug Section */}
+                <div className="bg-gray-100 p-4 rounded-lg mb-4 text-sm">
+                  <h4 className="font-bold mb-2">🔧 Debug Testing</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/test...');
+                          const res = await fetch('/api/test');
+                          const text = await res.text();
+                          console.log('Test API response:', text);
+                          alert('Test API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Test API error:', err);
+                          alert('Test API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-xs"
+                    >
+                      Test Basic API
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/contact-simple...');
+                          const res = await fetch('/api/contact-simple', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: 'Test', email: 'test@example.com', reason: 'Test', message: 'Test message' })
+                          });
+                          const text = await res.text();
+                          console.log('Contact Simple API response:', text);
+                          alert('Contact Simple API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Contact Simple API error:', err);
+                          alert('Contact Simple API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-green-500 text-white rounded text-xs"
+                    >
+                      Test Contact Simple
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/contact (full)...');
+                          const res = await fetch('/api/contact', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: 'Test', email: 'test@example.com', reason: 'Test', message: 'Test message' })
+                          });
+                          const text = await res.text();
+                          console.log('Contact Full API response:', text);
+                          alert('Contact Full API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Contact Full API error:', err);
+                          alert('Contact Full API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-purple-500 text-white rounded text-xs"
+                    >
+                      Test Contact Full
+                    </button>
+                  </div>
+                </div>
+
                 <Button
                   size="lg"
                   type="submit"
