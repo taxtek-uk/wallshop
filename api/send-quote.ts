@@ -3,7 +3,12 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req: any, res: any) {
+  console.log('--- API Request Received ---');
+  console.log('Method:', req.method);
+  console.log('Body:', req.body);
+
   if (req.method !== 'POST') {
+    console.warn('Invalid method:', req.method);
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -19,9 +24,13 @@ export default async function handler(req: any, res: any) {
     urgency
   } = req.body;
 
+  console.log('Form fields parsed:', {
+    name, email, phone, address, projectType, area, message, urgency
+  });
+
   try {
     const emailResponse = await resend.emails.send({
-      from: 'no-reply@thewallshop.co.uk', // must be verified in Resend
+      from: 'stephen@thewallshop.co.uk', // Must be verified in Resend
       to: 'stephen@thewallshop.co.uk',
       subject: `New Quote Request from ${name}`,
       html: `
@@ -38,9 +47,14 @@ export default async function handler(req: any, res: any) {
       `,
     });
 
+    console.log('Resend API response:', emailResponse);
+
     res.status(200).json({ success: true, data: emailResponse });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Failed to send email' });
+  } catch (error: any) {
+    console.error('Error sending email via Resend:', error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || 'Failed to send email'
+    });
   }
 }
