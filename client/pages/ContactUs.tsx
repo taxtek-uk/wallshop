@@ -101,10 +101,10 @@ export default function ContactUs() {
     setError("");
     
     try {
-      console.log('Submitting form to /api/contact...');
+      console.log('Submitting form to /api/working-contact...');
       console.log('Form data:', form);
       
-      const response = await fetch('/api/contact', {
+      const response = await fetch('/api/working-contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -444,6 +444,28 @@ export default function ContactUs() {
                       className="px-3 py-1 bg-yellow-500 text-white rounded text-xs"
                     >
                       Test Contact CommonJS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/working-contact (Final)...');
+                          const res = await fetch('/api/working-contact', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: 'Test User', email: 'test@example.com', reason: 'Testing', message: 'This is a test message from the debug panel.' })
+                          });
+                          const text = await res.text();
+                          console.log('Working Contact API response:', text);
+                          alert('Working Contact API: ' + text.substring(0, 150));
+                        } catch (err) {
+                          console.error('Working Contact API error:', err);
+                          alert('Working Contact API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-emerald-500 text-white rounded text-xs"
+                    >
+                      Test Final Contact
                     </button>
                   </div>
                 </div>

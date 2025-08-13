@@ -143,7 +143,7 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, selectedProduc
   setIsSubmitting(true);
 
   try {
-    const res = await fetch('/api/send-quote', {
+    const res = await fetch('/api/send-quote-working', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...formData, selectedProduct }),

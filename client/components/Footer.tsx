@@ -94,7 +94,7 @@ const Footer = () => {
     setSubscriptionMessage('');
 
     try {
-      const response = await fetch('/api/subscribe', {
+      const response = await fetch('/api/subscribe-working', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

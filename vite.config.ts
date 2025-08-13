@@ -76,7 +76,8 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(), 
-    expressPlugin(),
+    // Only use express plugin in development and when not in Vercel
+    mode === 'development' && !process.env.VERCEL && expressPlugin(),
     // Bundle analyzer
     mode === 'production' && visualizer({
       filename: 'dist/stats.html',
@@ -114,6 +115,8 @@ function expressPlugin(): Plugin {
         const app = createServer();
         // Add Express app as middleware to Vite dev server
         server.middlewares.use(app);
+      }).catch(err => {
+        console.warn('Could not load server module:', err.message);
       });
     },
   };
