@@ -1,12 +1,35 @@
-import { Request, Response } from 'express';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Log environment variable availability (without exposing the actual key)
-console.log('Contact route - Resend API Key available:', !!process.env.RESEND_API_KEY);
+// HTML escape function
+const esc = (str) => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
 
-export async function handleContact(req: Request, res: Response) {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow POST method
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   // Ensure JSON response for all cases
   res.setHeader('Content-Type', 'application/json');
   
@@ -38,16 +61,8 @@ export async function handleContact(req: Request, res: Response) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Please provide a valid email address.' });
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-
-    // Escape HTML for safety
-    const esc = (s: string) => String(s ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
 
     const html = `
       <!DOCTYPE html>
@@ -62,7 +77,6 @@ export async function handleContact(req: Request, res: Response) {
           
           <!-- Header with branding -->
           <div style="background: linear-gradient(135deg, #231c14 0%, #2a1f17 50%, #1a1410 100%); padding: 40px 30px; text-align: center; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.03"><circle cx="30" cy="30" r="2"/></g></g></svg>'); opacity: 0.5;"></div>
             <div style="position: relative; z-index: 1;">
               <div style="background: linear-gradient(135deg, #b69777, #907252); width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 <span style="color: white; font-size: 32px; font-weight: bold;">W</span>
@@ -127,23 +141,10 @@ export async function handleContact(req: Request, res: Response) {
               </div>
             </div>
 
-            <!-- Priority Indicator -->
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%); border: 2px solid #f59e0b; border-radius: 16px; padding: 20px; margin-bottom: 25px; text-align: center;">
-              <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <span style="color: #f59e0b; font-size: 24px; margin-right: 10px;">⚡</span>
-                <span style="color: #92400e; font-weight: 700; font-size: 16px;">Response Required</span>
-              </div>
-              <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 500;">Customer is waiting for your response. Aim to reply within 24 hours for best customer experience.</p>
-            </div>
-
             <!-- Action Buttons -->
             <div style="text-align: center; margin: 40px 0;">
               <a href="mailto:${esc(email)}?subject=Re: ${encodeURIComponent(reason)} - The Wall Shop Response" style="display: inline-block; background: linear-gradient(135deg, #b69777, #907252); color: white; text-decoration: none; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(182, 151, 119, 0.4); margin: 0 10px 15px; transition: all 0.3s ease;">
                 📧 Reply Now
-              </a>
-              <br>
-              <a href="mailto:stephen@thewallshop.co.uk?subject=Forward: Contact Form - ${encodeURIComponent(reason)}&body=${encodeURIComponent('Customer Details:\nName: ' + name + '\nEmail: ' + email + '\nReason: ' + reason + '\n\nMessage:\n' + message)}" style="display: inline-block; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; text-decoration: none; padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3); margin: 0 10px; transition: all 0.3s ease;">
-                🔄 Forward to Team
               </a>
             </div>
 
@@ -196,12 +197,9 @@ export async function handleContact(req: Request, res: Response) {
     });
     
     // Ensure we always send a JSON response
-    if (!res.headersSent) {
-      return res.status(500).json({ 
-        error: 'Failed to process contact form',
-        details: err instanceof Error ? err.message : 'Unknown server error'
-      });
-    }
+    return res.status(500).json({ 
+      error: 'Failed to process contact form',
+      details: err instanceof Error ? err.message : 'Unknown server error'
+    });
   }
 }
-

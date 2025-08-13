@@ -1,12 +1,35 @@
-import { Request, Response } from 'express';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Log environment variable availability (without exposing the actual key)
-console.log('Resend API Key available:', !!process.env.RESEND_API_KEY);
+// HTML escape function
+const esc = (str) => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
 
-export async function handleQuote(req: Request, res: Response) {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow POST method
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   // Ensure JSON response for all cases
   res.setHeader('Content-Type', 'application/json');
   
@@ -39,22 +62,8 @@ export async function handleQuote(req: Request, res: Response) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Please provide a valid email address.' });
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-
-    // Validate phone format (basic)
-    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
-    if (!phoneRegex.test(phone)) {
-      return res.status(400).json({ error: 'Please provide a valid phone number.' });
-    }
-
-    // Escape HTML for safety
-    const esc = (s: string) => String(s ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
 
     const html = `
       <!DOCTYPE html>
@@ -69,7 +78,6 @@ export async function handleQuote(req: Request, res: Response) {
           
           <!-- Header with branding -->
           <div style="background: linear-gradient(135deg, #231c14 0%, #2a1f17 50%, #1a1410 100%); padding: 40px 30px; text-align: center; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.03"><circle cx="30" cy="30" r="2"/></g></g></svg>'); opacity: 0.5;"></div>
             <div style="position: relative; z-index: 1;">
               <div style="background: linear-gradient(135deg, #b69777, #907252); width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 <span style="color: white; font-size: 32px; font-weight: bold;">W</span>
@@ -251,12 +259,9 @@ export async function handleQuote(req: Request, res: Response) {
     });
     
     // Ensure we always send a JSON response
-    if (!res.headersSent) {
-      return res.status(500).json({ 
-        error: 'Failed to process quote request',
-        details: err instanceof Error ? err.message : 'Unknown server error'
-      });
-    }
+    return res.status(500).json({ 
+      error: 'Failed to process quote request',
+      details: err instanceof Error ? err.message : 'Unknown server error'
+    });
   }
 }
-
