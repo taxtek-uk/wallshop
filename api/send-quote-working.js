@@ -45,7 +45,8 @@ module.exports = async (req, res) => {
 
     const {
       name, email, phone, address,
-      projectType, area, message, urgency, selectedProduct
+      projectType, area, message, urgency, selectedProduct,
+      quoteType, modules, wallCoverings, smartDevices, accessories, total
     } = req.body;
 
     console.log('Quote request received:', { name, email, phone, projectType });
@@ -68,7 +69,7 @@ module.exports = async (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Quote Request - The Wall Shop</title>
+        <title>New Comprehensive Quote Request - The Wall Shop</title>
       </head>
       <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333;">
         <div style="max-width: 680px; margin: 0 auto; background: #ffffff;">
@@ -79,7 +80,8 @@ module.exports = async (req, res) => {
               <span style="color: white; font-size: 32px; font-weight: bold;">W</span>
             </div>
             <h1 style="color: #ffffff; font-size: 32px; font-weight: 800; margin: 0 0 10px;">The Wall Shop</h1>
-            <p style="color: #b69777; font-size: 18px; margin: 0;">New Quote Request</p>
+            <p style="color: #b69777; font-size: 18px; margin: 0;">Comprehensive Quote Request</p>
+            ${quoteType ? `<p style="color: #ffffff; font-size: 16px; margin: 10px 0 0; background: rgba(182, 151, 119, 0.2); padding: 8px 16px; border-radius: 20px; display: inline-block;">${esc(quoteType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()))}</p>` : ''}
           </div>
 
           <!-- Main content -->
@@ -124,7 +126,7 @@ module.exports = async (req, res) => {
                 ${area ? `
                 <div style="padding: 15px; background: rgba(182, 151, 119, 0.08); border-radius: 12px;">
                   <span style="font-weight: 600; color: #231c14;">Area: </span>
-                  <span style="color: #6b5c47;">${esc(area)} m²</span>
+                  <span style="color: #6b5c47;">${esc(area)} sq ft</span>
                 </div>
                 ` : ''}
                 <div style="padding: 15px; background: rgba(182, 151, 119, 0.08); border-radius: 12px;">
@@ -132,6 +134,173 @@ module.exports = async (req, res) => {
                   <span style="color: #6b5c47;">${esc(urgency || 'standard')}</span>
                 </div>
               </div>
+            </div>
+            ` : ''}
+
+            <!-- Modules Section -->
+            ${modules && modules.length > 0 ? `
+            <div style="background: #f0f9ff; border: 2px solid #dbeafe; border-radius: 20px; padding: 30px; margin-bottom: 25px;">
+              <h3 style="color: #1e40af; font-size: 22px; font-weight: 700; margin: 0 0 20px;">Modules Required</h3>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: rgba(59, 130, 246, 0.1);">
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dbeafe; color: #1e40af; font-weight: 600;">Module</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dbeafe; color: #1e40af; font-weight: 600;">Size</th>
+                      <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dbeafe; color: #1e40af; font-weight: 600;">Qty</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #dbeafe; color: #1e40af; font-weight: 600;">Price</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #dbeafe; color: #1e40af; font-weight: 600;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${modules.map(module => `
+                    <tr>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(module.name)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(module.size)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${module.quantity}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">£${module.price.toFixed(2)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right; font-weight: 600;">£${(module.price * module.quantity).toFixed(2)}</td>
+                    </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            ` : ''}
+
+            <!-- Wall Coverings Section -->
+            ${wallCoverings && wallCoverings.length > 0 ? `
+            <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 20px; padding: 30px; margin-bottom: 25px;">
+              <h3 style="color: #166534; font-size: 22px; font-weight: 700; margin: 0 0 20px;">Wall Covering Required</h3>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: rgba(34, 197, 94, 0.1);">
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #bbf7d0; color: #166534; font-weight: 600;">Covering</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #bbf7d0; color: #166534; font-weight: 600;">Type</th>
+                      <th style="padding: 12px; text-align: center; border-bottom: 2px solid #bbf7d0; color: #166534; font-weight: 600;">Area (sq ft)</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #bbf7d0; color: #166534; font-weight: 600;">Price/sq ft</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #bbf7d0; color: #166534; font-weight: 600;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${wallCoverings.map(covering => `
+                    <tr>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(covering.name)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(covering.type)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${covering.area}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">£${covering.price.toFixed(2)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right; font-weight: 600;">£${(covering.price * covering.area).toFixed(2)}</td>
+                    </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            ` : ''}
+
+            <!-- Smart Devices Section -->
+            ${smartDevices && smartDevices.length > 0 ? `
+            <div style="background: #fef3c7; border: 2px solid #fde68a; border-radius: 20px; padding: 30px; margin-bottom: 25px;">
+              <h3 style="color: #92400e; font-size: 22px; font-weight: 700; margin: 0 0 20px;">Smart Devices Required</h3>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: rgba(245, 158, 11, 0.1);">
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #fde68a; color: #92400e; font-weight: 600;">Device</th>
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #fde68a; color: #92400e; font-weight: 600;">Category</th>
+                      <th style="padding: 12px; text-align: center; border-bottom: 2px solid #fde68a; color: #92400e; font-weight: 600;">Qty</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #fde68a; color: #92400e; font-weight: 600;">Price</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #fde68a; color: #92400e; font-weight: 600;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${smartDevices.map(device => `
+                    <tr>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(device.name)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(device.category)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${device.quantity}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">£${device.price.toFixed(2)}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right; font-weight: 600;">£${(device.price * device.quantity).toFixed(2)}</td>
+                    </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            ` : ''}
+
+            <!-- Accessories Section -->
+            ${accessories && accessories.length > 0 ? `
+            <div style="background: #fdf2f8; border: 2px solid #fbcfe8; border-radius: 20px; padding: 30px; margin-bottom: 25px;">
+              <h3 style="color: #be185d; font-size: 22px; font-weight: 700; margin: 0 0 20px;">Accessories</h3>
+              
+              <!-- Client Supplied Accessories -->
+              ${accessories.filter(acc => acc.suppliedBy === 'client').length > 0 ? `
+              <div style="margin-bottom: 20px;">
+                <h4 style="color: #be185d; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Supplied by Client</h4>
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr style="background: rgba(236, 72, 153, 0.1);">
+                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Item</th>
+                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Category</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Qty</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${accessories.filter(acc => acc.suppliedBy === 'client').map(accessory => `
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(accessory.name)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(accessory.category)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${accessory.quantity}</td>
+                      </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              ` : ''}
+
+              <!-- Wall Shop Supplied Accessories -->
+              ${accessories.filter(acc => acc.suppliedBy === 'wallshop').length > 0 ? `
+              <div>
+                <h4 style="color: #be185d; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Supplied by The Wall Shop</h4>
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr style="background: rgba(236, 72, 153, 0.1);">
+                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Item</th>
+                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Category</th>
+                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Qty</th>
+                        <th style="padding: 10px; text-align: right; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Price</th>
+                        <th style="padding: 10px; text-align: right; border-bottom: 2px solid #fbcfe8; color: #be185d; font-weight: 600;">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${accessories.filter(acc => acc.suppliedBy === 'wallshop').map(accessory => `
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(accessory.name)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151;">${esc(accessory.category)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${accessory.quantity}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">£${accessory.price.toFixed(2)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right; font-weight: 600;">£${(accessory.price * accessory.quantity).toFixed(2)}</td>
+                      </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              ` : ''}
+            </div>
+            ` : ''}
+
+            <!-- Total Section -->
+            ${total ? `
+            <div style="background: linear-gradient(135deg, #b69777, #907252); border-radius: 20px; padding: 30px; margin-bottom: 25px; text-align: center;">
+              <h3 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 0 0 10px;">Estimated Total</h3>
+              <p style="color: #ffffff; font-size: 36px; font-weight: 800; margin: 0;">£${total.toLocaleString()}</p>
+              <p style="color: rgba(255, 255, 255, 0.8); font-size: 14px; margin: 10px 0 0;">*Preliminary estimate - final pricing in detailed quote</p>
             </div>
             ` : ''}
 

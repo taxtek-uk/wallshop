@@ -27,6 +27,8 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Wall Panels', to: '/wall-panels', children: [
       { name: 'WPC', to: '/wall-panels/wpc' },
       { name: 'Anti-Collision', to: '/wall-panels/anti-collision' },
+      { name: 'Wood Grain', to: '/wall-panels/wood-grain' },
+      { name: 'Cloth Pattern', to: '/wall-panels/cloth-pattern' },
       { name: 'Splicing Boards', to: '/wall-panels/wpc-splicing' },
       { name: 'Hollow Locking', to: '/wall-panels/wpc-hollow' },
       { name: 'Fireproof', to: '/wall-panels/fireproof' },

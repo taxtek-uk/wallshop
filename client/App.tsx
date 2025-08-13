@@ -53,6 +53,8 @@ const UHDContinuousPattern = lazy(() => import("./pages/UHDContinuousPattern"));
 const SPCWaterproofWallPanel = lazy(() => import("./pages/SPCWaterproofWallPanel"));
 const SPCStoneCrystalFlooring = lazy(() => import("./pages/SPCStoneCrystalFlooring"));
 const PlasticWoodFlooring = lazy(() => import("./pages/PlasticWoodFlooring"));
+const WoodGrainWallPanels = lazy(() => import("./pages/WoodGrainWallPanels"));
+const ClothPatternWallPanels = lazy(() => import("./pages/ClothPatternWallPanels"));
 
 // Loading component
 const PageLoader = () => (
@@ -119,6 +121,8 @@ const App = () => (
             <Route path="/wall-panels" element={<WallPanels />} />
             <Route path="/wall-panels/wpc" element={<WPCWallPanels />} />
             <Route path="/wall-panels/anti-collision" element={<AntiCollisionWallPanels />} />
+            <Route path="/wall-panels/wood-grain" element={<WoodGrainWallPanels />} />
+            <Route path="/wall-panels/cloth-pattern" element={<ClothPatternWallPanels />} />
             <Route path="/wall-panels/wpc-splicing" element={<WPCSplicingBoards />} />
             <Route path="/wall-panels/wpc-hollow" element={<WPCHollowSeamlessLockingBoards />} />
             <Route path="/wall-panels/fireproof" element={<ClassAFireproofBoards />} />
