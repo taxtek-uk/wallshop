@@ -10,63 +10,20 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     allowedHosts: ["8081-ik3eo5j9uhqzevw5a3dmn-9ce7ec25.manusvm.computer", "8082-ik3eo5j9uhqzevw5a3dmn-9ce7ec25.manusvm.computer"]
   },
+  base: '/',
   build: {
     outDir: "dist/spa",
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
-        app: path.resolve(__dirname, 'client/App.tsx'),
       },
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', 'lucide-react'],
-          'radix-vendor': [
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-radio-group',
-            '@radix-ui/react-label',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-progress',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-hover-card',
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-menubar',
-            '@radix-ui/react-context-menu',
-            '@radix-ui/react-collapsible',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-aspect-ratio',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-toggle',
-            '@radix-ui/react-toggle-group'
-          ],
-          'query-vendor': ['@tanstack/react-query'],
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          // Page chunks
-          'smart-walls': ['./client/pages/SmartWalls.tsx'],
-          'smart-devices': ['./client/pages/SmartDevices.tsx'],
-          'wall-panels': [
-            './client/pages/WallPanels.tsx',
-            './client/pages/WPCWallPanels.tsx',
-            './client/pages/AntiCollisionWallPanels.tsx',
-            './client/pages/WPCSplicingBoards.tsx'
-          ]
-        }
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
       }
     },
-    // Optimize chunk size
     chunkSizeWarningLimit: 500,
-    // Enable minification
     minify: 'terser',
     terserOptions: {
       compress: {
@@ -75,7 +32,6 @@ export default defineConfig(({ mode }) => ({
         pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : []
       }
     },
-    // Enable source maps for debugging
     sourcemap: mode === 'development'
   },
   plugins: [
