@@ -55,6 +55,10 @@ const quickLinks = [
 
 const Footer = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [subscriptionMessage, setSubscriptionMessage] = useState('');
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -69,6 +73,51 @@ const Footer = () => {
       if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
   }, []);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setSubscriptionStatus('error');
+      setSubscriptionMessage('Please enter your email address.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setSubscriptionStatus('error');
+      setSubscriptionMessage('Please enter a valid email address.');
+      return;
+    }
+
+    setIsSubscribing(true);
+    setSubscriptionStatus('idle');
+    setSubscriptionMessage('');
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to subscribe');
+      }
+
+      setSubscriptionStatus('success');
+      setSubscriptionMessage('Successfully subscribed! Check your email for confirmation.');
+      setEmail('');
+    } catch (err) {
+      setSubscriptionStatus('error');
+      setSubscriptionMessage(err instanceof Error ? err.message : 'Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
 <footer
@@ -141,14 +190,30 @@ const Footer = () => {
               Get the latest design trends and exclusive offers.
             </p>
             <div className="flex flex-col gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-white/10 px-4 py-2 rounded-md placeholder-white/70 text-white focus:outline-none"
-              />
-              <Button className="bg-gradient-to-r from-gray-500 to-gray-600 text-black hover:from-gray-400 hover:to-gray-400 rounded-md py-2 font-semibold">
-                Subscribe
-              </Button>
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white/10 px-4 py-2 rounded-md placeholder-white/70 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                  disabled={isSubscribing}
+                />
+                <Button 
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="bg-gradient-to-r from-gray-500 to-gray-600 text-black hover:from-gray-400 hover:to-gray-400 rounded-md py-2 font-semibold disabled:opacity-50"
+                >
+                  {isSubscribing ? 'Subscribing...' : 'Subscribe'}
+                </Button>
+              </form>
+              {subscriptionMessage && (
+                <p className={`text-sm ${
+                  subscriptionStatus === 'success' ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {subscriptionMessage}
+                </p>
+              )}
             </div>
             <div className="flex gap-3 mt-6">
               {socialLinks.map(({ icon: Icon, href, label }, i) => (

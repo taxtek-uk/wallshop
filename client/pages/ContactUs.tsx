@@ -99,12 +99,29 @@ export default function ContactUs() {
     }
     setSubmitting(true);
     setError("");
-    // Replace with your backend/email logic
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send message');
+      }
+
       setSubmitting(false);
       setSubmitted(true);
       setForm(initialForm);
-    }, 1200);
+    } catch (err) {
+      setSubmitting(false);
+      setError(err instanceof Error ? err.message : 'Failed to send message. Please try again.');
+    }
   }
 
   return (
