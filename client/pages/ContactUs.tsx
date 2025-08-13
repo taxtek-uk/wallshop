@@ -109,10 +109,16 @@ export default function ContactUs() {
         body: JSON.stringify(form),
       });
 
-      const result = await response.json();
+      // Parse JSON response safely
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        throw new Error('Invalid response from server');
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to send message');
+        throw new Error(result?.error || 'Failed to send message');
       }
 
       setSubmitting(false);

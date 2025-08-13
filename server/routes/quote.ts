@@ -3,12 +3,26 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Log environment variable availability (without exposing the actual key)
+console.log('Resend API Key available:', !!process.env.RESEND_API_KEY);
+
 export async function handleQuote(req: Request, res: Response) {
+  // Ensure JSON response for all cases
+  res.setHeader('Content-Type', 'application/json');
+  
   try {
+    // Check if Resend API key is available
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY environment variable is not set');
+      return res.status(500).json({ error: 'Email service not configured' });
+    }
+
     const {
       name, email, phone, address,
       projectType, area, message, urgency, selectedProduct
     } = req.body;
+
+    console.log('Quote request received:', { name, email, phone, projectType });
 
     // Validate required fields
     if (!name || !email || !phone) {

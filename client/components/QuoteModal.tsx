@@ -144,15 +144,22 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, selectedProduc
 
   try {
     const res = await fetch('/api/send-quote', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(formData),
-});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...formData, selectedProduct }),
+    });
 
-if (!res.ok) {
-  const { error } = await res.json().catch(() => ({ error: 'Unknown error' }));
-  throw new Error(error || 'Failed to send quote');
-}
+    // Parse JSON response safely
+    let result;
+    try {
+      result = await res.json();
+    } catch (jsonError) {
+      throw new Error('Invalid response from server');
+    }
+
+    if (!res.ok) {
+      throw new Error(result?.error || 'Failed to send quote');
+    }
 
     setIsSubmitting(false);
     setIsSubmitted(true);
@@ -172,9 +179,10 @@ if (!res.ok) {
       setCurrentStep(1);
       onClose();
     }, 4000);
-  } catch {
+  } catch (error) {
     setIsSubmitting(false);
-    alert('Failed to submit quote request. Please try again later.');
+    const errorMessage = error instanceof Error ? error.message : 'Failed to submit quote request. Please try again later.';
+    alert(errorMessage);
   }
 };
 

@@ -3,9 +3,23 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Log environment variable availability (without exposing the actual key)
+console.log('Contact route - Resend API Key available:', !!process.env.RESEND_API_KEY);
+
 export async function handleContact(req: Request, res: Response) {
+  // Ensure JSON response for all cases
+  res.setHeader('Content-Type', 'application/json');
+  
   try {
+    // Check if Resend API key is available
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY environment variable is not set');
+      return res.status(500).json({ error: 'Email service not configured' });
+    }
+
     const { name, email, reason, message } = req.body;
+
+    console.log('Contact request received:', { name, email, reason });
 
     // Validate required fields
     if (!name || !email || !reason || !message) {
