@@ -329,7 +329,43 @@ export default function ContactUs() {
                       type="button"
                       onClick={async () => {
                         try {
-                          console.log('Testing /api/test...');
+                          console.log('Testing /api/ (root)...');
+                          const res = await fetch('/api/');
+                          const text = await res.text();
+                          console.log('Root API response:', text);
+                          alert('Root API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Root API error:', err);
+                          alert('Root API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-red-500 text-white rounded text-xs"
+                    >
+                      Test Root API
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/hello (CommonJS)...');
+                          const res = await fetch('/api/hello');
+                          const text = await res.text();
+                          console.log('Hello API response:', text);
+                          alert('Hello API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Hello API error:', err);
+                          alert('Hello API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-xs"
+                    >
+                      Test Hello (CommonJS)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/test (ES Module)...');
                           const res = await fetch('/api/test');
                           const text = await res.text();
                           console.log('Test API response:', text);
@@ -339,9 +375,9 @@ export default function ContactUs() {
                           alert('Test API error: ' + err.message);
                         }
                       }}
-                      className="px-3 py-1 bg-blue-500 text-white rounded text-xs"
+                      className="px-3 py-1 bg-indigo-500 text-white rounded text-xs"
                     >
-                      Test Basic API
+                      Test ES Module
                     </button>
                     <button
                       type="button"
@@ -386,6 +422,28 @@ export default function ContactUs() {
                       className="px-3 py-1 bg-purple-500 text-white rounded text-xs"
                     >
                       Test Contact Full
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          console.log('Testing /api/contact-test (CommonJS)...');
+                          const res = await fetch('/api/contact-test', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: 'Test', email: 'test@example.com', reason: 'Test', message: 'Test message' })
+                          });
+                          const text = await res.text();
+                          console.log('Contact Test API response:', text);
+                          alert('Contact Test API: ' + text.substring(0, 100));
+                        } catch (err) {
+                          console.error('Contact Test API error:', err);
+                          alert('Contact Test API error: ' + err.message);
+                        }
+                      }}
+                      className="px-3 py-1 bg-yellow-500 text-white rounded text-xs"
+                    >
+                      Test Contact CommonJS
                     </button>
                   </div>
                 </div>

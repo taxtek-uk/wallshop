@@ -1,56 +1,13 @@
-# Dependencies
 node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build outputs (except dist/spa)
-dist/server
+.env*
 .next
-.nuxt
-.vuepress/dist
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE files
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-logs
+.git
 *.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
-
-# Temporary folders
-tmp
-temp
-
-# Documentation (not needed for deployment)
-*.md
-!README.md
-
-# Scripts (not needed for deployment)
+dist/server
+server
+client
+shared
+netlify
 scripts
-
-# Source maps (optional, comment out if you want them)
-*.map
+public/videos/*.mp4
+public/videos/*.webm
