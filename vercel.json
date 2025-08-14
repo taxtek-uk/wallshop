@@ -1,12 +1,13 @@
 {
-  "installCommand": "npm install",
-  "buildCommand": "npx vite build",
-  "outputDirectory": "dist/spa",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/((?!api).+)",
-      "destination": "/index.html"
+  "functions": {
+    "api/[...server].js": {
+      "includeFiles": "server/**"
     }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "builds": [
+    { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist/spa" } }
   ]
 }
