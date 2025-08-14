@@ -232,8 +232,8 @@ export async function handleContact(req: Request, res: Response) {
     const resend = new Resend(process.env.RESEND_API_KEY as string);
 
     const { data, error } = await resend.emails.send({
-      from: "The Wall Shop <contact@thewallshop.co.uk>",
-      to: ["info@thewallshop.co.uk", "stephen@thewallshop.co.uk"], // adjust recipients as needed
+      from: "The Wall Shop <no-reply@thewallshop.co.uk>",
+      to: ["stephen@thewallshop.co.uk"], // adjust recipients as needed
       replyTo: email,
       subject: `Contact — ${reason} (${name})`,
       html,

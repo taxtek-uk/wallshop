@@ -98,7 +98,7 @@ export async function handleQuote(req: Request, res: Response) {
               category: normStr(x?.category, 60) || undefined,
               quantity: Math.max(0, Math.floor(toNum(x?.quantity))),
               price: toNum(x?.price),
-              suppliedBy: safeString(x?.suppliedBy) === "client" ? "client" : "wallshop",
+              suppliedBy: (safeString(x?.suppliedBy) === "client" ? "client" : "wallshop") as "client" | "wallshop",
             }))
             .filter((x) => x.name && x.quantity > 0)
         : [];
