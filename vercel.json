@@ -1,12 +1,7 @@
 {
-  "functions": {
-    "api/**/*": {
-      "runtime": "nodejs20.x"
-    }
-  },
+  "installCommand": "npm install",
   "buildCommand": "npx vite build",
   "outputDirectory": "dist/spa",
-  "installCommand": "npm install",
   "framework": null,
   "rewrites": [
     {
