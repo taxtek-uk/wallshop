@@ -1,8 +1,8 @@
 import { defineConfig } from "vite";
 import path from "path";
 
-// Server build configuration
 export default defineConfig({
+  base: "/", // Required for Vercel/static hosting to avoid asset path issues
   build: {
     lib: {
       entry: path.resolve(__dirname, "server/node-build.ts"),
@@ -10,12 +10,12 @@ export default defineConfig({
       fileName: "production",
       formats: ["es"],
     },
-    outDir: "dist/server",
-    target: "node22",
-    ssr: true,
+    outDir: "dist/server", // Server build output folder
+    target: "node22", // Matches latest Vercel Node runtime
+    ssr: true, // Enables Server-Side Rendering build
     rollupOptions: {
       external: [
-        // Node.js built-ins
+        // Node.js built-ins (don’t bundle)
         "fs",
         "path",
         "url",
@@ -29,17 +29,19 @@ export default defineConfig({
         "buffer",
         "querystring",
         "child_process",
-        // External dependencies that should not be bundled
+
+        // External dependencies to keep external in server build
         "express",
         "cors",
       ],
       output: {
         format: "es",
-        entryFileNames: "[name].mjs",
+        entryFileNames: "[name].mjs", // Ensure ESM output for Node 22
       },
     },
     minify: false, // Keep readable for debugging
-    sourcemap: true,
+    sourcemap: true, // Useful for production debugging
+    emptyOutDir: true, // Clear old build files before building
   },
   resolve: {
     alias: {
@@ -48,6 +50,6 @@ export default defineConfig({
     },
   },
   define: {
-    "process.env.NODE_ENV": '"production"',
+    "process.env.NODE_ENV": JSON.stringify("production"),
   },
 });

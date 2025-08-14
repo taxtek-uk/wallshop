@@ -1,8 +1,9 @@
-const express = require('express');
-const { createServer } = require('./dist/server/node-build.mjs');
+import express from 'express';
+import { createServer } from './dist/server/node-build.mjs';
+import dotenv from 'dotenv';
 
 // Load environment variables
-require('dotenv').config({ path: '.env.local' });
+dotenv.config();
 
 console.log('Starting API test...');
 console.log('Environment variables:');

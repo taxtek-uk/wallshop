@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Log environment variable availability (without exposing the actual key)
-console.log('Contact route - Resend API Key available:', !!process.env.RESEND_API_KEY);
-
 export async function handleContact(req: Request, res: Response) {
   // Ensure JSON response for all cases
   res.setHeader('Content-Type', 'application/json');
@@ -172,6 +167,9 @@ export async function handleContact(req: Request, res: Response) {
       </body>
       </html>
     `;
+
+    // Initialize Resend per-request (deferred), now that key is confirmed
+    const resend = new Resend(process.env.RESEND_API_KEY as string);
 
     const { data, error } = await resend.emails.send({
       from: 'The Wall Shop <contact@thewallshop.co.uk>',

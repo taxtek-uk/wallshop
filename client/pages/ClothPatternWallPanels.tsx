@@ -17,15 +17,54 @@ import { Textarea } from '@/components/ui/textarea';
 import QuoteModal from "@/components/QuoteModal";
 
 const ClothPatternWallPanels = () => {
-  const [selectedPattern, setSelectedPattern] = useState('linen');
+  const [selectedPattern, setSelectedPattern] = useState('1');
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
+
+
+
   const patterns = [
-    { id: 'linen', name: 'Natural Linen', description: 'Classic linen weave with subtle texture and neutral tones.', popularity: 'Most Popular' },
-    { id: 'canvas', name: 'Canvas Weave', description: 'Durable canvas pattern with pronounced texture and depth.', popularity: 'Contemporary' },
-    { id: 'silk', name: 'Silk Finish', description: 'Luxurious silk-like pattern with elegant sheen and smoothness.', popularity: 'Premium Choice' },
-    { id: 'tweed', name: 'Tweed Pattern', description: 'Traditional tweed weave with rich colors and sophisticated appeal.', popularity: 'Classic' }
-  ];
+  { id: "1", name: "Linen Weave", description: "Linen Weave texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/1.jpg", popularity: "" },
+  { id: "2", name: "Denim Texture", description: "Denim Texture texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/2.jpg", popularity: "" },
+  { id: "3", name: "Chambray Grid", description: "Chambray Grid texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/3.jpg", popularity: "" },
+  { id: "4", name: "Ivory Cotton", description: "Ivory Cotton texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/4.jpg", popularity: "" },
+  { id: "5", name: "Silver Mesh", description: "Silver Mesh texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/5.jpg", popularity: "" },
+  { id: "6", name: "Soft Gauze", description: "Soft Gauze texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/6.jpg", popularity: "" },
+  { id: "7", name: "Contrast Linen Panel", description: "Contrast Linen Panel texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/7.jpg", popularity: "" },
+  { id: "8", name: "Beige Canvas", description: "Beige Canvas texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/8.jpg", popularity: "" },
+  { id: "9", name: "Rice Grain Weave", description: "Rice Grain Weave texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/9.jpg", popularity: "" },
+  { id: "10", name: "Crosshatch Blend", description: "Crosshatch Blend texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/10.jpg", popularity: "" },
+  { id: "11", name: "Alabaster Cotton", description: "Alabaster Cotton texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/11.jpg", popularity: "" },
+  { id: "12", name: "Khaki Hemp", description: "Khaki Hemp texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/12.jpg", popularity: "" },
+  { id: "13", name: "Pebble Mesh", description: "Pebble Mesh texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/13.jpg", popularity: "" },
+  { id: "14", name: "Cream Wool", description: "Cream Wool texture for contemporary interior walls", img: "/images/carbon-rock-boards/fabric/14.jpg", popularity: "" }
+];
+
+
+
+  // Create selectedProduct object based on the selected pattern
+const selectedProduct = {
+  id: selectedPattern,
+  name: `Cloth Pattern Wall Panels - ${
+    patterns.find(p => p.id === selectedPattern)?.name || 'Natural Linen'
+  }`,
+  category: 'Wall Panels',
+  subcategory: 'Cloth Pattern',
+  description:
+    patterns.find(p => p.id === selectedPattern)?.description ||
+    'Classic linen weave with subtle texture and neutral tones.',
+  price: 'Custom Quote',
+  features: [
+    'Authentic Textile Feel',
+    'Multi-Dimensional Texture',
+    'Stain Resistant Surface',
+    'Acoustic Properties',
+    'Professional Installation',
+    'Design Versatility'
+  ]
+};
+
+  
 
   const specifications = [
     { label: 'Material', value: 'High-Definition Textile Pattern PVC' },
@@ -205,7 +244,7 @@ const ClothPatternWallPanels = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/images/cloth-pattern-wall-panel.png"
+                    src="/images/carbon-rock-boards/cloth.jpg"
                     alt="Cloth Pattern Wall Panel"
                     className="w-full h-full object-cover"
                   />
@@ -323,7 +362,7 @@ const ClothPatternWallPanels = () => {
                 <p className="text-xl text-[#6b5c47] max-w-3xl mx-auto leading-relaxed text-center mb-16">
                   Choose from our curated collection of premium textile patterns, each designed to bring sophisticated elegance to your space.
                 </p>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {patterns.map((pattern, i) => (
                     <motion.div
                       key={pattern.id}
@@ -338,17 +377,29 @@ const ClothPatternWallPanels = () => {
                       }`}
                       onClick={() => setSelectedPattern(pattern.id)}
                     >
-                      <div className="aspect-square bg-gradient-to-br from-[#f5f2ee] to-[#ede8e1] rounded-xl mb-4 flex items-center justify-center">
-                        <Shirt className="w-12 h-12 text-[#8b7aa8]" />
+                      {/* Pattern image */}
+                      <div className="aspect-square rounded-xl mb-4 overflow-hidden flex items-center justify-center">
+                        <img
+                          src={pattern.img}
+                          alt={pattern.name}
+                          className="object-cover w-full h-full"
+                        />
                       </div>
+
+                      {/* Pattern title */}
                       <h3 className="text-lg font-bold text-[#231c14] mb-2">{pattern.name}</h3>
+
+                      {/* Pattern description */}
                       <p className="text-sm text-[#6b5c47] mb-3">{pattern.description}</p>
+
+                      {/* Pattern popularity */}
                       <div className="text-xs text-[#8b7aa8] font-medium bg-[#8b7aa8]/10 px-3 py-1 rounded-full">
                         {pattern.popularity}
                       </div>
                     </motion.div>
                   ))}
                 </div>
+
               </div>
             </TabsContent>
 
@@ -503,6 +554,7 @@ const ClothPatternWallPanels = () => {
       <QuoteModal 
         isOpen={isQuoteModalOpen} 
         onClose={() => setIsQuoteModalOpen(false)} 
+        selectedProduct={selectedProduct}
       />
     </div>
   );

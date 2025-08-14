@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Log environment variable availability (without exposing the actual key)
-console.log('Subscribe route - Resend API Key available:', !!process.env.RESEND_API_KEY);
-
 export async function handleSubscribe(req: Request, res: Response) {
   // Ensure JSON response for all cases
   res.setHeader('Content-Type', 'application/json');

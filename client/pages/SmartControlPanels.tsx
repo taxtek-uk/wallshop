@@ -442,7 +442,7 @@ const SmartControlPanels: React.FC = () => {
       {/* Parallax Pattern Overlay */}
       <motion.div
         style={{ y }}
-        className="absolute inset-0 opacity-[0.04] bg-[url('/patterns/diagonal-lines.svg')] bg-repeat pointer-events-none"
+        className="absolute inset-0 opacity-[0.04] bg-repeat pointer-events-none"
       ></motion.div>
 
       <div className="container relative mx-auto px-4 lg:px-8">

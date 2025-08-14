@@ -19,13 +19,49 @@ import QuoteModal from "@/components/QuoteModal";
 const WoodGrainWallPanels = () => {
   const [selectedFinish, setSelectedFinish] = useState('oak');
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string }>({ 
+    name: "Wood Grain Wall Panels", 
+    price: "From £45/m²" 
+  });
 
-  const finishes = [
-    { id: 'oak', name: 'Classic Oak', description: 'Traditional oak wood grain with rich, warm tones.', popularity: 'Most Popular' },
-    { id: 'walnut', name: 'Premium Walnut', description: 'Luxurious walnut finish with deep chocolate hues.', popularity: 'Premium Choice' },
-    { id: 'pine', name: 'Natural Pine', description: 'Light, airy pine grain perfect for modern spaces.', popularity: 'Contemporary' },
-    { id: 'mahogany', name: 'Exotic Mahogany', description: 'Rich mahogany with distinctive grain patterns.', popularity: 'Luxury' }
-  ];
+ const finishes = [
+  { id: "1", name: "Natural Oak", description: "Classic oak texture with soft grain pattern", img: "/images/carbon-rock-boards/wood/1.jpg", popularity: "" },
+  { id: "2", name: "Walnut Mist", description: "Mid-brown walnut tone with subtle striations", img: "/images/carbon-rock-boards/wood/2.jpg", popularity: "" },
+  { id: "3", name: "Smoked Ash", description: "Dark smoked ash grain with rich contrast", img: "/images/carbon-rock-boards/wood/3.jpg", popularity: "" },
+  { id: "4", name: "Golden Maple", description: "Warm maple hue with straight grain", img: "/images/carbon-rock-boards/wood/4.jpg", popularity: "" },
+  { id: "5", name: "Weathered Cedar", description: "Textured cedar look with aged character", img: "/images/carbon-rock-boards/wood/5.jpg", popularity: "" },
+  { id: "6", name: "Rustic Pine", description: "Light pine tone with visible knots and streaks", img: "/images/carbon-rock-boards/wood/6.jpg", popularity: "" },
+  { id: "7", name: "Charcoal Oak", description: "Deep grey oak with modern finish", img: "/images/carbon-rock-boards/wood/7.jpg", popularity: "" },
+  { id: "8", name: "Amber Teak", description: "Teak-inspired golden tones and natural flow", img: "/images/carbon-rock-boards/wood/8.jpg", popularity: "" },
+  { id: "9", name: "Espresso Birch", description: "Bold espresso hue on tight birch grains", img: "/images/carbon-rock-boards/wood/9.jpg", popularity: "" },
+  { id: "10", name: "Sunbleached Timber", description: "Light grey-brown tone like weathered wood", img: "/images/carbon-rock-boards/wood/10.jpg", popularity: "" },
+  { id: "11", name: "Rosewood Brown", description: "Warm reddish grain like tropical rosewood", img: "/images/carbon-rock-boards/wood/11.jpg", popularity: "" },
+  { id: "12", name: "Whitewashed Oak", description: "Pale oak with a whitewashed soft grain", img: "/images/carbon-rock-boards/wood/12.jpg", popularity: "" },
+  { id: "13", name: "Hazel Beech", description: "Light beech finish with smooth texture", img: "/images/carbon-rock-boards/wood/13.jpg", popularity: "" },
+  { id: "14", name: "Dark Walnut", description: "Strong walnut character with deep tones", img: "/images/carbon-rock-boards/wood/14.jpg", popularity: "" },
+  { id: "15", name: "Bamboo Slate", description: "Neutral bamboo-inspired texture in muted finish", img: "/images/carbon-rock-boards/wood/15.jpg", popularity: "" },
+  { id: "16", name: "Ash Greywood", description: "Soft ash grain with light grey overtone", img: "/images/carbon-rock-boards/wood/16.jpg", popularity: "" },
+  { id: "17", name: "Ivory Elm", description: "Smooth ivory tone with linear elm grain", img: "/images/carbon-rock-boards/wood/17.jpg", popularity: "" },
+  { id: "18", name: "Toasted Mahogany", description: "Dark toasted tone with rich mahogany grain", img: "/images/carbon-rock-boards/wood/18.jpg", popularity: "" },
+  { id: "19", name: "Copperwood", description: "Copper-tinged finish with clean grain lines", img: "/images/carbon-rock-boards/wood/19.jpg", popularity: "" },
+  { id: "20", name: "Chestnut Brown", description: "Balanced brown chestnut-inspired finish", img: "/images/carbon-rock-boards/wood/20.jpg", popularity: "" },
+  { id: "21", name: "Graphite Oak", description: "Slate-grey grain for modern interiors", img: "/images/carbon-rock-boards/wood/21.jpg", popularity: "" },
+  { id: "22", name: "Almond Timber", description: "Soft beige almond tone with faint grain", img: "/images/carbon-rock-boards/wood/22.jpg", popularity: "" },
+  { id: "23", name: "Espresso Elm", description: "Dark espresso elm wood with deep tone", img: "/images/carbon-rock-boards/wood/23.jpg", popularity: "" },
+  { id: "24", name: "Vanilla Maple", description: "Creamy maple with calm grain profile", img: "/images/carbon-rock-boards/wood/24.jpg", popularity: "" },
+  { id: "25", name: "Antique Pine", description: "Vintage pine finish with natural age lines", img: "/images/carbon-rock-boards/wood/25.jpg", popularity: "" },
+  { id: "26", name: "Wenge Shadow", description: "Exotic wenge look with dark shadowy tones", img: "/images/carbon-rock-boards/wood/26.jpg", popularity: "" },
+  { id: "27", name: "Ironwood", description: "Heavy grained wood with metallic undertone", img: "/images/carbon-rock-boards/wood/27.jpg", popularity: "" },
+  { id: "28", name: "Smoky Timber", description: "Soft smoky finish with layered woodgrain", img: "/images/carbon-rock-boards/wood/28.jpg", popularity: "" },
+  { id: "29", name: "Cinnamon Oak", description: "Cinnamon-tinted oak grain with warm undertones", img: "/images/carbon-rock-boards/wood/29.jpg", popularity: "" },
+  { id: "30", name: "Grey Driftwood", description: "Weathered driftwood look in calming grey", img: "/images/carbon-rock-boards/wood/30.jpg", popularity: "" },
+  { id: "31", name: "Burnt Maple", description: "Darkened maple texture with bold personality", img: "/images/carbon-rock-boards/wood/31.jpg", popularity: "" },
+  { id: "32", name: "Soft Sandalwood", description: "Subtle sandalwood tone with organic waves", img: "/images/carbon-rock-boards/wood/32.jpg", popularity: "" },
+  { id: "33", name: "Molasses Walnut", description: "Deep walnut pattern with molasses hue", img: "/images/carbon-rock-boards/wood/33.jpg", popularity: "" },
+  { id: "34", name: "Pearl Beech", description: "Creamy pearl finish with smooth beech flow", img: "/images/carbon-rock-boards/wood/34.jpg", popularity: "" },
+  { id: "35", name: "Tundra Elm", description: "Frosty elm pattern perfect for minimal interiors", img: "/images/carbon-rock-boards/wood/35.jpg", popularity: "" }
+];
+
 
   const specifications = [
     { label: 'Material', value: 'High-Definition Wood Grain PVC' },
@@ -205,7 +241,7 @@ const WoodGrainWallPanels = () => {
               <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
                 <div className="aspect-video bg-white/5 rounded-2xl overflow-hidden mb-6 shadow-md">
                   <img
-                    src="/images/wood-grain-wall-panel.png"
+                    src="/images/carbon-rock-boards/wood.jpg"
                     alt="Wood Grain Wall Panel"
                     className="w-full h-full object-cover"
                   />
@@ -324,31 +360,45 @@ const WoodGrainWallPanels = () => {
                   Choose from our collection of authentic wood grain finishes, each carefully crafted to replicate natural timber.
                 </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {finishes.map((finish, i) => (
-                    <motion.div
-                      key={finish.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4, delay: i * 0.1 }}
-                      whileHover={{ scale: 1.05 }}
-                      className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-2xl ${
-                        selectedFinish === finish.id
-                          ? 'border-[#d4a574] bg-gradient-to-br from-[#faf7f3] to-white shadow-2xl'
-                          : 'border-[#e2d5c4] bg-white hover:border-[#d4a574]'
-                      }`}
-                      onClick={() => setSelectedFinish(finish.id)}
-                    >
-                      <div className="aspect-square bg-gradient-to-br from-[#f5f2ee] to-[#ede8e1] rounded-xl mb-4 flex items-center justify-center">
-                        <TreePine className="w-12 h-12 text-[#d4a574]" />
-                      </div>
-                      <h3 className="text-lg font-bold text-[#231c14] mb-2">{finish.name}</h3>
-                      <p className="text-sm text-[#6b5c47] mb-3">{finish.description}</p>
-                      <div className="text-xs text-[#d4a574] font-medium bg-[#d4a574]/10 px-3 py-1 rounded-full">
-                        {finish.popularity}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    {finishes.map((finish, i) => (
+                      <motion.div
+                        key={finish.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4, delay: i * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
+                        className={`p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-2xl ${
+                          selectedFinish === finish.id
+                            ? 'border-[#d4a574] bg-gradient-to-br from-[#faf7f3] to-white shadow-2xl'
+                            : 'border-[#e2d5c4] bg-white hover:border-[#d4a574]'
+                        }`}
+                        onClick={() => setSelectedFinish(finish.id)}
+                      >
+                        {/* Image */}
+                        <div className="aspect-square rounded-xl mb-4 overflow-hidden border border-[#e2d5c4]">
+                          <img
+                            src={finish.img}
+                            alt={finish.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+
+                        {/* Name */}
+                        <h3 className="text-lg font-bold text-[#231c14] mb-2">{finish.name}</h3>
+
+                        {/* Description */}
+                        <p className="text-sm text-[#6b5c47] mb-3">{finish.description}</p>
+
+                        {/* Popularity */}
+                        {finish.popularity && (
+                          <div className="text-xs text-[#d4a574] font-medium bg-[#d4a574]/10 px-3 py-1 rounded-full">
+                            {finish.popularity}
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+
               </div>
             </TabsContent>
 
@@ -503,6 +553,7 @@ const WoodGrainWallPanels = () => {
       <QuoteModal 
         isOpen={isQuoteModalOpen} 
         onClose={() => setIsQuoteModalOpen(false)} 
+        selectedProduct={selectedProduct}
       />
     </div>
   );

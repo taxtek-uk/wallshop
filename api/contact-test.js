@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,72 +12,34 @@ module.exports = async (req, res) => {
 
   // Only allow POST method
   if (req.method !== 'POST') {
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      method: req.method,
-      allowedMethods: ['POST']
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Always return JSON
   res.setHeader('Content-Type', 'application/json');
   
   try {
-    console.log('Contact test request received');
-    console.log('Method:', req.method);
-    console.log('Body:', JSON.stringify(req.body, null, 2));
-    console.log('Environment check:');
-    console.log('- RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
-    console.log('- RESEND_API_KEY length:', process.env.RESEND_API_KEY?.length || 0);
-    console.log('- NODE_ENV:', process.env.NODE_ENV);
-    console.log('- VERCEL_ENV:', process.env.VERCEL_ENV);
-
-    const { name, email, reason, message } = req.body || {};
-
-    // Validate required fields
+    const { name, email, reason, message } = req.body;
+    
+    // Basic validation
     if (!name || !email || !reason || !message) {
-      console.log('Validation failed - missing fields:', { name: !!name, email: !!email, reason: !!reason, message: !!message });
       return res.status(400).json({ 
-        error: 'Missing required fields',
-        required: ['name', 'email', 'reason', 'message'],
-        received: { name: !!name, email: !!email, reason: !!reason, message: !!message }
+        error: 'All fields are required: name, email, reason, and message.' 
       });
     }
 
-    // Check if Resend API key is available
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY environment variable is not set');
-      return res.status(500).json({ 
-        error: 'Email service not configured',
-        details: 'Missing RESEND_API_KEY environment variable'
-      });
-    }
-
-    // For now, just return success without actually sending email
-    console.log('Contact form validation passed - test mode');
+    console.log('Contact form test received:', { name, email, reason });
     
-    return res.status(200).json({
-      success: true,
-      message: 'Contact form received successfully (CommonJS test mode)',
-      data: { name, email, reason },
-      timestamp: new Date().toISOString(),
-      env_check: {
-        resend_api_key_exists: !!process.env.RESEND_API_KEY,
-        resend_api_key_length: process.env.RESEND_API_KEY?.length || 0,
-        node_env: process.env.NODE_ENV,
-        vercel_env: process.env.VERCEL_ENV
-      }
+    // Return success (without actually sending email for now)
+    return res.json({ 
+      success: true, 
+      message: 'Contact form test successful',
+      received_data: { name, email, reason, message_length: message.length }
     });
-
-  } catch (error) {
-    console.error('Contact form error:', error);
-    console.error('Error stack:', error.stack);
-    
+  } catch (err) {
+    console.error('Contact form error:', err);
     return res.status(500).json({ 
-      error: 'Server error occurred',
-      details: error.message,
-      timestamp: new Date().toISOString()
+      error: 'Failed to process contact form',
+      details: err.message
     });
   }
-};
+}

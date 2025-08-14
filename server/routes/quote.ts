@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Log environment variable availability (without exposing the actual key)
 console.log('Resend API Key available:', !!process.env.RESEND_API_KEY);
 
@@ -227,6 +225,9 @@ export async function handleQuote(req: Request, res: Response) {
       </body>
       </html>
     `;
+
+    // Initialize Resend per-request (deferred), now that key is confirmed
+    const resend = new Resend(process.env.RESEND_API_KEY as string);
 
     const { data, error } = await resend.emails.send({
       from: 'The Wall Shop <quotes@thewallshop.co.uk>',

@@ -101,10 +101,10 @@ export default function ContactUs() {
     setError("");
     
     try {
-      console.log('Submitting form to /api/working-contact...');
+      console.log('Submitting form to /api/contact...');
       console.log('Form data:', form);
       
-      const response = await fetch('/api/working-contact', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
