@@ -1,13 +1,5 @@
 {
-  "functions": {
-    "api/[...server].js": {
-      "includeFiles": "server/**"
-    }
-  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "builds": [
-    { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist/spa" } }
   ]
 }
