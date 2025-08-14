@@ -1,13 +1,26 @@
+# Dependencies
 node_modules
-.env*
-.next
-.git
+
+# Build outputs
+dist
 *.log
-dist/server
-server
-client
-shared
-netlify
-scripts
-public/videos/*.mp4
-public/videos/*.webm
+
+# Git files
+.git
+.gitignore
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Editor configs & misc
+.vscode
+.idea
+
+# Ignore everything in public/uploads except placeholder files
+public/uploads/*
+!public/uploads/.gitkeep
+
+# === Important: Make sure client folder is included ===
+!client/**

@@ -1,205 +1,295 @@
-import { Request, Response } from 'express';
-import { Resend } from 'resend';
+// server/handlers/handleContact.ts
+import { Request, Response } from "express";
+import { Resend } from "resend";
 
+/**
+ * Contact form handler — corporate/professional version
+ * - Clean, accessible email template (no emojis, no FA icons)
+ * - Plain-text fallback
+ * - Input validation + sanitisation
+ * - Minimal PII in logs
+ * - Consistent JSON responses
+ *
+ * Brand details (The Wall Shop)
+ * Domain: thewallshop.co.uk
+ * Email: info@thewallshop.co.uk
+ * Phone: +44 141 739 3377 (Mon–Fri, 9:00–18:00 PST)
+ * HQ: SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK
+ */
 export async function handleContact(req: Request, res: Response) {
-  // Ensure JSON response for all cases
-  res.setHeader('Content-Type', 'application/json');
-  
+  res.setHeader("Content-Type", "application/json");
+
   try {
-    console.log('Contact request started, checking environment variables...');
-    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
-    
-    // Check if Resend API key is available
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY environment variable is not set');
-      return res.status(500).json({ 
-        error: 'Email service not configured',
-        details: 'Missing RESEND_API_KEY environment variable'
+    // --- Environment checks (do not log secrets) ---
+    const hasKey = Boolean(process.env.RESEND_API_KEY);
+    if (!hasKey) {
+      return res.status(500).json({
+        error: "Email service not configured",
+        details: "Missing RESEND_API_KEY environment variable",
       });
     }
 
-    const { name, email, reason, message } = req.body;
+    // --- Extract + normalise body ---
+    const rawName = safeString(req.body?.name);
+    const rawEmail = safeString(req.body?.email);
+    const rawReason = safeString(req.body?.reason);
+    const rawMessage = safeString(req.body?.message);
 
-    console.log('Contact request received:', { name, email, reason });
+    const name = truncate(stripTags(rawName.trim()), 120);
+    const email = rawEmail.trim().toLowerCase();
+    const reason = truncate(stripTags(rawReason.trim()), 160);
+    const message = truncate(stripTagsMultiline(rawMessage.trim()), 8000);
 
-    // Validate required fields
-    if (!name || !email || !reason || !message) {
-      console.log('Validation failed: missing required fields');
-      return res.status(400).json({ 
-        error: 'All fields are required: name, email, reason, and message.' 
+    // --- Validate required fields ---
+    const errors: Record<string, string> = {};
+    if (!name) errors.name = "Name is required.";
+    if (!email) errors.email = "Email is required.";
+    else if (!isValidEmail(email)) errors.email = "Please provide a valid email address.";
+    if (!reason) errors.reason = "Subject is required.";
+    if (!message) errors.message = "Message is required.";
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        error: "Validation failed",
+        fields: errors,
       });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Please provide a valid email address.' });
-    }
+    // --- Build email content (HTML + Text) ---
+    const esc = escapeHtml;
+    const timestamp = new Date();
 
-    // Escape HTML for safety
-    const esc = (s: string) => String(s ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    // Preheader (hidden in most clients but boosts deliverability/clarity)
+    const preheader =
+      "New enquiry submitted via The Wall Shop contact form. Please review the details below.";
 
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Contact Form Submission - The Wall Shop</title>
-      </head>
-      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 680px; margin: 0 auto; background: linear-gradient(135deg, #f8f6f3 0%, #ffffff 100%);">
-          
-          <!-- Header with branding -->
-          <div style="background: linear-gradient(135deg, #231c14 0%, #2a1f17 50%, #1a1410 100%); padding: 40px 30px; text-align: center; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.03"><circle cx="30" cy="30" r="2"/></g></g></svg>'); opacity: 0.5;"></div>
-            <div style="position: relative; z-index: 1;">
-              <div style="background: linear-gradient(135deg, #b69777, #907252); width: 80px; height: 80px; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                <span style="color: white; font-size: 32px; font-weight: bold;">W</span>
-              </div>
-              <h1 style="color: #ffffff; font-size: 32px; font-weight: 800; margin: 0 0 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">The Wall Shop</h1>
-              <p style="color: #b69777; font-size: 18px; margin: 0; font-weight: 500;">Premium Wall Solutions</p>
-            </div>
-          </div>
+    // Brand palette (subtle, no gradients)
+    const c = {
+      bg: "#ffffff",
+      text: "#111827",
+      mutedText: "#6B7280",
+      key: "#374151",
+      border: "#E5E7EB",
+      brandDark: "#231c14",
+      brandGold: "#b89773",
+      panel: "#F9FAFB",
+      badgeBg: "#F3F4F6",
+      link: "#0F766E",
+    };
 
-          <!-- Main content -->
-          <div style="padding: 40px 30px; background: white;">
-            
-            <!-- Alert banner -->
-            <div style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 25px; border-radius: 16px; margin-bottom: 35px; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);">
-              <div style="display: flex; align-items: center; justify-content: center; text-align: center;">
-                <div style="background: rgba(255,255,255,0.2); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
-                  <span style="color: white; font-size: 24px;">📧</span>
-                </div>
-                <div>
-                  <h2 style="color: white; font-size: 24px; font-weight: 700; margin: 0 0 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">New Contact Form Submission</h2>
-                  <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin: 0;">A customer has reached out through your website</p>
-                </div>
-              </div>
-            </div>
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>New Contact — The Wall Shop</title>
+<style>
+  /* Basic reset for safer rendering */
+  body { margin:0; padding:0; background:${c.panel}; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  a { color:${c.link}; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .container { max-width:680px; margin:0 auto; background:${c.bg}; }
+  .header { padding:28px 28px 22px; border-bottom:1px solid ${c.border}; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand-badge {
+    width:44px; height:44px; border-radius:10px;
+    background:${c.brandDark}; color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:18px; letter-spacing:0.5px;
+  }
+  .brand-title { margin:0; font-size:18px; line-height:1.2; color:${c.brandDark}; font-weight:800; }
+  .brand-sub { margin:2px 0 0; font-size:12px; color:${c.mutedText}; }
 
-            <!-- Contact Information Card -->
-            <div style="background: linear-gradient(135deg, #f8f6f3 0%, #ffffff 100%); border: 2px solid #e2d5c4; border-radius: 20px; padding: 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-              <div style="display: flex; align-items: center; margin-bottom: 25px;">
-                <div style="background: linear-gradient(135deg, #b69777, #907252); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                  <span style="color: white; font-size: 18px;">👤</span>
-                </div>
-                <h3 style="color: #231c14; font-size: 22px; font-weight: 700; margin: 0;">Contact Information</h3>
-              </div>
-              <div style="display: grid; gap: 15px;">
-                <div style="display: flex; padding: 15px; background: rgba(182, 151, 119, 0.08); border-radius: 12px; border-left: 4px solid #b69777;">
-                  <span style="font-weight: 600; color: #231c14; min-width: 80px;">Name:</span>
-                  <span style="color: #6b5c47; font-weight: 500;">${esc(name)}</span>
-                </div>
-                <div style="display: flex; padding: 15px; background: rgba(182, 151, 119, 0.08); border-radius: 12px; border-left: 4px solid #b69777;">
-                  <span style="font-weight: 600; color: #231c14; min-width: 80px;">Email:</span>
-                  <span style="color: #6b5c47; font-weight: 500;"><a href="mailto:${esc(email)}" style="color: #b69777; text-decoration: none;">${esc(email)}</a></span>
-                </div>
-                <div style="display: flex; padding: 15px; background: rgba(182, 151, 119, 0.08); border-radius: 12px; border-left: 4px solid #b69777;">
-                  <span style="font-weight: 600; color: #231c14; min-width: 80px;">Subject:</span>
-                  <span style="display: inline-flex; align-items: center; padding: 6px 12px; background: #b69777; color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                    ${esc(reason)}
-                  </span>
-                </div>
-              </div>
-            </div>
+  .preheader { display:none; visibility:hidden; opacity:0; height:0; overflow:hidden; mso-hide:all; font-size:1px; color:transparent; }
+  .content { padding:28px; color:${c.text}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+  .title { margin:0 0 16px; font-size:20px; line-height:1.3; color:${c.text}; font-weight:800; }
+  .subtitle { margin:0 0 24px; font-size:14px; color:${c.mutedText}; }
 
-            <!-- Message Content Card -->
-            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%); border: 2px solid #dbeafe; border-radius: 20px; padding: 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-              <div style="display: flex; align-items: center; margin-bottom: 25px;">
-                <div style="background: linear-gradient(135deg, #3b82f6, #2563eb); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                  <span style="color: white; font-size: 18px;">💬</span>
-                </div>
-                <h3 style="color: #1e40af; font-size: 22px; font-weight: 700; margin: 0;">Customer Message</h3>
-              </div>
-              <div style="background: rgba(59, 130, 246, 0.08); padding: 25px; border-radius: 16px; border-left: 4px solid #3b82f6; line-height: 1.8; color: #374151; font-size: 16px; min-height: 80px;">
-                ${esc(message).replace(/\n/g, '<br>')}
-              </div>
-            </div>
+  .card { background:#fff; border:1px solid ${c.border}; border-radius:12px; padding:20px; margin-bottom:16px; }
+  .kv { width:100%; border-collapse:collapse; }
+  .kv th, .kv td { text-align:left; vertical-align:top; padding:10px 0; border-bottom:1px solid ${c.border}; font-size:14px; }
+  .kv th { color:${c.key}; width:120px; font-weight:600; }
+  .kv tr:last-child th, .kv tr:last-child td { border-bottom:none; }
 
-            <!-- Priority Indicator -->
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%); border: 2px solid #f59e0b; border-radius: 16px; padding: 20px; margin-bottom: 25px; text-align: center;">
-              <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                <span style="color: #f59e0b; font-size: 24px; margin-right: 10px;">⚡</span>
-                <span style="color: #92400e; font-weight: 700; font-size: 16px;">Response Required</span>
-              </div>
-              <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 500;">Customer is waiting for your response. Aim to reply within 24 hours for best customer experience.</p>
-            </div>
+  .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:${c.badgeBg}; color:${c.key}; font-size:12px; font-weight:600; }
 
-            <!-- Action Buttons -->
-            <div style="text-align: center; margin: 40px 0;">
-              <a href="mailto:${esc(email)}?subject=Re: ${encodeURIComponent(reason)} - The Wall Shop Response" style="display: inline-block; background: linear-gradient(135deg, #b69777, #907252); color: white; text-decoration: none; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(182, 151, 119, 0.4); margin: 0 10px 15px; transition: all 0.3s ease;">
-                📧 Reply Now
-              </a>
-              <br>
-              <a href="mailto:stephen@thewallshop.co.uk?subject=Forward: Contact Form - ${encodeURIComponent(reason)}&body=${encodeURIComponent('Customer Details:\nName: ' + name + '\nEmail: ' + email + '\nReason: ' + reason + '\n\nMessage:\n' + message)}" style="display: inline-block; background: linear-gradient(135deg, #6b7280, #4b5563); color: white; text-decoration: none; padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3); margin: 0 10px; transition: all 0.3s ease;">
-                🔄 Forward to Team
-              </a>
-            </div>
+  .message { white-space:pre-wrap; line-height:1.7; font-size:15px; color:${c.text}; }
 
-          </div>
+  .meta { padding:16px 20px; font-size:12px; color:${c.mutedText}; background:${c.panel}; border:1px solid ${c.border}; border-radius:12px; }
 
-          <!-- Footer -->
-          <div style="background: linear-gradient(135deg, #f8f6f3, #e2d5c4); padding: 30px; text-align: center; border-top: 1px solid #d1c7b7;">
-            <div style="margin-bottom: 20px;">
-              <h4 style="color: #231c14; font-size: 18px; font-weight: 700; margin: 0 0 10px;">The Wall Shop</h4>
-              <p style="color: #6b5c47; font-size: 14px; margin: 0;">Premium wall solutions and smart home technology</p>
-            </div>
-            <div style="border-top: 1px solid #d1c7b7; padding-top: 20px; font-size: 12px; color: #9ca3af;">
-              <p style="margin: 0;">This message was submitted through the Contact Us form on <a href="https://thewallshop.co.uk/contact" style="color: #b69777; text-decoration: none;">thewallshop.co.uk</a></p>
-              <p style="margin: 5px 0 0;">Received on ${new Date().toLocaleDateString('en-GB', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}</p>
-            </div>
-          </div>
+  .actions { padding-top:8px; }
+  .btn {
+    display:inline-block; padding:12px 18px; border-radius:10px; font-weight:700; font-size:14px; border:1px solid ${c.brandDark};
+    background:${c.brandDark}; color:#fff;
+  }
+  .btn.secondary {
+    background:#fff; color:${c.brandDark}; border-color:${c.border};
+  }
 
-        </div>
-      </body>
-      </html>
-    `;
+  .footer { padding:22px 28px 28px; border-top:1px solid ${c.border}; color:${c.mutedText}; font-size:12px; }
+  .foot-strong { color:${c.key}; font-weight:700; }
+  .brand-gold { color:${c.brandGold}; font-weight:600; }
+</style>
+</head>
+<body>
+<span class="preheader">${esc(preheader)}</span>
+<div class="container">
 
-    // Initialize Resend per-request (deferred), now that key is confirmed
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-badge">TWS</div>
+      <div>
+        <p class="brand-title">The Wall Shop</p>
+        <p class="brand-sub">Premium wall solutions & smart home technology</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="content">
+    <h1 class="title">New enquiry received</h1>
+    <p class="subtitle">A customer submitted the contact form at thewallshop.co.uk. The details are below.</p>
+
+    <div class="card">
+      <table class="kv" role="presentation" aria-label="Contact details">
+        <tr>
+          <th scope="row">Name</th>
+          <td>${esc(name)}</td>
+        </tr>
+        <tr>
+          <th scope="row">Email</th>
+          <td><a href="mailto:${esc(email)}">${esc(email)}</a></td>
+        </tr>
+        <tr>
+          <th scope="row">Subject</th>
+          <td><span class="badge">${esc(reason)}</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="message">${esc(message)}</div>
+    </div>
+
+    <div class="meta">
+      Received: ${esc(
+        timestamp.toLocaleString("en-GB", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      )}<br/>
+      Source: <span class="foot-strong">thewallshop.co.uk/contact</span>
+    </div>
+
+    <div class="actions" style="margin-top:16px;">
+      <a class="btn" href="mailto:${esc(
+        email
+      )}?subject=${encodeURIComponent("Re: " + reason + " — The Wall Shop")}">Reply</a>
+      <a class="btn secondary" style="margin-left:8px"
+         href="mailto:info@thewallshop.co.uk?subject=${encodeURIComponent(
+           "Fwd: Contact — " + reason
+         )}&body=${encodeURIComponent(
+           `Customer Details:\nName: ${name}\nEmail: ${email}\nSubject: ${reason}\n\nMessage:\n${message}`
+         )}">
+         Forward internally
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="foot-strong">The Wall Shop <span class="brand-gold">·</span> thewallshop.co.uk</div>
+    <div>SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK</div>
+    <div>+44 141 739 3377 · Mon–Fri, 9:00–18:00 PST · <a href="mailto:info@thewallshop.co.uk">info@thewallshop.co.uk</a></div>
+    <div style="margin-top:8px;">You are receiving this because your address is configured to receive contact form submissions.</div>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+    const text = [
+      "New enquiry received — The Wall Shop",
+      "",
+      `Name   : ${name}`,
+      `Email  : ${email}`,
+      `Subject: ${reason}`,
+      "",
+      "Message:",
+      message,
+      "",
+      `Received: ${timestamp.toLocaleString("en-GB")}`,
+      "Source  : thewallshop.co.uk/contact",
+      "",
+      "Reply: " + `mailto:${email}?subject=${encodeURIComponent("Re: " + reason + " — The Wall Shop")}`,
+    ].join("\n");
+
+    // --- Send via Resend ---
     const resend = new Resend(process.env.RESEND_API_KEY as string);
 
     const { data, error } = await resend.emails.send({
-      from: 'The Wall Shop <contact@thewallshop.co.uk>',
-      to: ["stephen@thewallshop.co.uk"],
+      from: "The Wall Shop <contact@thewallshop.co.uk>",
+      to: ["info@thewallshop.co.uk", "stephen@thewallshop.co.uk"], // adjust recipients as needed
       replyTo: email,
-      subject: `Contact Form: ${reason} - ${name}`,
+      subject: `Contact — ${reason} (${name})`,
       html,
+      text,
     });
 
     if (error) {
-      console.error('Resend error:', error);
-      return res.status(500).json({ error: 'Failed to send email' });
+      // Avoid echoing remote error details to client
+      return res.status(502).json({ error: "Failed to send email" });
     }
 
-    console.log('Contact email sent successfully:', data?.id);
-    return res.json({ success: true, message: 'Contact form submitted successfully', id: data?.id });
-  } catch (err) {
-    console.error('Contact form error:', err);
-    console.error('Error details:', {
-      message: err instanceof Error ? err.message : 'Unknown error',
-      stack: err instanceof Error ? err.stack : undefined
+    return res.json({
+      success: true,
+      message: "Contact form submitted successfully",
+      id: data?.id,
     });
-    
-    // Ensure we always send a JSON response
-    if (!res.headersSent) {
-      return res.status(500).json({ 
-        error: 'Failed to process contact form',
-        details: err instanceof Error ? err.message : 'Unknown server error'
-      });
-    }
+  } catch (err) {
+    // Avoid leaking stack traces to client; return clean JSON
+    const msg = err instanceof Error ? err.message : "Unknown server error";
+    return res.status(500).json({
+      error: "Failed to process contact form",
+      details: msg,
+    });
   }
 }
 
+/* ----------------------- Utilities ----------------------- */
+
+function safeString(v: unknown): string {
+  return typeof v === "string" ? v : "";
+}
+
+function isValidEmail(v: string): boolean {
+  // Simple but robust email validation for server-side
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  return re.test(v);
+}
+
+function stripTags(input: string): string {
+  return input.replace(/<\/?[^>]+(>|$)/g, "");
+}
+
+function stripTagsMultiline(input: string): string {
+  // Remove tags and normalise line breaks
+  return stripTags(input).replace(/\r\n?/g, "\n");
+}
+
+function truncate(input: string, max: number): string {
+  return input.length > max ? input.slice(0, max) : input;
+}
+
+function escapeHtml(s: string): string {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}

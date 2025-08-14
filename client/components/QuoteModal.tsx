@@ -292,9 +292,15 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, selectedProduc
         accessories,
         total: calculateTotal(),
       };
-      // TODO: replace with actual API call
-      // console.log("Submitting Quote Data:", payload);
-      await new Promise((r) => setTimeout(r, 1200));
+      const response = await fetch('/api/send-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok || (result && result.error)) {
+        throw new Error(result?.error || 'Failed to submit quote request.');
+      }
       setIsSubmitting(false);
       setIsSubmitted(true);
 

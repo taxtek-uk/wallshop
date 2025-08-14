@@ -3,4 +3,10 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./global.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root") as HTMLElement;
+
+createRoot(container).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
