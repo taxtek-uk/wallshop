@@ -8,6 +8,9 @@ import fs from 'fs';
 export default defineConfig(({ mode }) => ({
   root: 'client', // index.html now in /client
   server: {
+    proxy: {
+    "/api": "http://localhost:3000"
+  },
     host: '::',
     port: 8080
   },
