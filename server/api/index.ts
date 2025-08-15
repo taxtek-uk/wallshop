@@ -5,9 +5,9 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "../routes/demo";
-import { handleQuote } from "../routes/quote";
-import { handleContact } from "../routes/contact";
-import { handleSubscribe } from "../routes/subscribe";
+import { handleQuote } from "../../api/quote";
+import { handleContact } from "../../api/contact";
+import { handleSubscribe } from "../../api/subscribe";
 
 export function createServer() {
   const app = express();

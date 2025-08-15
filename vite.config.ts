@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080
   },
   build: {
-    outDir: '../dist/spa', // Output folder relative to root
+    outDir: 'dist', // Output folder relative to root
     rollupOptions: {
       output: {
         manualChunks: {

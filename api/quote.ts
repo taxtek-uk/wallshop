@@ -1,25 +1,31 @@
-// server/handlers/handleQuote.ts
-import { Request, Response } from "express";
+// api/quote.ts
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
-/**
- * Quote request handler — corporate/professional version
- * - No emojis/icons; clean, accessible layout
- * - Plain-text fallback for deliverability
- * - Input validation + sanitisation
- * - Minimal PII in logs
- * - Consistent JSON responses
- *
- * Brand: The Wall Shop (thewallshop.co.uk)
- * Email: info@thewallshop.co.uk
- * Phone: +44 141 739 3377 (Mon–Fri, 9:00–18:00 PST)
- * HQ: SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK
- */
-export async function handleQuote(req: Request, res: Response) {
+const ALLOWED_ORIGINS = [
+  "https://thewallshop.co.uk",
+  "https://www.thewallshop.co.uk",
+  "http://localhost:5173", // Vite dev
+];
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // --- CORS ---
+  const origin = String(req.headers.origin || "");
+  if (ALLOWED_ORIGINS.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.status(204).end();
+
+  // --- Method guard ---
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST,OPTIONS");
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   res.setHeader("Content-Type", "application/json");
 
   try {
-    // --- Environment checks (do not log secrets) ---
     if (!process.env.RESEND_API_KEY) {
       return res.status(500).json({
         error: "Email service not configured",
@@ -27,31 +33,40 @@ export async function handleQuote(req: Request, res: Response) {
       });
     }
 
+    // --- Parse body (supports raw string or parsed object) ---
+    const body =
+      typeof req.body === "string" ? safeParseJson(req.body) : ((req.body as any) ?? {});
+
     // --- Extract + normalise body (coerce to strings; trim) ---
-    const name = truncate(stripTags(safeString(req.body?.name).trim()), 120);
-    const email = safeString(req.body?.email).trim().toLowerCase();
-    const phone = truncate(stripTags(safeString(req.body?.phone).trim()), 40);
-    const address = truncate(stripTagsMultiline(safeString(req.body?.address).trim()), 500);
-    const projectType = truncate(stripTags(safeString(req.body?.projectType).trim()), 100);
-    const area = truncate(stripTags(safeString(req.body?.area).trim()), 32);
-    const urgency = normaliseUrgency(safeString(req.body?.urgency).trim());
-    const message = truncate(stripTagsMultiline(safeString(req.body?.message).trim()), 8000);
+    const name = truncate(stripTags(safeString(body?.name).trim()), 120);
+    const email = safeString(body?.email).trim().toLowerCase();
+    const phone = truncate(stripTags(safeString(body?.phone).trim()), 40);
+    const address = truncate(stripTagsMultiline(safeString(body?.address).trim()), 500);
+    const projectType = truncate(stripTags(safeString(body?.projectType).trim()), 100);
+    const area = truncate(stripTags(safeString(body?.area).trim()), 32);
+    const urgency = normaliseUrgency(safeString(body?.urgency).trim());
+    const message = truncate(stripTagsMultiline(safeString(body?.message).trim()), 8000);
 
     // selectedProduct may be an object; defend against arbitrary payloads
-    const rawProduct = req.body?.selectedProduct ?? null;
+    const rawProduct = body?.selectedProduct ?? null;
     const selectedProduct = normaliseProduct(rawProduct);
 
     // --- Normalise pricing arrays from QuoteModal ---
     type ModuleItem = { name: string; size?: string; quantity: number; price: number };
     type WallCovering = { name: string; type?: string; area: number; price: number };
     type SmartDevice = { name: string; category?: string; quantity: number; price: number };
-    type Accessory = { name: string; category?: string; quantity: number; price: number; suppliedBy?: "client" | "wallshop" };
+    type Accessory = {
+      name: string;
+      category?: string;
+      quantity: number;
+      price: number;
+      suppliedBy?: "client" | "wallshop";
+    };
 
     const toNum = (v: any): number => {
       const n = Number(v);
       return Number.isFinite(n) && n >= 0 ? n : 0;
     };
-
     const normStr = (v: any, max = 200) => truncate(stripTags(safeString(v).trim()), max);
 
     const normaliseModules = (arr: any): ModuleItem[] =>
@@ -98,15 +113,18 @@ export async function handleQuote(req: Request, res: Response) {
               category: normStr(x?.category, 60) || undefined,
               quantity: Math.max(0, Math.floor(toNum(x?.quantity))),
               price: toNum(x?.price),
-              suppliedBy: (safeString(x?.suppliedBy) === "client" ? "client" : "wallshop") as "client" | "wallshop",
+              suppliedBy:
+                (safeString(x?.suppliedBy) === "client" ? "client" : "wallshop") as
+                  | "client"
+                  | "wallshop",
             }))
             .filter((x) => x.name && x.quantity > 0)
         : [];
 
-    const modules = normaliseModules(req.body?.modules);
-    const wallCoverings = normaliseCoverings(req.body?.wallCoverings);
-    const smartDevices = normaliseDevices(req.body?.smartDevices);
-    const accessories = normaliseAccessories(req.body?.accessories);
+    const modules = normaliseModules(body?.modules);
+    const wallCoverings = normaliseCoverings(body?.wallCoverings);
+    const smartDevices = normaliseDevices(body?.smartDevices);
+    const accessories = normaliseAccessories(body?.accessories);
 
     // --- Validate required fields ---
     const errors: Record<string, string> = {};
@@ -115,7 +133,6 @@ export async function handleQuote(req: Request, res: Response) {
     else if (!isValidEmail(email)) errors.email = "Please provide a valid email address.";
     if (!phone) errors.phone = "Phone is required.";
     else if (!isValidPhone(phone)) errors.phone = "Please provide a valid phone number.";
-
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ error: "Validation failed", fields: errors });
     }
@@ -123,18 +140,18 @@ export async function handleQuote(req: Request, res: Response) {
     // --- Pricing calculations ---
     const VAT_RATE = 0.2; // 20% UK VAT
     const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
-
     const sum = (ns: number[]) => ns.reduce((a, b) => a + b, 0);
 
     const moduleSubtotal = sum(modules.map((m) => m.price * m.quantity));
     const coveringSubtotal = sum(wallCoverings.map((w) => w.price * w.area));
     const deviceSubtotal = sum(smartDevices.map((d) => d.price * d.quantity));
-    const accessorySubtotal = sum(accessories.filter((a) => a.suppliedBy !== "client").map((a) => a.price * a.quantity));
+    const accessorySubtotal = sum(
+      accessories.filter((a) => a.suppliedBy !== "client").map((a) => a.price * a.quantity)
+    );
 
     const netSubtotal = moduleSubtotal + coveringSubtotal + deviceSubtotal + accessorySubtotal;
     const vatAmount = +(netSubtotal * VAT_RATE).toFixed(2);
     const grossTotal = +(netSubtotal + vatAmount).toFixed(2);
-
     const formatMoney = (n: number) => currency.format(Math.round(n * 100) / 100);
 
     // --- Build email content (HTML + Text) ---
@@ -158,7 +175,6 @@ export async function handleQuote(req: Request, res: Response) {
     const preheader =
       "New quote request submitted via The Wall Shop. Review customer details and project requirements below.";
 
-    // Build pricing tables
     const tableStyles = `width:100%; border-collapse:collapse; font-size:14px;`;
     const thTdCommon = `padding:10px 8px; border-bottom:1px solid ${c.border}; text-align:left; vertical-align:top;`;
     const thStyle = `${thTdCommon} color:${c.key}; font-weight:700; background:${c.tableHeadBg};`;
@@ -398,14 +414,18 @@ export async function handleQuote(req: Request, res: Response) {
       </table>
     </div>
 
-    ${selectedProduct ? `<div class="card">
+    ${
+      selectedProduct
+        ? `<div class="card">
       <table class="kv" role="presentation" aria-label="Selected product">
         <tr><th scope="row">Product</th><td>${esc(selectedProduct.name)}</td></tr>
         ${selectedProduct.sku ? `<tr><th scope="row">SKU</th><td>${esc(selectedProduct.sku)}</td></tr>` : ``}
         ${selectedProduct.price ? `<tr><th scope="row">Price</th><td>${esc(selectedProduct.price)}</td></tr>` : ``}
         ${selectedProduct.url ? `<tr><th scope="row">Link</th><td><a href="${esc(selectedProduct.url)}">${esc(selectedProduct.url)}</a></td></tr>` : ``}
       </table>
-    </div>` : ``}
+    </div>`
+        : ``
+    }
 
     ${renderModules}
     ${renderCoverings}
@@ -428,10 +448,24 @@ export async function handleQuote(req: Request, res: Response) {
       )}<br/>
       Source: <span class="foot-strong">thewallshop.co.uk/quote</span>
       <div class="btns">
-        <a class="btn" href="mailto:${esc(email)}?subject=${encodeURIComponent("Re: Your quote request — The Wall Shop")}">Reply</a>
+        <a class="btn" href="mailto:${esc(
+          email
+        )}?subject=${encodeURIComponent("Re: Your quote request — The Wall Shop")}">Reply</a>
         <a class="btn secondary" href="mailto:info@thewallshop.co.uk?subject=${encodeURIComponent(
           "Fwd: Quote request — " + (projectType || name)
-        )}&body=${encodeURIComponent(buildForwardBody({ name, email, phone, address, projectType, area, urgency, message, selectedProduct }))}">Forward internally</a>
+        )}&body=${encodeURIComponent(
+          buildForwardBody({
+            name,
+            email,
+            phone,
+            address,
+            projectType,
+            area,
+            urgency,
+            message,
+            selectedProduct,
+          })
+        )}">Forward internally</a>
       </div>
     </div>
   </div>
@@ -446,6 +480,7 @@ export async function handleQuote(req: Request, res: Response) {
 </body>
 </html>`;
 
+    // --- Plain-text fallback ---
     const textLines: string[] = [
       "New quote request — The Wall Shop",
       "",
@@ -470,19 +505,37 @@ export async function handleQuote(req: Request, res: Response) {
 
     if (modules.length) {
       textLines.push("", "Modules:");
-      modules.forEach((m) => textLines.push(`  - ${m.name}${m.size ? ` (${m.size})` : ""} x${m.quantity} @ ${formatMoney(m.price)} = ${formatMoney(m.price * m.quantity)}`));
+      modules.forEach((m) =>
+        textLines.push(
+          `  - ${m.name}${m.size ? ` (${m.size})` : ""} x${m.quantity} @ ${formatMoney(m.price)} = ${formatMoney(
+            m.price * m.quantity
+          )}`
+        )
+      );
       textLines.push(`  Subtotal: ${formatMoney(moduleSubtotal)}`);
     }
 
     if (wallCoverings.length) {
       textLines.push("", "Wall Coverings:");
-      wallCoverings.forEach((w) => textLines.push(`  - ${w.name}${w.type ? ` [${w.type}]` : ""} ${w.area.toFixed(2)} m² @ ${formatMoney(w.price)}/m² = ${formatMoney(w.price * w.area)}`));
+      wallCoverings.forEach((w) =>
+        textLines.push(
+          `  - ${w.name}${w.type ? ` [${w.type}]` : ""} ${w.area.toFixed(2)} m² @ ${formatMoney(
+            w.price
+          )}/m² = ${formatMoney(w.price * w.area)}`
+        )
+      );
       textLines.push(`  Subtotal: ${formatMoney(coveringSubtotal)}`);
     }
 
     if (smartDevices.length) {
       textLines.push("", "Smart Devices:");
-      smartDevices.forEach((d) => textLines.push(`  - ${d.name}${d.category ? ` [${d.category}]` : ""} x${d.quantity} @ ${formatMoney(d.price)} = ${formatMoney(d.price * d.quantity)}`));
+      smartDevices.forEach((d) =>
+        textLines.push(
+          `  - ${d.name}${d.category ? ` [${d.category}]` : ""} x${d.quantity} @ ${formatMoney(
+            d.price
+          )} = ${formatMoney(d.price * d.quantity)}`
+        )
+      );
       textLines.push(`  Subtotal: ${formatMoney(deviceSubtotal)}`);
     }
 
@@ -491,7 +544,11 @@ export async function handleQuote(req: Request, res: Response) {
       accessories.forEach((a) => {
         const billable = a.suppliedBy !== "client";
         const line = billable ? a.price * a.quantity : 0;
-        textLines.push(`  - ${a.name}${a.category ? ` [${a.category}]` : ""} x${a.quantity} ${billable ? `@ ${formatMoney(a.price)} = ${formatMoney(line)}` : `(Client supplied)`}`);
+        textLines.push(
+          `  - ${a.name}${a.category ? ` [${a.category}]` : ""} x${a.quantity} ${
+            billable ? `@ ${formatMoney(a.price)} = ${formatMoney(line)}` : `(Client supplied)`
+          }`
+        );
       });
       textLines.push(`  Subtotal (billable): ${formatMoney(accessorySubtotal)}`);
     }
@@ -515,7 +572,7 @@ export async function handleQuote(req: Request, res: Response) {
     const resend = new Resend(process.env.RESEND_API_KEY as string);
     const { data, error } = await resend.emails.send({
       from: "The Wall Shop <quotes@thewallshop.co.uk>",
-      to: ["info@thewallshop.co.uk", "stephen@thewallshop.co.uk"], // adjust as needed
+      to: ["info@thewallshop.co.uk", "stephen@thewallshop.co.uk"],
       cc: [email], // keep client in the loop
       replyTo: email,
       subject: buildSubject({ name, projectType, selectedProduct }),
@@ -539,6 +596,14 @@ export async function handleQuote(req: Request, res: Response) {
 }
 
 /* ----------------------- Utilities ----------------------- */
+
+function safeParseJson(s: string): Record<string, unknown> {
+  try {
+    return s ? (JSON.parse(s) as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
 
 function safeString(v: unknown): string {
   return typeof v === "string" ? v : "";
