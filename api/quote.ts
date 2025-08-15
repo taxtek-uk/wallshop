@@ -451,7 +451,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         <a class="btn" href="mailto:${esc(
           email
         )}?subject=${encodeURIComponent("Re: Your quote request — The Wall Shop")}">Reply</a>
-        <a class="btn secondary" href="mailto:info@thewallshop.co.uk?subject=${encodeURIComponent(
+        <a class="btn secondary" href="mailto:stephen@thewallshop.co.uk?subject=${encodeURIComponent(
           "Fwd: Quote request — " + (projectType || name)
         )}&body=${encodeURIComponent(
           buildForwardBody({
@@ -473,7 +473,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   <div class="footer">
     <div class="foot-strong">The Wall Shop <span class="brand-gold">·</span> thewallshop.co.uk</div>
     <div>SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK</div>
-    <div>+44 141 739 3377 · Mon–Fri, 9:00–18:00 PST · <a href="mailto:info@thewallshop.co.uk">info@thewallshop.co.uk</a></div>
+    <div>+44 141 739 3377 · Mon–Fri, 9:00–18:00 PST · <a href="mailto:stephen@thewallshop.co.uk">stephen@thewallshop.co.uk</a></div>
     <div style="margin-top:8px;">You are receiving this because your address is configured to receive quote requests.</div>
   </div>
 </div>
@@ -572,7 +572,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const resend = new Resend(process.env.RESEND_API_KEY as string);
     const { data, error } = await resend.emails.send({
       from: "The Wall Shop <quotes@thewallshop.co.uk>",
-      to: ["info@thewallshop.co.uk", "stephen@thewallshop.co.uk"],
+      to: ["stephen@thewallshop.co.uk"],
       cc: [email], // keep client in the loop
       replyTo: email,
       subject: buildSubject({ name, projectType, selectedProduct }),
