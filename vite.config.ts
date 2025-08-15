@@ -2,20 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
-import express from 'express';
-import fs from 'fs';
 
 export default defineConfig(({ mode }) => ({
   root: 'client', // index.html now in /client
-  server: {
-    proxy: {
-    "/api": "http://localhost:3000"
-  },
-    host: '::',
-    port: 8080
-  },
   build: {
-    outDir: 'dist', // Output folder relative to root
+    outDir: '../dist/spa', // Output folder relative to root
     rollupOptions: {
       output: {
         manualChunks: {
@@ -80,25 +71,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Dev-only Express server
-    mode === 'development' &&
-      !process.env.VERCEL && {
-        name: 'express-server',
-        async configureServer(server) {
-          // Load the Express app from TS using Vite's SSR loader (works with .ts files)
-          const mod = await server.ssrLoadModule(path.resolve(__dirname, './server/api/index.ts'));
-          const apiApp = typeof mod.createServer === 'function' ? mod.createServer() : null;
-          if (apiApp) {
-            // Only route /api/* requests to the Express app; let Vite handle everything else
-            server.middlewares.use((req, res, next) => {
-              if (req.url && req.url.startsWith('/api')) {
-                return (apiApp as any)(req, res, next);
-              }
-              next();
-            });
-          }
-        }
-      },
     // Bundle analyzer
     mode === 'production' &&
       visualizer({
