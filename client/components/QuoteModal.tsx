@@ -269,7 +269,7 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, selectedProduc
       { value: "commercial-office", label: "Commercial - Office", icon: Building2 },
       { value: "commercial-retail", label: "Commercial - Retail", icon: Building2 },
       { value: "commercial-restaurant", label: "Commercial - Restaurant", icon: Building2 },
-      { value: "industrial-warehouse", label: "Industrial - Warehouse", icon: Building2 },
+      { value: "industrial-warehouse", label: "Commercial Hotels", icon: Building2 },
       { value: "other", label: "Other / Custom Project", icon: Palette },
     ] as const,
     []

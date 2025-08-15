@@ -46,9 +46,8 @@ const socialLinks = [
 const quickLinks = [
   { title: "Smart Walls", href: "/smart-walls" },
   { title: "Smart Devices", href: "/smart-devices" },
-  { title: "Smart Wall Accessories", href: "#" },
+  { title: "Wall Panels", href: "/wall-panels" },
   { title: "Carbon Rock Boards", href: "/carbon-rock-boards" },
-  { title: "Acoustic Panels", href: "/acoustic-panels" },
   { title: "Luxury Wallpapers", href: "/luxury-wallpapers" },
   { title: "Installation", href: "/installation" },
 ];
