@@ -276,62 +276,99 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, selectedProduc
   );
 
   // ===== Submit =====
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // last validation pass
-    setCurrentStep(4);
-    if (!validateStep()) return;
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        ...formData,
-        selectedProduct,
-        modules,
-        wallCoverings,
-        smartDevices,
-        accessories,
-        total: calculateTotal(),
-      };
-      const response = await fetch('/api/send-quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json();
-      if (!response.ok || (result && result.error)) {
-        throw new Error(result?.error || 'Failed to submit quote request.');
-      }
-      setIsSubmitting(false);
-      setIsSubmitted(true);
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  // Move to review step visually
+  setCurrentStep(4);
+  if (!validateStep()) return;
 
-      // reset and auto-close
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          address: "",
-          projectType: "",
-          area: "",
-          message: "",
-          urgency: "standard",
-          quoteType: "smart-wall",
-        });
-        setModules([{ id: "1", name: "1000mm Central Module", size: "1000mm", quantity: 2, price: 450 }]);
-        setWallCoverings([]);
-        setSmartDevices([]);
-        setAccessories([]);
-        setCurrentStep(1);
-        onClose();
-      }, 1800);
-    } catch (err) {
-      setIsSubmitting(false);
-      const message =
-        err instanceof Error ? err.message : "Failed to submit quote request. Please try again later.";
-      alert(message);
+  setIsSubmitting(true);
+  try {
+    // narrow selectedProduct -> plain JSON shape
+    const product =
+      selectedProduct && typeof selectedProduct === "object"
+        ? (() => {
+            const p: any = selectedProduct;
+            const out: Record<string, string> = {};
+            if (typeof p.name === "string") out.name = p.name;
+            if (typeof p.sku === "string") out.sku = p.sku;
+            if (typeof p.price === "string" || typeof p.price === "number") out.price = String(p.price);
+            if (typeof p.url === "string") out.url = p.url;
+            return Object.keys(out).length ? out : undefined;
+          })()
+        : undefined;
+
+    const payload = {
+      ...formData,
+      selectedProduct: product,
+      modules,
+      wallCoverings,
+      smartDevices,
+      accessories,
+      total: calculateTotal(),
+    };
+
+    const response = await fetch("/api/quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // credentials stay same-origin (default) — CORS allowed in our API
+      body: JSON.stringify(payload),
+    });
+
+    // Robust parse: try JSON; if empty, treat as success only if status OK
+    let result: any = null;
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      result = await response.json();
+    } else {
+      const text = await response.text(); // may be empty
+      if (text) {
+        try {
+          result = JSON.parse(text);
+        } catch {
+          // Not JSON; leave as null so we can fall back to status check
+        }
+      }
     }
-  };
+
+    if (!response.ok || (result && result.error)) {
+      const message =
+        (result && (result.details || result.error)) ||
+        `Request failed (${response.status})`;
+      throw new Error(message);
+    }
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+
+    // reset and auto-close
+    setTimeout(() => {
+      setIsSubmitted(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        projectType: "",
+        area: "",
+        message: "",
+        urgency: "standard",
+        quoteType: "smart-wall",
+      });
+      setModules([{ id: "1", name: "1000mm Central Module", size: "1000mm", quantity: 2, price: 450 }]);
+      setWallCoverings([]);
+      setSmartDevices([]);
+      setAccessories([]);
+      setCurrentStep(1);
+      onClose();
+    }, 1800);
+  } catch (err) {
+    setIsSubmitting(false);
+    const message =
+      err instanceof Error ? err.message : "Failed to submit quote request. Please try again later.";
+    alert(message);
+  }
+};
 
   // ===== Step Views =====
   const renderStep = () => {
