@@ -694,6 +694,7 @@ const SmartSwitches: React.FC = () => {
           <QuoteModal
             isOpen={isQuoteModalOpen}
             onClose={() => setIsQuoteModalOpen(false)}
+            productCategory="smart-devices"
             selectedProduct={selectedProduct}
           />
         )}

@@ -1735,7 +1735,7 @@ const WallPanels = () => {
                               ...styles.productButtonPrimary,
                             }}
                             onClick={() => {
-                              setSelectedProduct({ name: product.name, price: product.price });
+                              setSelectedProduct({ name: product.title, price: product.price });
                               setIsQuoteModalOpen(true);
                             }}
                           >

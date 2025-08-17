@@ -120,7 +120,7 @@ function SuccessStep() {
 }
 
 // Main modal content component
-function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps) {
+function QuoteModalContent({ isOpen, onClose, productCategory, selectedProduct }: QuoteModalProps) {
   const { state, nextStep, prevStep, validateCurrentStep, dispatch } = useQuote();
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +128,10 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
   useEffect(() => {
     if (productCategory && productCategory !== state.formData.productCategory) {
       dispatch({ type: 'SET_PRODUCT_CATEGORY', payload: productCategory });
+      // Do NOT jump to step 2: always start from Step 1 (contact)
+      if (productCategory === 'smart-devices') {
+        dispatch({ type: 'UPDATE_PRODUCT_DATA', payload: { category: 'smart-devices', data: { controlPanels: true } } });
+      }
     }
   }, [productCategory, state.formData.productCategory, dispatch]);
 
@@ -170,10 +174,31 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
     dispatch({ type: 'SET_SUBMITTING', payload: true });
 
     try {
-      const response = await fetch('/api/quote', {
+      const contact = state.formData.contact;
+
+      // Build payload to match sendQuote API expectations
+      const payload: any = {
+        contact: {
+          fullName: contact.fullName,
+          email: contact.email,
+          phone: contact.phone,
+          installationAddress: contact.installationAddress,
+          additionalNotes: contact.additionalNotes,
+        },
+        productCategory: state.formData.productCategory,
+      };
+
+      // Attach smart-walls specific data when on Smart Walls page
+      if (state.formData.productCategory === 'smart-walls') {
+        payload.smartWalls = {
+          ...state.formData.smartWalls,
+        };
+      }
+
+      const response = await fetch('/api/sendQuote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state.formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -182,8 +207,6 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
       }
 
       dispatch({ type: 'SET_SUBMITTED', payload: true });
-      
-      // Auto-close after showing success
       setTimeout(() => {
         dispatch({ type: 'RESET_FORM' });
         onClose();
@@ -206,20 +229,82 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
       case 1:
         return <Step1Contact />;
       case 2:
+        // If productCategory is preselected via props, skip selection UI and go straight to config
+        if (productCategory) {
+          switch (productCategory) {
+            case 'smart-walls':
+              return <StepSmartWalls />;
+            case 'smart-devices':
+              return <StepSmartDevices />;
+            case 'wall-panels':
+              return <StepWallPanels />;
+            case 'carbon-rock-boards':
+              return <StepCarbonRockBoards />;
+          }
+        }
         return <ProductCategoryStep />;
       case 3:
-        switch (state.formData.productCategory) {
-          case 'smart-walls':
-            return <StepSmartWalls />;
-          case 'smart-devices':
-            return <StepSmartDevices />;
-          case 'wall-panels':
-            return <StepWallPanels />;
-          case 'carbon-rock-boards':
-            return <StepCarbonRockBoards />;
-          default:
-            return <ProductCategoryStep />;
+        // Step 3 is only for smart-walls (review step)
+        // Other categories only have 2 steps (contact + configuration)
+        if (state.formData.productCategory === 'smart-walls') {
+          return (
+            <div className="space-y-6">
+              <h2 className="text-xl font-bold text-mocha-950">Review Your Smart Wall Quote</h2>
+              <div className="bg-white border border-stone-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-2">Contact</h3>
+                <ul className="text-sm text-stone-700 space-y-1">
+                  <li><strong>Name:</strong> {state.formData.contact.fullName}</li>
+                  <li><strong>Email:</strong> {state.formData.contact.email}</li>
+                  <li><strong>Phone:</strong> {state.formData.contact.phone}</li>
+                  {state.formData.contact.installationAddress && (
+                    <li><strong>Address:</strong> {state.formData.contact.installationAddress}</li>
+                  )}
+                  {state.formData.contact.additionalNotes && (
+                    <li><strong>Notes:</strong> {state.formData.contact.additionalNotes}</li>
+                  )}
+                </ul>
+              </div>
+
+              <div className="bg-white border border-stone-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-2">Project Details</h3>
+                <ul className="text-sm text-stone-700 space-y-1">
+                  <li><strong>Property Type:</strong> {state.formData.smartWalls?.projectDetails?.propertyType || '-'}</li>
+                  <li><strong>Purpose:</strong> {state.formData.smartWalls?.projectDetails?.purpose || '-'}</li>
+                  <li><strong>Location:</strong> {state.formData.smartWalls?.projectDetails?.location || '-'}</li>
+                  <li><strong>Installation:</strong> {state.formData.smartWalls?.projectDetails?.installation || '-'}</li>
+                </ul>
+              </div>
+
+              <div className="bg-white border border-stone-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-2">Wall Specifications</h3>
+                <ul className="text-sm text-stone-700 space-y-1">
+                  <li><strong>Width:</strong> {state.formData.smartWalls?.wallSpecifications?.width ?? '-'} m</li>
+                  <li><strong>Height:</strong> {state.formData.smartWalls?.wallSpecifications?.height ?? '-'} m</li>
+                  <li><strong>Thickness:</strong> {state.formData.smartWalls?.wallSpecifications?.thickness || '-'}</li>
+                  <li><strong>Layout:</strong> {state.formData.smartWalls?.wallSpecifications?.layout || '-'}</li>
+                </ul>
+              </div>
+
+              <div className="bg-white border border-stone-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-2">Technical Needs</h3>
+                <ul className="text-sm text-stone-700 space-y-1">
+                  {state.formData.smartWalls?.technicalNeeds ? (
+                    <>
+                      <li><strong>Soundproofing:</strong> {state.formData.smartWalls.technicalNeeds.soundproofing ? 'Yes' : 'No'}</li>
+                      <li><strong>Fire Rating:</strong> {state.formData.smartWalls.technicalNeeds.fireRating ? 'Yes' : 'No'}</li>
+                      <li><strong>Accessibility:</strong> {state.formData.smartWalls.technicalNeeds.accessibility ? 'Yes' : 'No'}</li>
+                      <li><strong>Eco-materials:</strong> {state.formData.smartWalls.technicalNeeds.ecoMaterials ? 'Yes' : 'No'}</li>
+                    </>
+                  ) : (
+                    <li>-</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          );
         }
+        // Fallback - this should not happen as step 3 is only for smart-walls
+        return <Step1Contact />;
       default:
         return <Step1Contact />;
     }
@@ -230,15 +315,21 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
     
     switch (state.currentStep) {
       case 1: return 'Contact Information';
-      case 2: return 'Product Category';
+      case 2:
+        if (productCategory) {
+          const label = productCategory.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+          return `${label} Configuration`;
+        }
+        return 'Product Category';
       case 3: return `${state.formData.productCategory?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Configuration`;
       default: return 'Quote Request';
     }
   };
 
-  const canGoNext = state.currentStep < 3;
+  const isTwoStepFlow = state.totalSteps === 2; // when category is preselected
+  const canGoNext = state.currentStep < state.totalSteps;
   const canGoBack = state.currentStep > 1 && !state.isSubmitted;
-  const isLastStep = state.currentStep === 3;
+  const isLastStep = state.currentStep === state.totalSteps;
 
   if (!isOpen) return null;
 
@@ -279,7 +370,7 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
                 </h1>
                 {!state.isSubmitted && (
                   <p className="text-sm text-stone-500">
-                    Step {state.currentStep} of 3
+                    Step {state.currentStep} of {state.totalSteps}
                   </p>
                 )}
               </div>
@@ -299,8 +390,8 @@ function QuoteModalContent({ isOpen, onClose, productCategory }: QuoteModalProps
               <div className="w-full bg-stone-200 rounded-full h-2">
                 <motion.div
                   className="bg-leather-600 h-2 rounded-full"
-                  initial={{ width: '33%' }}
-                  animate={{ width: `${(state.currentStep / 3) * 100}%` }}
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${(state.currentStep / state.totalSteps) * 100}%` }}
                   transition={{ duration: 0.3 }}
                 />
               </div>

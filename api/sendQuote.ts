@@ -96,7 +96,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     await resend.emails.send({
       from: "quotes@thewallshop.co.uk",
-      to: ["quotes@thewallshop.co.uk"],
+      to: ["stephen@thewallshop.co.uk"],
+      cc: email ? [email] : undefined,
       subject: `New ${formatProductCategory(productCategory)} Quote Request - ${fullName}`,
       html: emailHtml,
       text: emailText,
@@ -235,7 +236,35 @@ function buildProductSectionHtml(category: string, data: any): string {
 
 function buildSmartWallsHtml(data: any): string {
   let html = '<div class="section"><h3>Smart Walls Configuration</h3>';
+
+  // Project Details
+  if (data.projectDetails) {
+    html += '<div class="field"><strong>Project Details:</strong></div>';
+    html += `<div class="field"><strong>Property Type:</strong> ${escapeHtml(String(data.projectDetails.propertyType || '-'))}</div>`;
+    html += `<div class="field"><strong>Purpose:</strong> ${escapeHtml(String(data.projectDetails.purpose || '-'))}</div>`;
+    if (data.projectDetails.location) html += `<div class="field"><strong>Location:</strong> ${escapeHtml(String(data.projectDetails.location))}</div>`;
+    html += `<div class="field"><strong>Installation:</strong> ${escapeHtml(String(data.projectDetails.installation || '-'))}</div>`;
+  }
+
+  // Wall Specifications
+  if (data.wallSpecifications) {
+    html += '<div class="field"><strong>Wall Specifications:</strong></div>';
+    if (typeof data.wallSpecifications.width === 'number') html += `<div class="field"><strong>Width:</strong> ${data.wallSpecifications.width} m</div>`;
+    if (typeof data.wallSpecifications.height === 'number') html += `<div class="field"><strong>Height:</strong> ${data.wallSpecifications.height} m</div>`;
+    if (data.wallSpecifications.thickness) html += `<div class="field"><strong>Thickness:</strong> ${escapeHtml(String(data.wallSpecifications.thickness))}</div>`;
+    if (data.wallSpecifications.layout) html += `<div class="field"><strong>Layout:</strong> ${escapeHtml(String(data.wallSpecifications.layout))}</div>`;
+  }
   
+  // Technical Needs
+  if (data.technicalNeeds) {
+    html += '<div class="field"><strong>Technical Needs:</strong></div>';
+    html += `<div class="field"><strong>Soundproofing:</strong> ${data.technicalNeeds.soundproofing ? 'Yes' : 'No'}</div>`;
+    html += `<div class="field"><strong>Fire Rating:</strong> ${data.technicalNeeds.fireRating ? 'Yes' : 'No'}</div>`;
+    html += `<div class="field"><strong>Accessibility:</strong> ${data.technicalNeeds.accessibility ? 'Yes' : 'No'}</div>`;
+    html += `<div class="field"><strong>Eco-materials:</strong> ${data.technicalNeeds.ecoMaterials ? 'Yes' : 'No'}</div>`;
+  }
+  
+  // Existing feature sections
   if (data.tvIntegration) {
     html += '<div class="field"><strong>TV Integration:</strong> Yes</div>';
     if (data.screenSize) html += `<div class="field"><strong>Screen Size:</strong> ${escapeHtml(data.screenSize)}</div>`;

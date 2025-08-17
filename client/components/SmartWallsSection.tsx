@@ -9,7 +9,6 @@ import {
   Check,
   ArrowRight,
 } from "lucide-react";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -173,11 +172,7 @@ const SmartWallsSection = () => {
           </div>
         </div>
 
-         {/* Before/After Comparison */}
-               
-                <div className="container mx-auto px-4 lg:px-8">
-                  <BeforeAfterSlider />
-                </div>
+        
                
 
         {/* Centered Button Below Cards */}

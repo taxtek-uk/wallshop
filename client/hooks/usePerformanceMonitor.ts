@@ -38,8 +38,10 @@ export const usePerformanceMonitor = () => {
       if ('PerformanceObserver' in window) {
         const observer = new PerformanceObserver((list) => {
           const entries = list.getEntries();
-          entries.forEach((entry) => {
-            metrics.fid = entry.processingStart - entry.startTime;
+          entries.forEach((entry: any) => {
+            // processingStart exists on PerformanceEventTiming; fallback if unavailable
+            const processingStart = entry.processingStart ?? entry.startTime;
+            metrics.fid = processingStart - entry.startTime;
             console.log('FID:', metrics.fid);
           });
         });

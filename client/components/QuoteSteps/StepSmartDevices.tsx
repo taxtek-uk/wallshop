@@ -6,11 +6,15 @@ import { SmartDevicesFormData } from '@/types/quote';
 
 export default function StepSmartDevices() {
   const { state, updateProductData } = useQuote();
-  const smartDevicesData = (state.formData.smartDevices || {
+  const smartDevicesData: SmartDevicesFormData = {
     controlPanels: false,
     securitySensors: false,
     homeAutomation: false,
-  }) as SmartDevicesFormData;
+    securityFeatures: [],
+    automationFeatures: [],
+    selectedDevices: [],
+    ...state.formData.smartDevices,
+  };
 
   const handleFieldChange = (field: keyof SmartDevicesFormData, value: any) => {
     const updatedData = { ...smartDevicesData, [field]: value };
@@ -18,15 +22,14 @@ export default function StepSmartDevices() {
   };
 
   const handleFeatureToggle = (category: 'securityFeatures' | 'automationFeatures', feature: string) => {
-    const currentFeatures = smartDevicesData[category] || [];
-    const updatedFeatures = currentFeatures.includes(feature)
-      ? currentFeatures.filter(f => f !== feature)
-      : [...currentFeatures, feature];
-    handleFieldChange(category, updatedFeatures);
+    const current = Array.isArray(smartDevicesData[category]) ? smartDevicesData[category] as string[] : [];
+    const set = new Set(current);
+    if (set.has(feature)) set.delete(feature); else set.add(feature);
+    handleFieldChange(category, Array.from(set));
   };
 
   const panelModelOptions = [
-    'Touch Panel 7"', 'Touch Panel 10"', 'Touch Panel 15"', 'Wall Switch Panel', 'Portable Remote'
+    'MixPad 7', 'MixPad 7 Ultra', 'MixPad X', 'MixPad M5', 'MixPad S', 'ZigBee Mini Hub'
   ];
 
   const roomOptions = [
@@ -45,6 +48,35 @@ export default function StepSmartDevices() {
     'Smart Thermostats', 'Automated Blinds', 'Smart Locks', 'Garage Door Control', 'Irrigation System', 'Pool/Spa Control'
   ];
 
+  // Quick select devices catalog
+  const deviceCatalog: { name: string; category: string }[] = [
+    { name: 'MixPad X', category: 'Control Panel' },
+    { name: 'MixPad 7 Ultra', category: 'Control Panel' },
+    { name: 'MixPad 7', category: 'Control Panel' },
+    { name: 'MixPad M5', category: 'Control Panel' },
+    { name: 'Smart Lock V5 Face', category: 'Security' },
+    { name: 'Smart Door Lock S2', category: 'Security' },
+    { name: '2K Wireless Smart IP Camera S2', category: 'Surveillance' },
+    { name: 'Door Window Sensor', category: 'Sensors' },
+    { name: 'Temperature Humidity Sensor', category: 'Sensors' },
+    { name: 'Zigbee Smoke Sensor', category: 'Emergency' },
+    { name: 'Sky Dome Pro Ceiling Light', category: 'Lighting' },
+    { name: 'SOPRO Smart Decorative Lights', category: 'Lighting' },
+    { name: 'Smart LED Light', category: 'Lighting' },
+    { name: 'ZigBee RGB Relay', category: 'Controller' },
+    { name: 'MixDimmer', category: 'Controller' },
+    { name: 'Smart Thermostat Pro', category: 'HVAC' },
+    { name: 'Smart Radiator Valves', category: 'Heating' }
+  ];
+
+  const isSelected = (name: string) => (smartDevicesData.selectedDevices || []).some(d => d.name === name);
+  const toggleDevice = (name: string, category: string) => {
+    const current = smartDevicesData.selectedDevices || [];
+    const exists = current.find(d => d.name === name);
+    const next = exists ? current.filter(d => d.name !== name) : [...current, { name, category }];
+    handleFieldChange('selectedDevices', next);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -55,11 +87,42 @@ export default function StepSmartDevices() {
     >
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-mocha-950 mb-2">
-          Smart Devices Configuration
+          Select Your Smart Devices
         </h2>
-        <p className="text-stone-400 text-sm">
-          Choose the smart devices and automation systems for your intelligent home.
+        <p className="text-stone-500 text-sm">
+          Pick one or more devices and options. We’ll include them in your quote.
         </p>
+      </div>
+
+      {/* Quick Device Picker */}
+      <div className="bg-white border border-stone-200 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Tablet className="w-5 h-5 text-leather-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-mocha-950">Quick Device Picker</h3>
+              <p className="text-sm text-stone-600">Tap to select one or more devices</p>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {deviceCatalog.map((d) => (
+            <button
+              key={d.name}
+              onClick={() => toggleDevice(d.name, d.category)}
+              className={`p-3 rounded-lg border text-left transition-all duration-200 ${
+                isSelected(d.name)
+                  ? 'bg-leather-50 border-leather-300 text-leather-800 shadow-sm'
+                  : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
+              }`}
+            >
+              <div className="text-sm font-semibold">{d.name}</div>
+              <div className="text-xs text-stone-500">{d.category}</div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Control Panels Section */}

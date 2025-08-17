@@ -195,13 +195,13 @@ const Warranty = () => {
                 <h2 className="text-3xl font-bold text-leather-900">What's Covered</h2>
               </div>
               <div className="space-y-5 text-left max-w-md mx-auto">
-                {[
-                  [Hammer, "Manufacturing Defects", "Materials that fail due to production flaws"],
-                  [Paintbrush, "Installation Issues", "Problems with our workmanship during setup"],
-                  [Cpu, "Electronic Components", "Smart wall technology and integrated systems"],
-                  [Sun, "Premature Fading", "Color degradation beyond normal expectations"],
-                  [StickyNote, "Adhesion Failures", "Wallpapers or panels that don't stay properly attached"],
-                ].map(([Icon, title, desc], i) => (
+                {([
+                  { Icon: Hammer, title: "Manufacturing Defects", desc: "Materials that fail due to production flaws" },
+                  { Icon: Paintbrush, title: "Installation Issues", desc: "Problems with our workmanship during setup" },
+                  { Icon: Cpu, title: "Electronic Components", desc: "Smart wall technology and integrated systems" },
+                  { Icon: Sun, title: "Premature Fading", desc: "Color degradation beyond normal expectations" },
+                  { Icon: StickyNote, title: "Adhesion Failures", desc: "Wallpapers or panels that don't stay properly attached" },
+                ] as { Icon: React.ComponentType<{ className?: string }>; title: string; desc: string }[]).map(({ Icon, title, desc }, i) => (
                   <div key={i} className="flex items-start space-x-3">
                     <Icon className="w-5 h-5 mt-1 text-leather-700 flex-shrink-0" />
                     <div>
@@ -224,13 +224,13 @@ const Warranty = () => {
                 <h2 className="text-3xl font-bold text-orange-800">Not Covered</h2>
               </div>
               <div className="space-y-5 text-left max-w-md mx-auto">
-                {[
-                  [EyeOff, "Normal Wear & Tear", "Expected aging and usage over time"],
-                  [XCircle, "Accidental Damage", "Impact damage, scratches, or user-caused issues"],
-                  [ZapOff, "Misuse or Abuse", "Damage from improper use or maintenance"],
-                  [CloudLightning, "Environmental Factors", "Extreme conditions, flooding, or fire damage"],
-                  [Wrench, "Third-Party Modifications", "Changes made by non-authorized personnel"],
-                ].map(([Icon, title, desc], i) => (
+                {([
+                  { Icon: EyeOff, title: "Normal Wear & Tear", desc: "Expected aging and usage over time" },
+                  { Icon: XCircle, title: "Accidental Damage", desc: "Impact damage, scratches, or user-caused issues" },
+                  { Icon: ZapOff, title: "Misuse or Abuse", desc: "Damage from improper use or maintenance" },
+                  { Icon: CloudLightning, title: "Environmental Factors", desc: "Extreme conditions, flooding, or fire damage" },
+                  { Icon: Wrench, title: "Third-Party Modifications", desc: "Changes made by non-authorized personnel" },
+                ] as { Icon: React.ComponentType<{ className?: string }>; title: string; desc: string }[]).map(({ Icon, title, desc }, i) => (
                   <div key={i} className="flex items-start space-x-3">
                     <Icon className="w-5 h-5 mt-1 text-orange-600 flex-shrink-0" />
                     <div>

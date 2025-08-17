@@ -377,7 +377,7 @@ const CarbonRockBoards = () => {
       <QuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
-        selectedProduct={selectedProduct}
+        productCategory="carbon-rock-boards"
       />
 
       {/* Soft fade animation */}

@@ -18,9 +18,9 @@ const benefits = [
   },
   {
     icon: ShieldCheck,
-    title: "Durable Steel Frame",
+    title: "Durable Metal Frame",
     description:
-      "Robust steel frame ensures long-lasting stability and perfect fit on any existing wall.",
+      "Robust metal frame ensures long-lasting stability and perfect fit on any existing wall.",
   },
   {
     icon: Zap,

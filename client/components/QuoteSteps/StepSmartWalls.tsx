@@ -6,12 +6,13 @@ import { SmartWallsFormData } from '@/types/quote';
 
 export default function StepSmartWalls() {
   const { state, updateProductData } = useQuote();
-  const smartWallsData = (state.formData.smartWalls || {
+  const smartWallsData: SmartWallsFormData = {
     tvIntegration: false,
     speakers: false,
     lighting: false,
     additionalFeatures: [],
-  }) as SmartWallsFormData;
+    ...state.formData.smartWalls,
+  };
 
   const handleFieldChange = (field: keyof SmartWallsFormData, value: any) => {
     const updatedData = { ...smartWallsData, [field]: value };
@@ -19,11 +20,10 @@ export default function StepSmartWalls() {
   };
 
   const handleFeatureToggle = (feature: string) => {
-    const currentFeatures = smartWallsData.additionalFeatures || [];
-    const updatedFeatures = currentFeatures.includes(feature)
-      ? currentFeatures.filter(f => f !== feature)
-      : [...currentFeatures, feature];
-    handleFieldChange('additionalFeatures', updatedFeatures);
+    const current = Array.isArray(smartWallsData.additionalFeatures) ? smartWallsData.additionalFeatures : [];
+    const set = new Set(current);
+    if (set.has(feature)) set.delete(feature); else set.add(feature);
+    handleFieldChange('additionalFeatures', Array.from(set));
   };
 
   const screenSizeOptions = [
@@ -46,6 +46,22 @@ export default function StepSmartWalls() {
     'Cable Management', 'Wireless Charging Pad', 'USB Outlets', 'Smart Home Hub Integration',
     'Temperature Control', 'Air Quality Monitoring', 'Security Camera Integration'
   ];
+
+  // New: Smart Wall page-specific fields
+  const handleProjectDetailsChange = (field: keyof NonNullable<SmartWallsFormData['projectDetails']>, value: any) => {
+    const current = smartWallsData.projectDetails || { propertyType: 'residential', purpose: 'decorative', installation: 'supply-install' } as NonNullable<SmartWallsFormData['projectDetails']>;
+    handleFieldChange('projectDetails', { ...current, [field]: value });
+  };
+
+  const handleWallSpecsChange = (field: keyof NonNullable<SmartWallsFormData['wallSpecifications']>, value: any) => {
+    const current = smartWallsData.wallSpecifications || { width: 0, height: 0, thickness: '', layout: 'straight' } as NonNullable<SmartWallsFormData['wallSpecifications']>;
+    handleFieldChange('wallSpecifications', { ...current, [field]: value });
+  };
+
+  const handleTechnicalNeedsChange = (field: keyof NonNullable<SmartWallsFormData['technicalNeeds']>, value: boolean) => {
+    const current = smartWallsData.technicalNeeds || { soundproofing: false, fireRating: false, accessibility: false, ecoMaterials: false } as NonNullable<SmartWallsFormData['technicalNeeds']>;
+    handleFieldChange('technicalNeeds', { ...current, [field]: value });
+  };
 
   return (
     <motion.div
@@ -349,6 +365,147 @@ export default function StepSmartWalls() {
                 <Plus className="w-4 h-4 text-stone-400" />
               )}
             </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Project Details */}
+      <div className="bg-white border border-stone-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-mocha-950 mb-4">Project Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Property Type</label>
+            <select
+              value={smartWallsData.projectDetails?.propertyType || 'residential'}
+              onChange={(e) => handleProjectDetailsChange('propertyType', e.target.value as any)}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            >
+              <option value="residential">Residential</option>
+              <option value="commercial">Commercial</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Purpose</label>
+            <select
+              value={smartWallsData.projectDetails?.purpose || 'decorative'}
+              onChange={(e) => handleProjectDetailsChange('purpose', e.target.value as any)}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            >
+              <option value="partition">Partition</option>
+              <option value="decorative">Decorative</option>
+              <option value="soundproof">Soundproof</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Location</label>
+            <input
+              type="text"
+              value={smartWallsData.projectDetails?.location || ''}
+              onChange={(e) => handleProjectDetailsChange('location', e.target.value)}
+              placeholder="City/Area"
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Installation</label>
+            <div className="flex gap-3">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="installation"
+                  value="supply-only"
+                  checked={(smartWallsData.projectDetails?.installation || 'supply-install') === 'supply-only'}
+                  onChange={(e) => handleProjectDetailsChange('installation', e.target.value as any)}
+                />
+                Supply only
+              </label>
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="installation"
+                  value="supply-install"
+                  checked={(smartWallsData.projectDetails?.installation || 'supply-install') === 'supply-install'}
+                  onChange={(e) => handleProjectDetailsChange('installation', e.target.value as any)}
+                />
+                Supply & Install
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Wall Specifications */}
+      <div className="bg-white border border-stone-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-mocha-950 mb-4">Wall Specifications</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Width (m)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={smartWallsData.wallSpecifications?.width ?? ''}
+              onChange={(e) => handleWallSpecsChange('width', parseFloat(e.target.value))}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Height (m)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={smartWallsData.wallSpecifications?.height ?? ''}
+              onChange={(e) => handleWallSpecsChange('height', parseFloat(e.target.value))}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Thickness</label>
+            <input
+              type="text"
+              placeholder="e.g., 50mm"
+              value={smartWallsData.wallSpecifications?.thickness || ''}
+              onChange={(e) => handleWallSpecsChange('thickness', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-mocha-950 mb-2">Layout</label>
+            <select
+              value={smartWallsData.wallSpecifications?.layout || 'straight'}
+              onChange={(e) => handleWallSpecsChange('layout', e.target.value as any)}
+              className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-mocha-950 focus:outline-none focus:ring-2 focus:ring-leather-600"
+            >
+              <option value="straight">Straight</option>
+              <option value="l-shape">L-Shape</option>
+              <option value="u-shape">U-Shape</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Technical Needs */}
+      <div className="bg-white border border-stone-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-mocha-950 mb-4">Technical Needs</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {([
+            ['soundproofing', 'Soundproofing'],
+            ['fireRating', 'Fire Rating'],
+            ['accessibility', 'Accessibility'],
+            ['ecoMaterials', 'Eco-materials'],
+          ] as const).map(([key, label]) => (
+            <label key={key} className="inline-flex items-center gap-3 p-3 border border-stone-200 rounded-lg">
+              <input
+                type="checkbox"
+                checked={Boolean(smartWallsData.technicalNeeds?.[key])}
+                onChange={(e) => handleTechnicalNeedsChange(key, e.target.checked)}
+              />
+              <span className="text-sm">{label}</span>
+            </label>
           ))}
         </div>
       </div>

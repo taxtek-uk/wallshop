@@ -248,7 +248,7 @@ const ModularSmartWallsSection = () => {
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-white/95 max-w-2xl mb-10 leading-relaxed animate-fade-in-up delay-300 font-light">
-              Engineered for fast installation and timeless luxury, our smart walls combine a steel inner frame with premium marble, stone, mirror, and metal effect boards. The internal cable assembly supports the integration of smart home devices such as dimmable lighting, climate control and security systems as well as standard control of sound systems, TVs and horizontal fireplaces. The systems can even control electric curtain systems to provide a cinematic experience.
+              Engineered for fast installation and timeless luxury, our smart walls combine a metal inner frame with premium marble, stone, mirror, and metal effect boards. The internal cable assembly supports the integration of smart home devices such as dimmable lighting, climate control and security systems as well as standard control of sound systems, TVs and horizontal fireplaces. The systems can even control electric curtain systems to provide a cinematic experience.
             </p>
 
             <ul className="space-y-8 max-w-lg">

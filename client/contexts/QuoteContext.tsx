@@ -51,7 +51,8 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
           ...state.formData,
           productCategory: action.payload,
         },
-        totalSteps: 3, // Contact + Product Category + Product Specific
+        // Smart Walls has Contact -> Config -> Review. Others remain Contact -> Config
+        totalSteps: action.payload === 'smart-walls' ? 3 : 2,
       };
     
     case 'UPDATE_CONTACT':
@@ -63,14 +64,23 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
         },
       };
     
-    case 'UPDATE_PRODUCT_DATA':
+    case 'UPDATE_PRODUCT_DATA': {
+      // Map category to the correct camelCase form key
+      const categoryKeyMap: Record<ProductCategory, keyof QuoteFormData> = {
+        'smart-walls': 'smartWalls',
+        'smart-devices': 'smartDevices',
+        'wall-panels': 'wallPanels',
+        'carbon-rock-boards': 'carbonRockBoards',
+      };
+      const key = categoryKeyMap[action.payload.category];
       return {
         ...state,
         formData: {
           ...state.formData,
-          [action.payload.category]: action.payload.data,
+          [key]: action.payload.data,
         },
       };
+    }
     
     case 'SET_ERRORS':
       return { ...state, errors: action.payload };

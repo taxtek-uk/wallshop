@@ -57,7 +57,6 @@ import smartEvent from '/images/event-space.webp';
 
 function SmartWalls() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<{ name: string, price: string }>({ name: '', price: '' });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
@@ -1039,7 +1038,7 @@ function SmartWalls() {
       <QuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
-        selectedProduct={selectedProduct}
+        productCategory="smart-walls"
       />
     </div>
   );

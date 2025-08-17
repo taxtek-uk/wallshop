@@ -23,6 +23,25 @@ export interface SmartWallsFormData {
   lightingType?: string;
   colorControl?: boolean;
   additionalFeatures: string[];
+  // Added for Smart Wall specific quoting
+  projectDetails?: {
+    propertyType: 'residential' | 'commercial' | 'other';
+    purpose: 'partition' | 'decorative' | 'soundproof' | 'other';
+    location?: string;
+    installation: 'supply-only' | 'supply-install';
+  };
+  wallSpecifications?: {
+    width: number;     // meters
+    height: number;    // meters
+    thickness: string; // free text or mm
+    layout: 'straight' | 'l-shape' | 'u-shape' | 'custom';
+  };
+  technicalNeeds?: {
+    soundproofing: boolean;
+    fireRating: boolean;
+    accessibility: boolean;
+    ecoMaterials: boolean;
+  };
 }
 
 export interface SmartDevicesFormData {
@@ -36,6 +55,7 @@ export interface SmartDevicesFormData {
   securityFeatures?: string[];
   homeAutomation: boolean;
   automationFeatures?: string[];
+  selectedDevices?: { name: string; category?: string }[];
 }
 
 export interface WallPanelsFormData {
@@ -84,6 +104,9 @@ export interface QuoteModalProps {
   isOpen: boolean;
   onClose: () => void;
   productCategory?: ProductCategory;
+  // Optional: some pages pass a selected product to prefill context or email
+  // Keeping it as loose type to avoid breaking pages that already pass it
+  selectedProduct?: any;
 }
 
 export interface StepProps {

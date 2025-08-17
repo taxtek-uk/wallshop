@@ -483,7 +483,7 @@ const WPCWallPanels = () => {
       <QuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
-        selectedProduct={{ name: "WPC Wall Panels", price: "From £45/m²" }}
+        productCategory="wall-panels"
       />
     </div>
   );

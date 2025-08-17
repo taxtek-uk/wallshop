@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Volume, Mirror, Square, Ruler, Wrench } from 'lucide-react';
+import { Volume, Square, Ruler, Wrench } from 'lucide-react';
 import { useQuote } from '@/contexts/QuoteContext';
 import { CarbonRockBoardsFormData } from '@/types/quote';
 
@@ -35,7 +35,7 @@ export default function StepCarbonRockBoards() {
       value: 'mirror', 
       label: 'Mirror Boards', 
       description: 'Reflective surface with tinted options',
-      icon: Mirror
+      icon: Square
     },
     { 
       value: 'standard', 
@@ -194,7 +194,7 @@ export default function StepCarbonRockBoards() {
         >
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-10 h-10 bg-leather-100 rounded-lg flex items-center justify-center">
-              <Mirror className="w-5 h-5 text-leather-600" />
+              <Square className="w-5 h-5 text-leather-600" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-mocha-950">Mirror Configuration</h3>
