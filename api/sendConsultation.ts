@@ -5,6 +5,7 @@
  */
 
 // Types for consultation data
+
 export interface ConsultationData {
   fullName: string;
   email: string;
@@ -677,13 +678,13 @@ export async function sendCustomerConfirmation(data: ConsultationData): Promise<
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏢 The Wall Shop</h1>
+            <h1>The Wall Shop</h1>
             <p>Premium Wall Solutions & Design</p>
         </div>
         
         <div class="content">
             <div class="confirmation-badge">
-                ✅ Request Received Successfully
+                Request Received Successfully
             </div>
             
             <h2>Dear ${data.fullName},</h2>
@@ -691,7 +692,7 @@ export async function sendCustomerConfirmation(data: ConsultationData): Promise<
             <p>Thank you for your interest in our services! We've received your consultation request for <strong>${data.projectType}</strong> and are excited to help bring your vision to life.</p>
             
             <div class="next-steps">
-                <h3>🚀 What happens next?</h3>
+                <h3>What happens next?</h3>
                 <ul>
                     <li><strong>Within 24 hours:</strong> Our team will review your requirements and contact you via your preferred method (${data.preferredContactMethod})</li>
                     <li><strong>Initial consultation:</strong> We'll schedule a free consultation to discuss your project in detail</li>
@@ -702,7 +703,7 @@ export async function sendCustomerConfirmation(data: ConsultationData): Promise<
             <p>In the meantime, feel free to browse our portfolio and recent projects on our website. If you have any urgent questions, don't hesitate to reach out.</p>
             
             <div class="contact-info">
-                <h3>📞 Contact Information</h3>
+                <h3>Contact Information</h3>
                 <p><strong>Email:</strong> stephen@thewallshop.co.uk<br>
                 <strong>Phone:</strong> Available during consultation<br>
                 <strong>Website:</strong> www.thewallshop.co.uk</p>
