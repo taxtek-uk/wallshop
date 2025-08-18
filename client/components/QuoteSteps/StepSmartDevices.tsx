@@ -495,7 +495,7 @@ export default function StepSmartDevices() {
                                   Popular
                                 </span>
                               )}
-                              <span className="text-sm font-bold text-mocha-950">{model.price}</span>
+                             
                             </div>
                           </div>
                           <p className="text-xs text-stone-600">{model.description}</p>
