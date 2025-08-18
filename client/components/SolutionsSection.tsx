@@ -7,8 +7,10 @@ import {
   Shield,
   Sun,
   ArrowRight,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ConsultationModal from "./ConsultationModal";
 
 const SOLUTIONS = [
   {
@@ -57,6 +59,7 @@ const SOLUTIONS = [
 
 const SolutionsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -177,13 +180,36 @@ const SolutionsSection = () => {
         />
       </div> */}
 
-      <div className="mt-16 flex justify-center">
+      <div className="mt-16 flex flex-col items-center">
         <img
           src="/images/devices-img.webp"
           alt="Smart Living Solutions"
           width={1275}
           height={199}
-          className="rounded-xl shadow-lg"
+          className="rounded-xl shadow-lg mb-12"
+        />
+        
+        <div className={`transition-all duration-1000 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`} style={{ transitionDelay: '0.8s' }}>
+          <Button
+            onClick={() => setIsConsultationModalOpen(true)}
+            className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-[#b69777] to-[#e6b260] hover:from-[#b89773] hover:to-[#e6c191] text-black rounded-2xl shadow-xl hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105"
+          >
+            <span className="flex items-center space-x-3">
+              <Calendar className="w-5 h-5" />
+              <span>Schedule Consultation</span>
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Button>
+        </div>
+        
+        {/* Consultation Modal */}
+        <ConsultationModal 
+          isOpen={isConsultationModalOpen} 
+          onClose={() => setIsConsultationModalOpen(false)}
+          title="Schedule Your Consultation"
+          subtitle="Let's discuss your smart home solutions"
         />
       </div>
 

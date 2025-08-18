@@ -865,7 +865,7 @@ function SmartWalls() {
       </section>
 
       {/* Enhanced Inquiry Form Section */}
-      <section id="inquiry" className="py-20 relative overflow-hidden">
+      {/* <section id="inquiry" className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#b69777]/5 to-[#907252]/5" />
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <motion.div
@@ -1031,7 +1031,7 @@ function SmartWalls() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <Footer />

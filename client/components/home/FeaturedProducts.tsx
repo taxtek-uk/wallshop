@@ -18,6 +18,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ConsultationModal  from "@/components/ConsultationModal";
 
 interface Feature {
   id: string;
@@ -118,6 +119,7 @@ const SMART_FEATURES: SubFeature[] = [
 const SmartWallFeatures: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -352,7 +354,7 @@ const SmartWallFeatures: React.FC = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={scrollToContact}
+                onClick={() => setIsConsultationModalOpen(true)}
                 className="group px-8 py-4 text-lg font-semibold bg-gradient-to-r from-[#f9d382] to-[#e6b260] hover:from-[#f3c669] hover:to-[#e1aa49] text-black rounded-2xl shadow-xl hover:shadow-[#f9d382]/25 transition-all duration-300 transform hover:scale-105"
               >
                 <span className="flex items-center space-x-3">
@@ -371,7 +373,14 @@ const SmartWallFeatures: React.FC = () => {
           </div>
         </div>
       </div>
-
+      
+      <ConsultationModal 
+        isOpen={isConsultationModalOpen} 
+        onClose={() => setIsConsultationModalOpen(false)}
+        title="Schedule Consultation"
+        subtitle="Let's discuss your smart wall project"
+      />
+      
       {/* Enhanced CSS Animations */}
       <style>{`
         @keyframes pulse-slow {

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import { ArrowRight, Play, ChevronDown, Pause, Sparkles, Zap, Shield, Cpu, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TaglineStrip from "./TaglineStrip";
+import ConsultationModal from "./ConsultationModal";
 
 interface Feature {
   label: string;
@@ -48,6 +49,7 @@ const HeroSection: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [isInView, setIsInView] = useState(false);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
 
@@ -244,7 +246,7 @@ const HeroSection: React.FC = () => {
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
           <Button
-            onClick={() => scrollToSection("#contact")}
+            onClick={() => setIsConsultationModalOpen(true)}
             size="lg"
             className="group px-8 py-4 text-lg font-medium bg-white/10 border border-white/30 text-white backdrop-blur-lg hover:bg-white/20 hover:border-white/50 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
           >
@@ -318,6 +320,14 @@ const HeroSection: React.FC = () => {
       >
         <ChevronDown className="h-8 w-8 animate-bounce group-hover:animate-pulse transition-all duration-300" />
       </button>
+      
+      {/* Consultation Modal */}
+      <ConsultationModal 
+        isOpen={isConsultationModalOpen} 
+        onClose={() => setIsConsultationModalOpen(false)}
+        title="Book Your Free Consultation"
+        subtitle="Let's discuss your smart wall project"
+      />
 
       {/* Enhanced CSS Animations */}
       <style>{`
