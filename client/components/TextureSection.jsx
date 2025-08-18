@@ -225,8 +225,8 @@ const TextureSection = () => {
 
   {/* Cards */}
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-    {categories.map((category, index) => (
-     <div className="group rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden bg-white">
+    {categories.map((category) => (
+     <div key={category.id} className="group rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden bg-white">
 
         {/* Top Image with clipped corners */}
         <div className="h-52 w-full overflow-hidden">

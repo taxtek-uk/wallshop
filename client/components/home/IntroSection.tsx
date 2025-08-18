@@ -75,7 +75,7 @@ const IntroSection = () => {
     <section 
       ref={sectionRef}
       id="intro"
-      className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-br from-white via-gray-50/50 to-white text-neutral-900 overflow-hidden"
+      className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-bl from-[#edd2f3] via-[#fffcdc] to-[#84dfff] text-neutral-900 overflow-hidden"
     >
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

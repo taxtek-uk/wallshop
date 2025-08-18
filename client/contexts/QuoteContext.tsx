@@ -120,9 +120,7 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(quoteReducer, initialState);
 
   const nextStep = () => {
-    if (state.currentStep < state.totalSteps) {
-      dispatch({ type: 'SET_STEP', payload: state.currentStep + 1 });
-    }
+    dispatch({ type: 'SET_STEP', payload: state.currentStep + 1 });
   };
 
   const prevStep = () => {

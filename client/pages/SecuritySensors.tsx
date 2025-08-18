@@ -455,7 +455,7 @@ const SecuritySensors: React.FC = () => {
         </div>
 
         {/* Hero Section */}
-        <section className="pt-14 pb-16 relative overflow-hidden bg-gradient-to-br from-[#231c14] via-[#2a1f17] to-[#1a1410]">
+        <section className="pt-14 pb-16 relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1c0a00] via-[#361500] to-[#603601] backdrop-blur">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0 bg-gradient-to-r from-[#b69777]/20 to-[#907252]/20"></div>
           </div>

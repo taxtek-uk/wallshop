@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { HelmetProvider } from "react-helmet-async";
+import { QuoteProvider } from "@/contexts/QuoteContext";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -83,6 +84,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <HelmetProvider>
+          <QuoteProvider>
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -139,6 +141,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </QuoteProvider>
         </HelmetProvider>
       </BrowserRouter>
     </TooltipProvider>

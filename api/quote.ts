@@ -1,728 +1,1059 @@
-// api/quote.ts
+// api/contact.ts - Enhanced Professional Contact Form Handler
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
+// Comprehensive CORS configuration for production and development environments
 const ALLOWED_ORIGINS = [
   "https://thewallshop.co.uk",
   "https://www.thewallshop.co.uk",
-  "http://localhost:5173", // Vite dev
+  "https://staging.thewallshop.co.uk",
+  "http://localhost:5173", // Vite development server
+  "http://localhost:3000", // Alternative development port
 ];
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // --- CORS ---
-  const origin = String(req.headers.origin || "");
-  if (ALLOWED_ORIGINS.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
-  res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.status(204).end();
+// Rate limiting configuration (requests per IP per minute)
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-  // --- Method guard ---
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST,OPTIONS");
-    return res.status(405).json({ error: "Method Not Allowed" });
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Enhanced CORS handling with security headers
+  const origin = String(req.headers.origin || "");
+  const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin);
+  
+  if (isAllowedOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+  res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
+  
+  // Security headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
   }
 
-  res.setHeader("Content-Type", "application/json");
+  // Method validation
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res.status(405).json({ 
+      error: "Method Not Allowed",
+      message: "This endpoint only accepts POST requests.",
+      allowedMethods: ["POST", "OPTIONS"]
+    });
+  }
+
+  // Content type validation
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
 
   try {
-    if (!process.env.RESEND_API_KEY) {
-      return res.status(500).json({
-        error: "Email service not configured",
-        details: "Missing RESEND_API_KEY environment variable",
+    // Rate limiting implementation
+    const clientIP = getClientIP(req);
+    const rateLimitResult = checkRateLimit(clientIP);
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        error: "Rate Limit Exceeded",
+        message: "Too many requests. Please wait before submitting again.",
+        retryAfter: Math.ceil(rateLimitResult.resetTime / 1000),
+        details: {
+          limit: RATE_LIMIT_MAX_REQUESTS,
+          window: RATE_LIMIT_WINDOW / 1000,
+          remaining: 0
+        }
       });
     }
 
-    // --- Parse body (supports raw string or parsed object) ---
-    const body =
-      typeof req.body === "string" ? safeParseJson(req.body) : ((req.body as any) ?? {});
-
-    // --- Extract + normalise body (coerce to strings; trim) ---
-    const name = truncate(stripTags(safeString(body?.name).trim()), 120);
-    const email = safeString(body?.email).trim().toLowerCase();
-    const phone = truncate(stripTags(safeString(body?.phone).trim()), 40);
-    const address = truncate(stripTagsMultiline(safeString(body?.address).trim()), 500);
-    const projectType = truncate(stripTags(safeString(body?.projectType).trim()), 100);
-    const area = truncate(stripTags(safeString(body?.area).trim()), 32);
-    const urgency = normaliseUrgency(safeString(body?.urgency).trim());
-    const message = truncate(stripTagsMultiline(safeString(body?.message).trim()), 8000);
-
-    // selectedProduct may be an object; defend against arbitrary payloads
-    const rawProduct = body?.selectedProduct ?? null;
-    const selectedProduct = normaliseProduct(rawProduct);
-
-    // --- Normalise pricing arrays from QuoteModal ---
-    type ModuleItem = { name: string; size?: string; quantity: number; price: number };
-    type WallCovering = { name: string; type?: string; area: number; price: number };
-    type SmartDevice = { name: string; category?: string; quantity: number; price: number };
-    type Accessory = {
-      name: string;
-      category?: string;
-      quantity: number;
-      price: number;
-      suppliedBy?: "client" | "wallshop";
-    };
-
-    const toNum = (v: any): number => {
-      const n = Number(v);
-      return Number.isFinite(n) && n >= 0 ? n : 0;
-    };
-    const normStr = (v: any, max = 200) => truncate(stripTags(safeString(v).trim()), max);
-
-    const normaliseModules = (arr: any): ModuleItem[] =>
-      Array.isArray(arr)
-        ? arr
-            .map((x) => ({
-              name: normStr(x?.name, 160),
-              size: normStr(x?.size, 40) || undefined,
-              quantity: Math.max(0, Math.floor(toNum(x?.quantity))),
-              price: toNum(x?.price),
-            }))
-            .filter((x) => x.name && x.quantity > 0)
-        : [];
-
-    const normaliseCoverings = (arr: any): WallCovering[] =>
-      Array.isArray(arr)
-        ? arr
-            .map((x) => ({
-              name: normStr(x?.name, 160),
-              type: normStr(x?.type, 60) || undefined,
-              area: toNum(x?.area),
-              price: toNum(x?.price),
-            }))
-            .filter((x) => x.name && x.area > 0)
-        : [];
-
-    const normaliseDevices = (arr: any): SmartDevice[] =>
-      Array.isArray(arr)
-        ? arr
-            .map((x) => ({
-              name: normStr(x?.name, 160),
-              category: normStr(x?.category, 60) || undefined,
-              quantity: Math.max(0, Math.floor(toNum(x?.quantity))),
-              price: toNum(x?.price),
-            }))
-            .filter((x) => x.name && x.quantity > 0)
-        : [];
-
-    const normaliseAccessories = (arr: any): Accessory[] =>
-      Array.isArray(arr)
-        ? arr
-            .map((x) => ({
-              name: normStr(x?.name, 160),
-              category: normStr(x?.category, 60) || undefined,
-              quantity: Math.max(0, Math.floor(toNum(x?.quantity))),
-              price: toNum(x?.price),
-              suppliedBy:
-                (safeString(x?.suppliedBy) === "client" ? "client" : "wallshop") as
-                  | "client"
-                  | "wallshop",
-            }))
-            .filter((x) => x.name && x.quantity > 0)
-        : [];
-
-    const modules = normaliseModules(body?.modules);
-    const wallCoverings = normaliseCoverings(body?.wallCoverings);
-    const smartDevices = normaliseDevices(body?.smartDevices);
-    const accessories = normaliseAccessories(body?.accessories);
-
-    // --- Validate required fields ---
-    const errors: Record<string, string> = {};
-    if (!name) errors.name = "Name is required.";
-    if (!email) errors.email = "Email is required.";
-    else if (!isValidEmail(email)) errors.email = "Please provide a valid email address.";
-    if (!phone) errors.phone = "Phone is required.";
-    else if (!isValidPhone(phone)) errors.phone = "Please provide a valid phone number.";
-    if (Object.keys(errors).length > 0) {
-      return res.status(400).json({ error: "Validation failed", fields: errors });
+    // Environment validation
+    if (!process.env.RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY environment variable");
+      return res.status(500).json({
+        error: "Service Configuration Error",
+        message: "Email service is temporarily unavailable. Please try again later.",
+        details: "Missing email service configuration"
+      });
     }
 
-    // --- Pricing calculations ---
-    const VAT_RATE = 0.2; // 20% UK VAT
-    const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
-    const sum = (ns: number[]) => ns.reduce((a, b) => a + b, 0);
+    // Enhanced request body parsing with validation
+    const body = await parseRequestBody(req);
+    
+    // Comprehensive input validation and sanitization
+    const validationResult = validateContactForm(body);
+    
+    if (!validationResult.isValid) {
+      return res.status(400).json({
+        error: "Validation Failed",
+        message: "Please correct the highlighted fields and try again.",
+        fields: validationResult.errors,
+        timestamp: new Date().toISOString()
+      });
+    }
 
-    const moduleSubtotal = sum(modules.map((m) => m.price * m.quantity));
-    const coveringSubtotal = sum(wallCoverings.map((w) => w.price * w.area));
-    const deviceSubtotal = sum(smartDevices.map((d) => d.price * d.quantity));
-    const accessorySubtotal = sum(
-      accessories.filter((a) => a.suppliedBy !== "client").map((a) => a.price * a.quantity)
-    );
+    const contactData = validationResult.data;
 
-    const netSubtotal = moduleSubtotal + coveringSubtotal + deviceSubtotal + accessorySubtotal;
-    const vatAmount = +(netSubtotal * VAT_RATE).toFixed(2);
-    const grossTotal = +(netSubtotal + vatAmount).toFixed(2);
-    const formatMoney = (n: number) => currency.format(Math.round(n * 100) / 100);
+    // Enhanced email content generation
+    const emailContent = generateEmailContent(contactData);
+    
+    // Initialize Resend client with error handling
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    
+    // Send emails with comprehensive error handling
+    const emailResults = await sendContactEmails(resend, contactData, emailContent);
+    
+    if (!emailResults.success) {
+      throw new Error(emailResults.error || "Failed to send contact emails");
+    }
 
-    // --- Build email content (HTML + Text) ---
-    const c = {
-      bg: "#ffffff",
-      text: "#111827",
-      mutedText: "#6B7280",
-      key: "#374151",
-      border: "#E5E7EB",
-      brandDark: "#231c14",
-      brandGold: "#b89773",
-      panel: "#F9FAFB",
-      badgeBg: "#F3F4F6",
-      link: "#0F766E",
-      headerBg: "#0f172a",
-      tableHeadBg: "#f8fafc",
-    };
+    // Success response with detailed information
+    return res.status(200).json({
+      success: true,
+      message: "Thank you for contacting us! We'll respond within 2 business hours.",
+      details: {
+        submittedAt: new Date().toISOString(),
+        referenceId: generateReferenceId(),
+        estimatedResponse: "Within 2 business hours",
+        nextSteps: [
+          "We'll review your inquiry and requirements",
+          "A specialist will contact you to discuss your project",
+          "We'll provide a detailed consultation and quote"
+        ]
+      },
+      emailIds: emailResults.emailIds
+    });
 
-    const esc = escapeHtml;
-    const timestamp = new Date();
-    const preheader =
-      "New quote request submitted via The Wall Shop. Review customer details and project requirements below.";
+  } catch (error) {
+    // Comprehensive error logging
+    console.error("Contact Form Error:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      userAgent: req.headers["user-agent"],
+      origin: req.headers.origin
+    });
 
-    const tableStyles = `width:100%; border-collapse:collapse; font-size:14px;`;
-    const thTdCommon = `padding:10px 8px; border-bottom:1px solid ${c.border}; text-align:left; vertical-align:top;`;
-    const thStyle = `${thTdCommon} color:${c.key}; font-weight:700; background:${c.tableHeadBg};`;
-    const tdStyle = `${thTdCommon} color:${c.text};`;
+    // User-friendly error response
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "We're experiencing technical difficulties. Please try again or contact us directly.",
+      details: {
+        timestamp: new Date().toISOString(),
+        supportEmail: "support@thewallshop.co.uk",
+        supportPhone: "+44 141 739 3377"
+      }
+    });
+  }
+}
 
-    const renderModules = modules.length
-      ? `
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:16px; color:${c.key};">Modules</h2>
-        <table role="presentation" aria-label="Modules" style="${tableStyles}">
-          <thead>
-            <tr>
-              <th style="${thStyle}">Item</th>
-              <th style="${thStyle}">Details</th>
-              <th style="${thStyle}">Qty</th>
-              <th style="${thStyle}">Unit</th>
-              <th style="${thStyle}; text-align:right;">Line Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${modules
-              .map((m) => {
-                const line = m.price * m.quantity;
-                return `<tr>
-                    <td style="${tdStyle}">${esc(m.name)}</td>
-                    <td style="${tdStyle}">${m.size ? esc(m.size) : "-"}</td>
-                    <td style="${tdStyle}">${m.quantity}</td>
-                    <td style="${tdStyle}">${formatMoney(m.price)}</td>
-                    <td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(line)}</td>
-                  </tr>`;
-              })
-              .join("")}
-            <tr>
-              <td colspan="4" style="${tdStyle}; text-align:right; font-weight:700;">Subtotal</td>
-              <td style="${tdStyle}; text-align:right; font-weight:700;">${formatMoney(moduleSubtotal)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`
-      : "";
+// Enhanced utility functions
 
-    const renderCoverings = wallCoverings.length
-      ? `
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:16px; color:${c.key};">Wall Coverings</h2>
-        <table role="presentation" aria-label="Wall coverings" style="${tableStyles}">
-          <thead>
-            <tr>
-              <th style="${thStyle}">Item</th>
-              <th style="${thStyle}">Type</th>
-              <th style="${thStyle}">Area</th>
-              <th style="${thStyle}">Unit</th>
-              <th style="${thStyle}; text-align:right;">Line Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${wallCoverings
-              .map((w) => {
-                const line = w.price * w.area;
-                return `<tr>
-                    <td style="${tdStyle}">${esc(w.name)}</td>
-                    <td style="${tdStyle}">${w.type ? esc(w.type) : "-"}</td>
-                    <td style="${tdStyle}">${w.area.toFixed(2)} m²</td>
-                    <td style="${tdStyle}">${formatMoney(w.price)} / m²</td>
-                    <td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(line)}</td>
-                  </tr>`;
-              })
-              .join("")}
-            <tr>
-              <td colspan="4" style="${tdStyle}; text-align:right; font-weight:700;">Subtotal</td>
-              <td style="${tdStyle}; text-align:right; font-weight:700;">${formatMoney(coveringSubtotal)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`
-      : "";
+function getClientIP(req: VercelRequest): string {
+  const forwarded = req.headers["x-forwarded-for"];
+  const realIP = req.headers["x-real-ip"];
+  
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
+  }
+  
+  if (typeof realIP === "string") {
+    return realIP.trim();
+  }
+  
+  return req.connection?.remoteAddress || "unknown";
+}
 
-    const renderDevices = smartDevices.length
-      ? `
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:16px; color:${c.key};">Smart Devices</h2>
-        <table role="presentation" aria-label="Smart devices" style="${tableStyles}">
-          <thead>
-            <tr>
-              <th style="${thStyle}">Item</th>
-              <th style="${thStyle}">Category</th>
-              <th style="${thStyle}">Qty</th>
-              <th style="${thStyle}">Unit</th>
-              <th style="${thStyle}; text-align:right;">Line Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${smartDevices
-              .map((d) => {
-                const line = d.price * d.quantity;
-                return `<tr>
-                    <td style="${tdStyle}">${esc(d.name)}</td>
-                    <td style="${tdStyle}">${d.category ? esc(d.category) : "-"}</td>
-                    <td style="${tdStyle}">${d.quantity}</td>
-                    <td style="${tdStyle}">${formatMoney(d.price)}</td>
-                    <td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(line)}</td>
-                  </tr>`;
-              })
-              .join("")}
-            <tr>
-              <td colspan="4" style="${tdStyle}; text-align:right; font-weight:700;">Subtotal</td>
-              <td style="${tdStyle}; text-align:right; font-weight:700;">${formatMoney(deviceSubtotal)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`
-      : "";
+function checkRateLimit(clientIP: string): { allowed: boolean; resetTime: number } {
+  const now = Date.now();
+  const rateLimitData = rateLimitMap.get(clientIP);
+  
+  if (!rateLimitData || now > rateLimitData.resetTime) {
+    // Reset or initialize rate limit
+    rateLimitMap.set(clientIP, {
+      count: 1,
+      resetTime: now + RATE_LIMIT_WINDOW
+    });
+    return { allowed: true, resetTime: now + RATE_LIMIT_WINDOW };
+  }
+  
+  if (rateLimitData.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, resetTime: rateLimitData.resetTime };
+  }
+  
+  // Increment count
+  rateLimitData.count++;
+  rateLimitMap.set(clientIP, rateLimitData);
+  
+  return { allowed: true, resetTime: rateLimitData.resetTime };
+}
 
-    const renderAccessories = accessories.length
-      ? `
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:16px; color:${c.key};">Accessories</h2>
-        <table role="presentation" aria-label="Accessories" style="${tableStyles}">
-          <thead>
-            <tr>
-              <th style="${thStyle}">Item</th>
-              <th style="${thStyle}">Category</th>
-              <th style="${thStyle}">Qty</th>
-              <th style="${thStyle}">Unit</th>
-              <th style="${thStyle}">Supplied By</th>
-              <th style="${thStyle}; text-align:right;">Line Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${accessories
-              .map((a) => {
-                const billable = a.suppliedBy !== "client";
-                const line = billable ? a.price * a.quantity : 0;
-                return `<tr>
-                    <td style="${tdStyle}">${esc(a.name)}</td>
-                    <td style="${tdStyle}">${a.category ? esc(a.category) : "-"}</td>
-                    <td style="${tdStyle}">${a.quantity}</td>
-                    <td style="${tdStyle}">${billable ? formatMoney(a.price) : "-"}</td>
-                    <td style="${tdStyle}">${a.suppliedBy === "client" ? "Client" : "The Wall Shop"}</td>
-                    <td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(line)}</td>
-                  </tr>`;
-              })
-              .join("")}
-            <tr>
-              <td colspan="5" style="${tdStyle}; text-align:right; font-weight:700;">Subtotal (billable)</td>
-              <td style="${tdStyle}; text-align:right; font-weight:700;">${formatMoney(accessorySubtotal)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`
-      : "";
+async function parseRequestBody(req: VercelRequest): Promise<any> {
+  try {
+    if (typeof req.body === "string") {
+      return JSON.parse(req.body);
+    }
+    return req.body || {};
+  } catch (error) {
+    throw new Error("Invalid JSON in request body");
+  }
+}
 
-    const renderSummary = `
-      <div class="card" style="background:${c.panel};">
-        <h2 style="margin:0 0 12px; font-size:16px; color:${c.key};">Summary</h2>
-        <table role="presentation" aria-label="Totals" style="${tableStyles}">
-          <tbody>
-            <tr><td style="${tdStyle}">Modules</td><td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(moduleSubtotal)}</td></tr>
-            <tr><td style="${tdStyle}">Wall Coverings</td><td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(coveringSubtotal)}</td></tr>
-            <tr><td style="${tdStyle}">Smart Devices</td><td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(deviceSubtotal)}</td></tr>
-            <tr><td style="${tdStyle}">Accessories (billable)</td><td style="${tdStyle}; text-align:right; font-weight:600;">${formatMoney(accessorySubtotal)}</td></tr>
-            <tr><td colspan="2" style="${tdStyle}"></td></tr>
-            <tr><td style="${tdStyle}; font-weight:700;">Subtotal</td><td style="${tdStyle}; text-align:right; font-weight:700;">${formatMoney(netSubtotal)}</td></tr>
-            <tr><td style="${tdStyle};">VAT (20%)</td><td style="${tdStyle}; text-align:right;">${formatMoney(vatAmount)}</td></tr>
-            <tr><td style="${tdStyle}; font-weight:800; border-top:2px solid ${c.border};">Total</td><td style="${tdStyle}; text-align:right; font-weight:800; border-top:2px solid ${c.border};">${formatMoney(grossTotal)}</td></tr>
-          </tbody>
-        </table>
-      </div>`;
+interface ContactData {
+  fullName: string;
+  email: string;
+  phone: string;
+  company?: string;
+  subject: string;
+  message: string;
+  projectType?: string;
+  budget?: string;
+  timeline?: string;
+  source?: string;
+  newsletter?: boolean;
+}
 
-    const html = `<!DOCTYPE html>
+interface ValidationResult {
+  isValid: boolean;
+  data?: ContactData;
+  errors?: Record<string, string>;
+}
+
+function validateContactForm(body: any): ValidationResult {
+  const errors: Record<string, string> = {};
+  
+  // Enhanced validation with detailed error messages
+  const fullName = sanitizeString(body?.fullName || body?.name || "").trim();
+  const email = sanitizeString(body?.email || "").trim().toLowerCase();
+  const phone = sanitizeString(body?.phone || "").trim();
+  const company = sanitizeString(body?.company || "").trim();
+  const subject = sanitizeString(body?.subject || "").trim();
+  const message = sanitizeString(body?.message || "").trim();
+  const projectType = sanitizeString(body?.projectType || "").trim();
+  const budget = sanitizeString(body?.budget || "").trim();
+  const timeline = sanitizeString(body?.timeline || "").trim();
+  const source = sanitizeString(body?.source || "").trim();
+  const newsletter = Boolean(body?.newsletter);
+
+  // Name validation
+  if (!fullName) {
+    errors.fullName = "Full name is required";
+  } else if (fullName.length < 2) {
+    errors.fullName = "Name must be at least 2 characters long";
+  } else if (fullName.length > 100) {
+    errors.fullName = "Name must be less than 100 characters";
+  } else if (!/^[a-zA-Z\s\-'\.]+$/.test(fullName)) {
+    errors.fullName = "Name contains invalid characters";
+  }
+
+  // Email validation
+  if (!email) {
+    errors.email = "Email address is required";
+  } else if (!isValidEmail(email)) {
+    errors.email = "Please enter a valid email address";
+  } else if (email.length > 254) {
+    errors.email = "Email address is too long";
+  }
+
+  // Phone validation
+  if (!phone) {
+    errors.phone = "Phone number is required";
+  } else if (!isValidPhone(phone)) {
+    errors.phone = "Please enter a valid phone number";
+  }
+
+  // Subject validation
+  if (!subject) {
+    errors.subject = "Subject is required";
+  } else if (subject.length < 5) {
+    errors.subject = "Subject must be at least 5 characters long";
+  } else if (subject.length > 200) {
+    errors.subject = "Subject must be less than 200 characters";
+  }
+
+  // Message validation
+  if (!message) {
+    errors.message = "Message is required";
+  } else if (message.length < 10) {
+    errors.message = "Message must be at least 10 characters long";
+  } else if (message.length > 5000) {
+    errors.message = "Message must be less than 5000 characters";
+  }
+
+  // Company validation (optional)
+  if (company && company.length > 100) {
+    errors.company = "Company name must be less than 100 characters";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { isValid: false, errors };
+  }
+
+  return {
+    isValid: true,
+    data: {
+      fullName,
+      email,
+      phone,
+      company: company || undefined,
+      subject,
+      message,
+      projectType: projectType || undefined,
+      budget: budget || undefined,
+      timeline: timeline || undefined,
+      source: source || undefined,
+      newsletter
+    }
+  };
+}
+
+function sanitizeString(value: any): string {
+  if (typeof value !== "string") return "";
+  
+  return value
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
+    .replace(/[<>'"&]/g, (match) => { // Escape dangerous characters
+      const escapeMap: Record<string, string> = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '&': '&amp;'
+      };
+      return escapeMap[match] || match;
+    })
+    .substring(0, 5000); // Prevent extremely long inputs
+}
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email);
+}
+
+function isValidPhone(phone: string): boolean {
+  // Enhanced phone validation for UK and international numbers
+  const phoneRegex = /^(?:\+44|0)(?:\d{10}|\d{3}\s?\d{3}\s?\d{4}|\d{4}\s?\d{6}|\d{2}\s?\d{4}\s?\d{4})$|^(?:\+\d{1,3})?[\s\-\(\)]?[\d\s\-\(\)]{7,15}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+function generateReferenceId(): string {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  return `TWS-${timestamp}-${random}`.toUpperCase();
+}
+
+interface EmailContent {
+  adminHtml: string;
+  adminText: string;
+  customerHtml: string;
+  customerText: string;
+}
+
+function generateEmailContent(data: ContactData): EmailContent {
+  const timestamp = new Date().toLocaleString('en-GB', {
+    timeZone: 'Europe/London',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const referenceId = generateReferenceId();
+  const esc = escapeHtml;
+
+  // Enhanced admin notification email
+  const adminHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>New Quote Request — The Wall Shop</title>
-<style>
-  body { margin:0; padding:0; background:${c.panel}; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-  a { color:${c.link}; text-decoration:none; } a:hover { text-decoration:underline; }
-  .container { max-width:720px; margin:0 auto; background:${c.bg}; }
-  .header { padding:28px 28px 22px; border-bottom:1px solid ${c.border}; background:${c.headerBg}; }
-  .brand { display:flex; align-items:center; gap:12px; }
-  .brand-badge { width:44px; height:44px; border-radius:10px; background:${c.brandGold}; color:#0f172a; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; letter-spacing:0.5px; }
-  .brand-title { margin:0; font-size:18px; line-height:1.2; color:#ffffff; font-weight:800; }
-  .brand-sub { margin:2px 0 0; font-size:12px; color:#cbd5e1; }
-  .preheader { display:none; visibility:hidden; opacity:0; height:0; overflow:hidden; mso-hide:all; font-size:1px; color:transparent; }
-  .content { padding:28px; color:${c.text}; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif; }
-  .title { margin:0 0 16px; font-size:20px; font-weight:800; color:${c.text}; }
-  .subtitle { margin:0 0 24px; font-size:14px; color:${c.mutedText}; }
-  .card { background:#fff; border:1px solid ${c.border}; border-radius:12px; padding:20px; margin-bottom:16px; }
-  .kv { width:100%; border-collapse:collapse; }
-  .kv th,.kv td { text-align:left; vertical-align:top; padding:10px 0; border-bottom:1px solid ${c.border}; font-size:14px; }
-  .kv th { color:${c.key}; width:140px; font-weight:600; }
-  .kv tr:last-child th,.kv tr:last-child td { border-bottom:none; }
-  .badge { display:inline-block; padding:6px 10px; border-radius:999px; background:${c.badgeBg}; color:${c.key}; font-size:12px; font-weight:600; text-transform:capitalize; }
-  .message { white-space:pre-wrap; line-height:1.7; font-size:15px; color:${c.text}; }
-  .meta { padding:16px 20px; font-size:12px; color:${c.mutedText}; background:${c.panel}; border:1px solid ${c.border}; border-radius:12px; }
-  .footer { padding:22px 28px 28px; border-top:1px solid ${c.border}; color:${c.mutedText}; font-size:12px; }
-  .foot-strong { color:${c.key}; font-weight:700; }
-  .brand-gold { color:${c.brandGold}; font-weight:600; }
-  .btns { margin-top:12px; }
-  .btn { display:inline-block; padding:12px 18px; border-radius:10px; font-weight:700; font-size:14px; border:1px solid ${c.brandDark}; background:${c.brandDark}; color:#fff; }
-  .btn + .btn { margin-left:8px; }
-  .btn.secondary { background:#fff; color:${c.brandDark}; border-color:${c.border}; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Contact Inquiry - The Wall Shop</title>
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0; 
+      background: #f8fafc; 
+      color: #1f2937; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+    .container { 
+      max-width: 700px; 
+      margin: 20px auto; 
+      background: #ffffff; 
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header { 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+      color: #ffffff; 
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .brand-logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #b69777 0%, #907252 100%);
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 24px;
+      color: #ffffff;
+    }
+    .header h1 { 
+      margin: 0 0 8px; 
+      font-size: 28px; 
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    .header p { 
+      margin: 0; 
+      color: #cbd5e1; 
+      font-size: 16px;
+    }
+    .content { 
+      padding: 32px 28px; 
+    }
+    .priority-badge {
+      display: inline-block;
+      background: #dc2626;
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+    .section { 
+      background: #f8fafc;
+      border: 1px solid #e2e8f0; 
+      border-radius: 12px; 
+      padding: 24px; 
+      margin-bottom: 24px; 
+    }
+    .section-title { 
+      margin: 0 0 16px; 
+      font-size: 18px; 
+      color: #0f172a; 
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      background: #3b82f6;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 12px;
+    }
+    .field-row { 
+      display: flex; 
+      gap: 16px; 
+      padding: 12px 16px; 
+      background: #ffffff; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 8px; 
+      margin-bottom: 8px;
+      align-items: flex-start;
+    }
+    .field-label { 
+      min-width: 140px; 
+      color: #475569; 
+      font-weight: 600; 
+      font-size: 14px;
+    }
+    .field-value { 
+      color: #0f172a; 
+      font-weight: 500;
+      flex: 1;
+      word-break: break-word;
+    }
+    .message-content {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 12px;
+      white-space: pre-wrap;
+      font-family: 'Georgia', serif;
+      line-height: 1.7;
+      color: #374151;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background: #6b7280;
+      color: #ffffff;
+    }
+    .metadata {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 16px 20px;
+      margin-top: 24px;
+      border-radius: 0 8px 8px 0;
+    }
+    .footer { 
+      background: #f8fafc; 
+      border-top: 1px solid #e2e8f0; 
+      padding: 24px 28px; 
+      text-align: center; 
+    }
+    .footer-text {
+      margin: 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+    .company-info {
+      margin-top: 12px;
+      color: #475569;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
-<span class="preheader">${esc(preheader)}</span>
-<div class="container">
-  <div class="header">
-    <div class="brand">
-      <div class="brand-badge">TWS</div>
-      <div>
-        <p class="brand-title">The Wall Shop</p>
-        <p class="brand-sub">Premium wall solutions & smart home technology</p>
+  <div class="container">
+    <div class="header">
+      <div class="brand-logo">TW</div>
+      <h1>New Contact Inquiry</h1>
+      <p>Priority customer inquiry received</p>
+    </div>
+    
+    <div class="content">
+      <div class="priority-badge">High Priority</div>
+      
+      <div class="section">
+        <h3 class="section-title">
+          <div class="section-icon">C</div>
+          Contact Information
+        </h3>
+        <div class="field-row">
+          <div class="field-label">Full Name</div>
+          <div class="field-value">${esc(data.fullName)}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Email Address</div>
+          <div class="field-value"><a href="mailto:${esc(data.email)}" style="color: #3b82f6; text-decoration: none;">${esc(data.email)}</a></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Phone Number</div>
+          <div class="field-value"><a href="tel:${esc(data.phone)}" style="color: #3b82f6; text-decoration: none;">${esc(data.phone)}</a></div>
+        </div>
+        ${data.company ? `
+        <div class="field-row">
+          <div class="field-label">Company</div>
+          <div class="field-value">${esc(data.company)}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">
+          <div class="section-icon">I</div>
+          Inquiry Details
+        </h3>
+        <div class="field-row">
+          <div class="field-label">Subject</div>
+          <div class="field-value"><strong>${esc(data.subject)}</strong></div>
+        </div>
+        ${data.projectType ? `
+        <div class="field-row">
+          <div class="field-label">Project Type</div>
+          <div class="field-value">${esc(data.projectType)}</div>
+        </div>
+        ` : ''}
+        ${data.budget ? `
+        <div class="field-row">
+          <div class="field-label">Budget Range</div>
+          <div class="field-value">${esc(data.budget)}</div>
+        </div>
+        ` : ''}
+        ${data.timeline ? `
+        <div class="field-row">
+          <div class="field-label">Timeline</div>
+          <div class="field-value">${esc(data.timeline)}</div>
+        </div>
+        ` : ''}
+        ${data.source ? `
+        <div class="field-row">
+          <div class="field-label">How they found us</div>
+          <div class="field-value">${esc(data.source)}</div>
+        </div>
+        ` : ''}
+        <div class="field-row">
+          <div class="field-label">Newsletter</div>
+          <div class="field-value">${data.newsletter ? 'Yes, subscribed' : 'No subscription'}</div>
+        </div>
+        
+        <div class="message-content">
+          ${esc(data.message)}
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a href="mailto:${esc(data.email)}?subject=Re: ${encodeURIComponent(data.subject)}" class="btn btn-primary">
+          Reply to Customer
+        </a>
+        <a href="tel:${esc(data.phone)}" class="btn btn-secondary">
+          Call Customer
+        </a>
+      </div>
+
+      <div class="metadata">
+        <strong>Reference ID:</strong> ${referenceId}<br>
+        <strong>Submitted:</strong> ${timestamp}<br>
+        <strong>Response SLA:</strong> Within 2 business hours
       </div>
     </div>
-  </div>
 
-  <div class="content">
-    <h1 class="title">New quote request</h1>
-    <p class="subtitle">A customer submitted a quote request at thewallshop.co.uk. Details are below.</p>
-
-    <div class="card">
-      <table class="kv" role="presentation" aria-label="Customer details">
-        <tr><th scope="row">Name</th><td>${esc(name)}</td></tr>
-        <tr><th scope="row">Email</th><td><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
-        <tr><th scope="row">Phone</th><td><a href="tel:${esc(phone)}">${esc(phone)}</a></td></tr>
-        ${address ? `<tr><th scope="row">Address</th><td>${esc(address)}</td></tr>` : ``}
-      </table>
-    </div>
-
-    <div class="card">
-      <table class="kv" role="presentation" aria-label="Project details">
-        ${projectType ? `<tr><th scope="row">Project type</th><td>${esc(projectType)}</td></tr>` : ``}
-        ${area ? `<tr><th scope="row">Area</th><td>${esc(area)} m²</td></tr>` : ``}
-        <tr><th scope="row">Urgency</th><td><span class="badge">${esc(urgency)}</span></td></tr>
-      </table>
-    </div>
-
-    ${
-      selectedProduct
-        ? `<div class="card">
-      <table class="kv" role="presentation" aria-label="Selected product">
-        <tr><th scope="row">Product</th><td>${esc(selectedProduct.name)}</td></tr>
-        ${selectedProduct.sku ? `<tr><th scope="row">SKU</th><td>${esc(selectedProduct.sku)}</td></tr>` : ``}
-        ${selectedProduct.price ? `<tr><th scope="row">Price</th><td>${esc(selectedProduct.price)}</td></tr>` : ``}
-        ${selectedProduct.url ? `<tr><th scope="row">Link</th><td><a href="${esc(selectedProduct.url)}">${esc(selectedProduct.url)}</a></td></tr>` : ``}
-      </table>
-    </div>`
-        : ``
-    }
-
-    ${renderModules}
-    ${renderCoverings}
-    ${renderDevices}
-    ${renderAccessories}
-    ${renderSummary}
-
-    ${message ? `<div class="card"><div class="message">${esc(message)}</div></div>` : ``}
-
-    <div class="meta">
-      Received: ${esc(
-        timestamp.toLocaleString("en-GB", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      )}<br/>
-      Source: <span class="foot-strong">thewallshop.co.uk/quote</span>
-      <div class="btns">
-        <a class="btn" href="mailto:${esc(
-          email
-        )}?subject=${encodeURIComponent("Re: Your quote request — The Wall Shop")}">Reply</a>
-        <a class="btn secondary" href="mailto:stephen@thewallshop.co.uk?subject=${encodeURIComponent(
-          "Fwd: Quote request — " + (projectType || name)
-        )}&body=${encodeURIComponent(
-          buildForwardBody({
-            name,
-            email,
-            phone,
-            address,
-            projectType,
-            area,
-            urgency,
-            message,
-            selectedProduct,
-          })
-        )}">Forward internally</a>
-      </div>
+    <div class="footer">
+      <p class="footer-text"><strong>The Wall Shop</strong> - Premium Wall Solutions</p>
+      <p class="company-info">
+        SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK<br>
+        Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk
+      </p>
     </div>
   </div>
-
-  <div class="footer">
-    <div class="foot-strong">The Wall Shop <span class="brand-gold">·</span> thewallshop.co.uk</div>
-    <div>SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK</div>
-    <div>+44 141 739 3377 · Mon–Fri, 9:00–18:00 PST · <a href="mailto:stephen@thewallshop.co.uk">stephen@thewallshop.co.uk</a></div>
-    <div style="margin-top:8px;">You are receiving this because your address is configured to receive quote requests.</div>
-  </div>
-</div>
 </body>
 </html>`;
 
-    // --- Plain-text fallback ---
-    const textLines: string[] = [
-      "New quote request — The Wall Shop",
-      "",
-      `Name   : ${name}`,
-      `Email  : ${email}`,
-      `Phone  : ${phone}`,
-      address ? `Address: ${address}` : "",
-      projectType ? `Project: ${projectType}` : "",
-      area ? `Area   : ${area} m²` : "",
-      `Urgency: ${urgency}`,
-      selectedProduct
-        ? [
-            "",
-            "Selected product:",
-            `  Name : ${selectedProduct.name}`,
-            selectedProduct.sku ? `  SKU  : ${selectedProduct.sku}` : "",
-            selectedProduct.price ? `  Price: ${selectedProduct.price}` : "",
-            selectedProduct.url ? `  Link : ${selectedProduct.url}` : "",
-          ].join("\n")
-        : "",
-    ].filter(Boolean) as string[];
+  // Enhanced customer confirmation email
+  const customerHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You for Contacting The Wall Shop</title>
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0; 
+      background: #f8fafc; 
+      color: #1f2937; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+    .container { 
+      max-width: 650px; 
+      margin: 20px auto; 
+      background: #ffffff; 
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header { 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+      color: #ffffff; 
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .brand-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #b69777 0%, #907252 100%);
+      border-radius: 16px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 32px;
+      color: #ffffff;
+    }
+    .header h1 { 
+      margin: 0 0 12px; 
+      font-size: 32px; 
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    .header p { 
+      margin: 0; 
+      color: #cbd5e1; 
+      font-size: 18px;
+    }
+    .content { 
+      padding: 40px 32px; 
+    }
+    .greeting {
+      font-size: 20px;
+      color: #0f172a;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .message {
+      font-size: 16px;
+      color: #374151;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    .highlight-box {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border: 1px solid #93c5fd;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+      text-align: center;
+    }
+    .highlight-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 8px;
+    }
+    .highlight-text {
+      color: #1e3a8a;
+      font-size: 16px;
+    }
+    .next-steps {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+    .next-steps h3 {
+      margin: 0 0 16px;
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .step-number {
+      background: #3b82f6;
+      color: #ffffff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-text {
+      color: #374151;
+      font-size: 15px;
+    }
+    .contact-info {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 20px 24px;
+      margin: 32px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .contact-info h4 {
+      margin: 0 0 12px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .contact-details {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .contact-details a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .footer { 
+      background: #f8fafc; 
+      border-top: 1px solid #e2e8f0; 
+      padding: 32px; 
+      text-align: center; 
+    }
+    .footer-text {
+      margin: 0 0 16px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .company-info {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .reference-id {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 24px 0;
+      text-align: center;
+      font-size: 14px;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand-logo">TW</div>
+      <h1>Thank You!</h1>
+      <p>We've received your inquiry</p>
+    </div>
+    
+    <div class="content">
+      <div class="greeting">Hello ${esc(data.fullName.split(' ')[0])},</div>
+      
+      <div class="message">
+        Thank you for contacting <strong>The Wall Shop</strong>. We've successfully received your inquiry about 
+        "<em>${esc(data.subject)}</em>" and our team is already reviewing your requirements.
+      </div>
 
-    if (modules.length) {
-      textLines.push("", "Modules:");
-      modules.forEach((m) =>
-        textLines.push(
-          `  - ${m.name}${m.size ? ` (${m.size})` : ""} x${m.quantity} @ ${formatMoney(m.price)} = ${formatMoney(
-            m.price * m.quantity
-          )}`
-        )
-      );
-      textLines.push(`  Subtotal: ${formatMoney(moduleSubtotal)}`);
+      <div class="highlight-box">
+        <div class="highlight-title">Priority Response Guaranteed</div>
+        <div class="highlight-text">
+          Our specialists will respond to your inquiry within <strong>2 business hours</strong>
+        </div>
+      </div>
+
+      <div class="reference-id">
+        <strong>Reference ID:</strong> ${referenceId}<br>
+        Please keep this reference for your records
+      </div>
+
+      <div class="next-steps">
+        <h3>What happens next?</h3>
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-text">
+            <strong>Review & Analysis</strong><br>
+            Our technical team will carefully review your requirements and project details
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-text">
+            <strong>Expert Consultation</strong><br>
+            A specialist will contact you to discuss your project and answer any questions
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-text">
+            <strong>Detailed Proposal</strong><br>
+            We'll provide a comprehensive quote and project timeline tailored to your needs
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-info">
+        <h4>Need immediate assistance?</h4>
+        <div class="contact-details">
+          <strong>Phone:</strong> <a href="tel:+441417393377">+44 141 739 3377</a><br>
+          <strong>Email:</strong> <a href="mailto:info@thewallshop.co.uk">info@thewallshop.co.uk</a><br>
+          <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM GMT
+        </div>
+      </div>
+
+      <div class="message">
+        We're excited to help you transform your space with our premium wall solutions. 
+        Our team has over 15 years of experience delivering exceptional results for residential 
+        and commercial projects across the UK.
+      </div>
+    </div>
+
+    <div class="footer">
+      <p class="footer-text">The Wall Shop - Premium Wall Solutions</p>
+      <div class="company-info">
+        SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK<br>
+        Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk<br>
+        Website: <a href="https://thewallshop.co.uk" style="color: #3b82f6;">thewallshop.co.uk</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  // Text versions for better email client compatibility
+  const adminText = `
+NEW CONTACT INQUIRY - THE WALL SHOP
+Reference: ${referenceId}
+
+CONTACT INFORMATION:
+Name: ${data.fullName}
+Email: ${data.email}
+Phone: ${data.phone}
+${data.company ? `Company: ${data.company}` : ''}
+
+INQUIRY DETAILS:
+Subject: ${data.subject}
+${data.projectType ? `Project Type: ${data.projectType}` : ''}
+${data.budget ? `Budget: ${data.budget}` : ''}
+${data.timeline ? `Timeline: ${data.timeline}` : ''}
+${data.source ? `Source: ${data.source}` : ''}
+Newsletter: ${data.newsletter ? 'Yes' : 'No'}
+
+MESSAGE:
+${data.message}
+
+SUBMITTED: ${timestamp}
+RESPONSE SLA: Within 2 business hours
+
+Reply to customer: ${data.email}
+Call customer: ${data.phone}
+  `.trim();
+
+  const customerText = `
+Thank you for contacting The Wall Shop!
+
+Hello ${data.fullName.split(' ')[0]},
+
+We've received your inquiry about "${data.subject}" and our team will respond within 2 business hours.
+
+Reference ID: ${referenceId}
+
+WHAT HAPPENS NEXT:
+1. Our technical team will review your requirements
+2. A specialist will contact you for consultation  
+3. We'll provide a detailed proposal and quote
+
+NEED IMMEDIATE ASSISTANCE?
+Phone: +44 141 739 3377
+Email: info@thewallshop.co.uk
+Hours: Monday - Friday, 9:00 AM - 6:00 PM GMT
+
+The Wall Shop - Premium Wall Solutions
+SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK
+Website: thewallshop.co.uk
+  `.trim();
+
+  return {
+    adminHtml,
+    adminText,
+    customerHtml,
+    customerText
+  };
+}
+
+function escapeHtml(text: string): string {
+  const escapeMap: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;'
+  };
+  
+  return String(text || '').replace(/[&<>"'\/]/g, (match) => escapeMap[match] || match);
+}
+
+interface EmailResults {
+  success: boolean;
+  error?: string;
+  emailIds?: {
+    admin?: string;
+    customer?: string;
+  };
+}
+
+async function sendContactEmails(
+  resend: any, 
+  data: ContactData, 
+  content: EmailContent
+): Promise<EmailResults> {
+  try {
+    // Send both emails in parallel for better performance
+    const [adminResult, customerResult] = await Promise.allSettled([
+      // Admin notification
+      resend.emails.send({
+        from: "The Wall Shop Contact Form <contact@thewallshop.co.uk>",
+        to: ["stephen@thewallshop.co.uk"],
+        subject: `New Contact Inquiry: ${data.subject} - ${data.fullName}`,
+        html: content.adminHtml,
+        text: content.adminText,
+        headers: {
+          'X-Priority': '1',
+          'X-MSMail-Priority': 'High',
+          'Importance': 'high'
+        }
+      }),
+      
+      // Customer confirmation
+      resend.emails.send({
+        from: "The Wall Shop <info@thewallshop.co.uk>",
+        to: [data.email],
+        subject: "Thank you for contacting The Wall Shop - We'll respond within 2 hours",
+        html: content.customerHtml,
+        text: content.customerText
+      })
+    ]);
+
+    // Check results
+    const adminSuccess = adminResult.status === 'fulfilled' && !adminResult.value.error;
+    const customerSuccess = customerResult.status === 'fulfilled' && !customerResult.value.error;
+
+    if (!adminSuccess && !customerSuccess) {
+      throw new Error("Failed to send both admin and customer emails");
     }
 
-    if (wallCoverings.length) {
-      textLines.push("", "Wall Coverings:");
-      wallCoverings.forEach((w) =>
-        textLines.push(
-          `  - ${w.name}${w.type ? ` [${w.type}]` : ""} ${w.area.toFixed(2)} m² @ ${formatMoney(
-            w.price
-          )}/m² = ${formatMoney(w.price * w.area)}`
-        )
-      );
-      textLines.push(`  Subtotal: ${formatMoney(coveringSubtotal)}`);
+    if (!adminSuccess) {
+      console.warn("Failed to send admin notification email:", 
+        adminResult.status === 'rejected' ? adminResult.reason : adminResult.value.error);
     }
 
-    if (smartDevices.length) {
-      textLines.push("", "Smart Devices:");
-      smartDevices.forEach((d) =>
-        textLines.push(
-          `  - ${d.name}${d.category ? ` [${d.category}]` : ""} x${d.quantity} @ ${formatMoney(
-            d.price
-          )} = ${formatMoney(d.price * d.quantity)}`
-        )
-      );
-      textLines.push(`  Subtotal: ${formatMoney(deviceSubtotal)}`);
+    if (!customerSuccess) {
+      console.warn("Failed to send customer confirmation email:", 
+        customerResult.status === 'rejected' ? customerResult.reason : customerResult.value.error);
     }
 
-    if (accessories.length) {
-      textLines.push("", "Accessories:");
-      accessories.forEach((a) => {
-        const billable = a.suppliedBy !== "client";
-        const line = billable ? a.price * a.quantity : 0;
-        textLines.push(
-          `  - ${a.name}${a.category ? ` [${a.category}]` : ""} x${a.quantity} ${
-            billable ? `@ ${formatMoney(a.price)} = ${formatMoney(line)}` : `(Client supplied)`
-          }`
-        );
-      });
-      textLines.push(`  Subtotal (billable): ${formatMoney(accessorySubtotal)}`);
-    }
-
-    textLines.push(
-      "",
-      `Subtotal: ${formatMoney(netSubtotal)}`,
-      `VAT (20%): ${formatMoney(vatAmount)}`,
-      `Total: ${formatMoney(grossTotal)}`,
-      "",
-      message ? ["Message:", message, ""].join("\n") : "",
-      `Received: ${timestamp.toLocaleString("en-GB")}`,
-      "Source  : thewallshop.co.uk/quote",
-      "",
-      "Reply: " + `mailto:${email}?subject=${encodeURIComponent("Re: Your quote request — The Wall Shop")}`
-    );
-
-    const text = textLines.filter(Boolean).join("\n");
-
-    // --- Send via Resend ---
-    const resend = new Resend(process.env.RESEND_API_KEY as string);
-    const { data, error } = await resend.emails.send({
-      from: "The Wall Shop <quotes@thewallshop.co.uk>",
-      to: ["stephen@thewallshop.co.uk"],
-      cc: [email], // keep client in the loop
-      replyTo: email,
-      subject: buildSubject({ name, projectType, selectedProduct }),
-      html,
-      text,
-    });
-
-    if (error) {
-      return res.status(502).json({ error: "Failed to send quote request" });
-    }
-
-    return res.json({
+    return {
       success: true,
-      message: "Quote request sent successfully",
-      id: data?.id,
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown server error";
-    return res.status(500).json({ error: "Failed to process quote request", details: msg });
+      emailIds: {
+        admin: adminSuccess ? adminResult.value.data?.id : undefined,
+        customer: customerSuccess ? customerResult.value.data?.id : undefined
+      }
+    };
+
+  } catch (error) {
+    console.error("Email sending error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error"
+    };
   }
 }
 
-/* ----------------------- Utilities ----------------------- */
-
-function safeParseJson(s: string): Record<string, unknown> {
-  try {
-    return s ? (JSON.parse(s) as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
-}
-
-function safeString(v: unknown): string {
-  return typeof v === "string" ? v : "";
-}
-
-function stripTags(input: string): string {
-  return input.replace(/<\/?[^>]+(>|$)/g, "");
-}
-
-function stripTagsMultiline(input: string): string {
-  return stripTags(input).replace(/\r\n?/g, "\n");
-}
-
-function truncate(input: string, max: number): string {
-  return input.length > max ? input.slice(0, max) : input;
-}
-
-function isValidEmail(v: string): boolean {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  return re.test(v);
-}
-
-function isValidPhone(v: string): boolean {
-  // Accepts +, spaces, dashes, dots, parentheses; digits 7–20
-  const cleaned = v.replace(/[^\d]/g, "");
-  return cleaned.length >= 7 && cleaned.length <= 20;
-}
-
-function escapeHtml(s: string): string {
-  return String(s ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function normaliseUrgency(u: string): "urgent" | "standard" | "flexible" {
-  const val = u.toLowerCase();
-  if (["urgent", "high", "asap", "immediate"].includes(val)) return "urgent";
-  if (["flexible", "low"].includes(val)) return "flexible";
-  return "standard";
-}
-
-type ProductLite = { name: string; price?: string; sku?: string; url?: string } | null;
-
-function normaliseProduct(p: any): ProductLite {
-  if (!p || typeof p !== "object") return null;
-  const name = truncate(stripTags(safeString(p.name).trim()), 160);
-  if (!name) return null;
-  const price = truncate(stripTags(safeString(p.price).trim()), 60);
-  const sku = truncate(stripTags(safeString(p.sku).trim()), 60);
-  const url = safeUrl(safeString(p.url).trim());
-  return { name, ...(price && { price }), ...(sku && { sku }), ...(url && { url }) };
-}
-
-function safeUrl(u: string): string | undefined {
-  try {
-    if (!u) return undefined;
-    const parsed = new URL(u);
-    if (!/^https?:$/.test(parsed.protocol)) return undefined;
-    return parsed.toString();
-  } catch {
-    return undefined;
-  }
-}
-
-function buildSubject({
-  name,
-  projectType,
-  selectedProduct,
-}: {
-  name: string;
-  projectType?: string;
-  selectedProduct?: ProductLite;
-}): string {
-  const parts = ["Quote request"];
-  if (projectType) parts.push(`— ${projectType}`);
-  if (selectedProduct?.name) parts.push(`— ${selectedProduct.name}`);
-  parts.push(`(${name})`);
-  return parts.join(" ");
-}
-
-function buildForwardBody(input: {
-  name: string;
-  email: string;
-  phone: string;
-  address?: string;
-  projectType?: string;
-  area?: string;
-  urgency: string;
-  message?: string;
-  selectedProduct?: ProductLite;
-}): string {
-  const lines = [
-    "Customer Details:",
-    `Name   : ${input.name}`,
-    `Email  : ${input.email}`,
-    `Phone  : ${input.phone}`,
-    input.address ? `Address: ${input.address}` : "",
-    "",
-    "Project:",
-    input.projectType ? `  Type : ${input.projectType}` : "",
-    input.area ? `  Area : ${input.area} m²` : "",
-    `  Urgency: ${input.urgency}`,
-    "",
-    input.selectedProduct
-      ? [
-          "Selected Product:",
-          `  Name : ${input.selectedProduct.name}`,
-          input.selectedProduct.sku ? `  SKU  : ${input.selectedProduct.sku}` : "",
-          input.selectedProduct.price ? `  Price: ${input.selectedProduct.price}` : "",
-          input.selectedProduct.url ? `  Link : ${input.selectedProduct.url}` : "",
-          "",
-        ].join("\n")
-      : "",
-    input.message ? ["Message:", input.message, ""].join("\n") : "",
-    "—",
-    "Forwarded from thewallshop.co.uk/quote",
-  ].filter(Boolean);
-  return lines.join("\n");
-}

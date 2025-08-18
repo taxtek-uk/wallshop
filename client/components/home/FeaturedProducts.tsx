@@ -171,7 +171,7 @@ const SmartWallFeatures: React.FC = () => {
     <section 
       ref={sectionRef}
       id="smart-wall-features"
-      className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden"
+      className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-bl from-[#0f172a] via-[#1e1a78] to-[#0f172a] text-white overflow-hidden"
     >
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

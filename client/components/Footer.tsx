@@ -121,7 +121,7 @@ const Footer = () => {
   return (
 <footer
   ref={sectionRef}
-  className="relative text-white overflow-hidden bg-gradient-to-br from-[#0d0d0d] via-[#1c1c1c] to-[#0d0d0d] backdrop-blur-md"
+  className="relative text-white overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1c0a00] via-[#361500] to-[#603601] backdrop-blur-md"
 >
 
 
@@ -161,7 +161,7 @@ const Footer = () => {
           <div className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            <h3 className="text-lg font-semibold text-gray-400 mb-4">
+            <h3 className="text-lg font-semibold text-gray-100 mb-4">
               Our Services
             </h3>
             <ul className="space-y-2">
@@ -182,7 +182,7 @@ const Footer = () => {
           <div className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            <h3 className="text-lg font-semibold text-gray-400 mb-4">
+            <h3 className="text-lg font-semibold text-gray-100 mb-4">
               Stay Connected
             </h3>
             <p className="text-white/80 mb-4 text-sm">
@@ -201,7 +201,7 @@ const Footer = () => {
                 <Button 
                   type="submit"
                   disabled={isSubscribing}
-                  className="bg-gradient-to-r from-gray-500 to-gray-600 text-black hover:from-gray-400 hover:to-gray-400 rounded-md py-2 font-semibold disabled:opacity-50"
+                  className="bg-gradient-to-r from-gray-100 to-gray-300 text-black hover:from-gray-200 hover:to-gray-400 rounded-md py-2 font-semibold disabled:opacity-50"
                 >
                   {isSubscribing ? 'Subscribing...' : 'Subscribe'}
                 </Button>

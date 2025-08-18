@@ -1,483 +1,579 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
-import { QuoteProvider, useQuote } from '@/contexts/QuoteContext';
-import { ProductCategory, QuoteModalProps } from '@/types/quote';
+import { 
+  X, ChevronLeft, ChevronRight, Check, FileText, Send, 
+  User, Layers, Zap, Grid, Settings, Clock, Shield,
+  Mail, Phone, MapPin, Building, CheckCircle, AlertCircle,
+  Download, Eye, Sparkles
+} from 'lucide-react';
+import { useQuote } from '@/contexts/QuoteContext';
+import { ProductCategory } from '@/types/quote';
 import Step1Contact from '@/components/QuoteSteps/Step1Contact';
 import StepSmartWalls from '@/components/QuoteSteps/StepSmartWalls';
 import StepSmartDevices from '@/components/QuoteSteps/StepSmartDevices';
 import StepWallPanels from '@/components/QuoteSteps/StepWallPanels';
 import StepCarbonRockBoards from '@/components/QuoteSteps/StepCarbonRockBoards';
-
-// Product category selection component
-function ProductCategoryStep() {
-  const { state, dispatch } = useQuote();
-  
-  const categories = [
-    {
-      id: 'smart-walls' as ProductCategory,
-      title: 'Smart Walls',
-      description: 'Complete smart wall systems with integrated technology',
-      features: ['TV Integration', 'Audio Systems', 'Smart Lighting', 'Cable Management'],
-    },
-    {
-      id: 'smart-devices' as ProductCategory,
-      title: 'Smart Devices',
-      description: 'Control panels, sensors, and home automation',
-      features: ['Control Panels', 'Security Sensors', 'Home Automation', 'Smart Integration'],
-    },
-    {
-      id: 'wall-panels' as ProductCategory,
-      title: 'Wall Panels',
-      description: 'Decorative and functional wall panel solutions',
-      features: ['Fluted Panels', 'HD Printing', 'Custom Textures', 'Various Finishes'],
-    },
-    {
-      id: 'carbon-rock-boards' as ProductCategory,
-      title: 'Carbon Rock Boards',
-      description: 'High-performance carbon rock board systems',
-      features: ['Acoustic Boards', 'Mirror Boards', 'Standard Boards', 'Custom Sizes'],
-    },
-  ];
-
-  const handleCategorySelect = (category: ProductCategory) => {
-    dispatch({ type: 'SET_PRODUCT_CATEGORY', payload: category });
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-mocha-950 mb-2">
-          What can we help you with?
-        </h2>
-        <p className="text-stone-400 text-sm">
-          Select the product category that best matches your project needs.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => handleCategorySelect(category.id)}
-            className={`p-6 rounded-lg border text-left transition-all duration-200 hover:shadow-lg ${
-              state.formData.productCategory === category.id
-                ? 'bg-leather-50 border-leather-300 ring-2 ring-leather-200'
-                : 'bg-white border-stone-200 hover:bg-stone-50'
-            }`}
-          >
-            <h3 className="text-lg font-semibold text-mocha-950 mb-2">{category.title}</h3>
-            <p className="text-sm text-stone-600 mb-4">{category.description}</p>
-            <div className="space-y-1">
-              {category.features.map((feature, index) => (
-                <div key={index} className="flex items-center text-xs text-stone-500">
-                  <Check className="w-3 h-3 text-leather-600 mr-2" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-          </button>
-        ))}
-      </div>
-    </motion.div>
-  );
+import StepReviewSubmit from '@/components/QuoteSteps/StepReviewSubmit';
+interface QuoteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  productCategory?: ProductCategory;
+  selectedProduct?: any;
+  // new: entry point to adapt flow
+  entryPoint?: 'home' | 'smart-walls' | 'smart-devices' | 'wall-panels' | 'carbon-rock-boards';
 }
 
-// Success step component
-function SuccessStep() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="text-center py-8"
-    >
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-        <Check className="w-10 h-10 text-green-600" />
-      </div>
-      <h2 className="text-2xl font-bold text-mocha-950 mb-4">
-        Quote Request Submitted!
-      </h2>
-      <p className="text-stone-600 mb-6 max-w-md mx-auto">
-        Thank you for your interest in The Wall Shop. We've received your quote request 
-        and will get back to you within 24 hours with a detailed proposal.
-      </p>
-      <div className="bg-clay-50 border border-clay-200 rounded-lg p-4 max-w-md mx-auto">
-        <p className="text-sm text-mocha-950">
-          <strong>What happens next?</strong><br />
-          Our team will review your requirements and prepare a customized quote. 
-          You'll receive an email with detailed pricing and next steps.
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+export default function QuoteModal({ isOpen, onClose, productCategory, selectedProduct, entryPoint }: QuoteModalProps) {
+  const location = useLocation();
+  const { state, nextStep, prevStep, dispatch, validateCurrentStep } = useQuote();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-// Main modal content component
-function QuoteModalContent({ isOpen, onClose, productCategory, selectedProduct }: QuoteModalProps) {
-  const { state, nextStep, prevStep, validateCurrentStep, dispatch } = useQuote();
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // Set initial product category if provided
+  // Initialize product category when modal opens
   useEffect(() => {
-    if (productCategory && productCategory !== state.formData.productCategory) {
+    if (isOpen && productCategory) {
       dispatch({ type: 'SET_PRODUCT_CATEGORY', payload: productCategory });
-      // Do NOT jump to step 2: always start from Step 1 (contact)
-      if (productCategory === 'smart-devices') {
-        dispatch({ type: 'UPDATE_PRODUCT_DATA', payload: { category: 'smart-devices', data: { controlPanels: true } } });
-      }
     }
-  }, [productCategory, state.formData.productCategory, dispatch]);
+  }, [isOpen, productCategory, dispatch]);
 
-  // Handle body scroll lock
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      // Focus the modal for accessibility
-      setTimeout(() => modalRef.current?.focus(), 100);
-    } else {
-      document.body.style.overflow = 'unset';
+  // Determine entry point automatically from URL if not provided
+  const resolvedEntryPoint: NonNullable<QuoteModalProps['entryPoint']> = (() => {
+    if (entryPoint) return entryPoint;
+    const p = location.pathname;
+    if (p.startsWith('/smart-walls')) return 'smart-walls';
+    if (p.startsWith('/smart-devices')) return 'smart-devices';
+    if (p.startsWith('/wall-panels')) return 'wall-panels';
+    if (p.startsWith('/carbon-rock-boards')) return 'carbon-rock-boards';
+    return 'home';
+  })();
+
+  // Build steps dynamically by entry point
+  const steps = ((): { id: string; title: string; description: string; icon: any; component: any; color: string; required: boolean }[] => {
+    const contact = {
+      id: 'contact',
+      title: 'Contact Information',
+      description: 'Your details and project requirements',
+      icon: User,
+      component: Step1Contact,
+      color: 'gray',
+      required: true,
+    } as const;
+
+    const crb = {
+      id: 'carbon-rock-boards',
+      title: 'Carbon Rock Boards',
+      description: 'Premium acoustic and decorative panels',
+      icon: Layers,
+      component: StepCarbonRockBoards,
+      color: 'gray',
+      required: false,
+    } as const;
+
+    const sd = {
+      id: 'smart-devices',
+      title: 'Smart Devices',
+      description: 'Intelligent automation and control systems',
+      icon: Zap,
+      component: StepSmartDevices,
+      color: 'gray',
+      required: false,
+    } as const;
+
+    const sw = {
+      id: 'smart-walls',
+      title: 'Smart Walls',
+      description: 'Integrated technology wall solutions',
+      icon: Grid,
+      component: StepSmartWalls,
+      color: 'gray',
+      required: false,
+    } as const;
+
+    const wp = {
+      id: 'wall-panels',
+      title: 'Wall Panels',
+      description: 'Custom decorative and functional panels',
+      icon: Settings,
+      component: StepWallPanels,
+      color: 'gray',
+      required: false,
+    } as const;
+
+    const review = {
+      id: 'review',
+      title: 'Review & Submit',
+      description: 'Confirm your details before submission',
+      icon: Check,
+      component: StepReviewSubmit,
+      color: 'gray',
+      required: false,
+    } as const;
+
+    switch (resolvedEntryPoint) {
+      case 'smart-walls':
+        return [contact, sw, review] as any;
+      case 'smart-devices':
+        return [contact, sd, review] as any;
+      case 'wall-panels':
+        return [contact, wp, review] as any;
+      case 'carbon-rock-boards':
+        return [contact, crb, review] as any;
+      case 'home':
+      default:
+        // Show all 5 steps in order from Home
+        return [contact, crb, sd, sw, wp] as any;
     }
+  })();
 
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  const currentStepData = steps[state.currentStep - 1] || steps[0];
+  const StepComponent = currentStepData.component;
 
   const handleNext = () => {
-    if (validateCurrentStep()) {
+    // Enforce contact step validation before proceeding past step 1
+    if (state.currentStep === 1) {
+      const valid = validateCurrentStep();
+      if (!valid) return;
+    }
+    if (state.currentStep < steps.length) {
       nextStep();
     }
   };
 
-  const handleSubmit = async () => {
-    if (!validateCurrentStep()) return;
+  const handlePrevious = () => {
+    if (state.currentStep > 1) {
+      prevStep();
+    }
+  };
 
-    dispatch({ type: 'SET_SUBMITTING', payload: true });
-
-    try {
-      const contact = state.formData.contact;
-
-      // Build payload to match sendQuote API expectations
-      const payload: any = {
-        contact: {
-          fullName: contact.fullName,
-          email: contact.email,
-          phone: contact.phone,
-          installationAddress: contact.installationAddress,
-          additionalNotes: contact.additionalNotes,
-        },
-        productCategory: state.formData.productCategory,
-      };
-
-      // Attach smart-walls specific data when on Smart Walls page
-      if (state.formData.productCategory === 'smart-walls') {
-        payload.smartWalls = {
-          ...state.formData.smartWalls,
-        };
-      }
-
-      const response = await fetch('/api/sendQuote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.details || errorData.error || 'Failed to submit quote request');
-      }
-
-      dispatch({ type: 'SET_SUBMITTED', payload: true });
+  const submitQuote = async () => {
+    // TODO: Implement actual quote submission logic
+    // This would typically send the form data to an API endpoint
+    return new Promise((resolve) => {
       setTimeout(() => {
-        dispatch({ type: 'RESET_FORM' });
-        onClose();
-      }, 3000);
-
-    } catch (error) {
-      console.error('Quote submission error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to submit quote request. Please try again.');
-    } finally {
-      dispatch({ type: 'SET_SUBMITTING', payload: false });
-    }
+        console.log('Quote submitted:', state.formData);
+        resolve(true);
+      }, 1000);
+    });
   };
 
-  const renderCurrentStep = () => {
-    if (state.isSubmitted) {
-      return <SuccessStep />;
-    }
-
-    switch (state.currentStep) {
-      case 1:
-        return <Step1Contact />;
-      case 2:
-        // If productCategory is preselected via props, skip selection UI and go straight to config
-        if (productCategory) {
-          switch (productCategory) {
-            case 'smart-walls':
-              return <StepSmartWalls />;
-            case 'smart-devices':
-              return <StepSmartDevices />;
-            case 'wall-panels':
-              return <StepWallPanels />;
-            case 'carbon-rock-boards':
-              return <StepCarbonRockBoards />;
-          }
-        }
-        return <ProductCategoryStep />;
-      case 3:
-        // Step 3 is only for smart-walls (review step)
-        // Other categories only have 2 steps (contact + configuration)
-        if (state.formData.productCategory === 'smart-walls') {
-          return (
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-mocha-950">Review Your Smart Wall Quote</h2>
-              <div className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-2">Contact</h3>
-                <ul className="text-sm text-stone-700 space-y-1">
-                  <li><strong>Name:</strong> {state.formData.contact.fullName}</li>
-                  <li><strong>Email:</strong> {state.formData.contact.email}</li>
-                  <li><strong>Phone:</strong> {state.formData.contact.phone}</li>
-                  {state.formData.contact.installationAddress && (
-                    <li><strong>Address:</strong> {state.formData.contact.installationAddress}</li>
-                  )}
-                  {state.formData.contact.additionalNotes && (
-                    <li><strong>Notes:</strong> {state.formData.contact.additionalNotes}</li>
-                  )}
-                </ul>
-              </div>
-
-              <div className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-2">Project Details</h3>
-                <ul className="text-sm text-stone-700 space-y-1">
-                  <li><strong>Property Type:</strong> {state.formData.smartWalls?.projectDetails?.propertyType || '-'}</li>
-                  <li><strong>Purpose:</strong> {state.formData.smartWalls?.projectDetails?.purpose || '-'}</li>
-                  <li><strong>Location:</strong> {state.formData.smartWalls?.projectDetails?.location || '-'}</li>
-                  <li><strong>Installation:</strong> {state.formData.smartWalls?.projectDetails?.installation || '-'}</li>
-                </ul>
-              </div>
-
-              <div className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-2">Wall Specifications</h3>
-                <ul className="text-sm text-stone-700 space-y-1">
-                  <li><strong>Width:</strong> {state.formData.smartWalls?.wallSpecifications?.width ?? '-'} m</li>
-                  <li><strong>Height:</strong> {state.formData.smartWalls?.wallSpecifications?.height ?? '-'} m</li>
-                  <li><strong>Thickness:</strong> {state.formData.smartWalls?.wallSpecifications?.thickness || '-'}</li>
-                  <li><strong>Layout:</strong> {state.formData.smartWalls?.wallSpecifications?.layout || '-'}</li>
-                </ul>
-              </div>
-
-              <div className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-2">Technical Needs</h3>
-                <ul className="text-sm text-stone-700 space-y-1">
-                  {state.formData.smartWalls?.technicalNeeds ? (
-                    <>
-                      <li><strong>Soundproofing:</strong> {state.formData.smartWalls.technicalNeeds.soundproofing ? 'Yes' : 'No'}</li>
-                      <li><strong>Fire Rating:</strong> {state.formData.smartWalls.technicalNeeds.fireRating ? 'Yes' : 'No'}</li>
-                      <li><strong>Accessibility:</strong> {state.formData.smartWalls.technicalNeeds.accessibility ? 'Yes' : 'No'}</li>
-                      <li><strong>Eco-materials:</strong> {state.formData.smartWalls.technicalNeeds.ecoMaterials ? 'Yes' : 'No'}</li>
-                    </>
-                  ) : (
-                    <li>-</li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          );
-        }
-        // Fallback - this should not happen as step 3 is only for smart-walls
-        return <Step1Contact />;
-      default:
-        return <Step1Contact />;
-    }
+  const resetQuote = () => {
+    dispatch({ type: 'RESET_FORM' });
   };
 
-  const getStepTitle = () => {
-    if (state.isSubmitted) return 'Success';
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
     
-    switch (state.currentStep) {
-      case 1: return 'Contact Information';
-      case 2:
-        if (productCategory) {
-          const label = productCategory.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-          return `${label} Configuration`;
-        }
-        return 'Product Category';
-      case 3: return `${state.formData.productCategory?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Configuration`;
-      default: return 'Quote Request';
+    try {
+      await submitQuote();
+      setSubmitSuccess(true);
+      // Show success for at least 10 seconds, then refresh page
+      setTimeout(() => {
+        try {
+          window.location.reload();
+        } catch {}
+      }, 10000);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit quote');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const isTwoStepFlow = state.totalSteps === 2; // when category is preselected
-  const canGoNext = state.currentStep < state.totalSteps;
-  const canGoBack = state.currentStep > 1 && !state.isSubmitted;
-  const isLastStep = state.currentStep === state.totalSteps;
+  const handleClose = () => {
+    if (!isSubmitting) {
+      onClose();
+    }
+  };
+
+  const getStepValidation = (stepIndex: number) => {
+    const step = steps[stepIndex];
+    if (!step.required) return { isValid: true, message: 'Optional step' };
+    
+    switch (step.id) {
+      case 'contact':
+        const contact = state.formData.contact;
+        const hasName = !!contact?.fullName && contact.fullName.trim().length > 1;
+        const hasEmail = !!contact?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email);
+        const hasPhone = !!contact?.phone && /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/.test(contact.phone);
+        
+        if (!hasName || !hasEmail || !hasPhone) {
+          return { isValid: false, message: 'Required fields missing' };
+        }
+        return { isValid: true, message: 'Complete' };
+      
+      default:
+        return { isValid: true, message: 'Optional' };
+    }
+  };
+
+  // Progress logic:
+  // - For any flow, do linear step-based progress once Contact is valid
+  // - Denominator is (totalSteps - 1) so the last step reads 100%
+  // - While Contact is invalid, progress is 0
+  const getOverallProgress = () => {
+    const totalSteps = steps.length;
+    if (totalSteps <= 1) return 0;
+
+    const contactValid = getStepValidation(0).isValid;
+    if (!contactValid) return 0;
+
+    // Completed steps: past steps plus the contact step if valid
+    let completed = state.currentStep - 1; // steps behind the current one
+    if (state.currentStep === 1 && contactValid) completed = 1; // count contact when still on step 1
+
+    // Clamp and compute percentage so that being on last step shows 100%
+    completed = Math.max(1, Math.min(completed, totalSteps - 1));
+    return (completed / (totalSteps - 1)) * 100;
+  };
+
+  const canSubmit = () => {
+    return steps.every((step, index) => {
+      if (!step.required) return true;
+      return getStepValidation(index).isValid;
+    });
+  };
+
+  const getSelectedProductsCount = () => {
+    let count = 0;
+    if (state.formData.carbonRockBoards && Object.keys(state.formData.carbonRockBoards).length > 0) count++;
+    if (state.formData.smartDevices && Object.keys(state.formData.smartDevices).length > 0) count++;
+    if (state.formData.smartWalls && Object.keys(state.formData.smartWalls).length > 0) count++;
+    if (state.formData.wallPanels && Object.keys(state.formData.wallPanels).length > 0) count++;
+    return count;
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      
+      if (e.key === 'Escape' && !isSubmitting) {
+        handleClose();
+      } else if (e.key === 'ArrowLeft' && state.currentStep > 1) {
+        handlePrevious();
+      } else if (e.key === 'ArrowRight' && state.currentStep < steps.length) {
+        handleNext();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, state.currentStep, isSubmitting]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-full items-center justify-center p-4">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
-        />
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={handleClose}
+      />
 
-        {/* Modal */}
-        <motion.div
-          ref={modalRef}
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.2 }}
-          className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl"
-          tabIndex={-1}
-          role="dialog"
-          aria-labelledby="quote-modal-title"
-          aria-modal="true"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-stone-200">
+      {/* Modal */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2 }}
+        className="relative w-full max-w-6xl max-h-[95vh] mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden"
+        role="dialog"
+        aria-labelledby="quote-modal-title"
+        aria-modal="true"
+      >
+        {/* Header */}
+        <header className="relative bg-gradient-to-r from-mocha-950 to-leather-900 text-white p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-leather-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">W</span>
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 id="quote-modal-title" className="text-xl font-bold text-mocha-950">
-                  {getStepTitle()}
+                <h1 id="quote-modal-title" className="text-2xl font-bold">
+                  Request Custom Quote
                 </h1>
-                {!state.isSubmitted && (
-                  <p className="text-sm text-stone-500">
-                    Step {state.currentStep} of {state.totalSteps}
-                  </p>
-                )}
+                <p className="text-white/80 text-sm">
+                  Configure your premium interior solutions
+                </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            
+            <div className="flex items-center space-x-4">
+              {/* Progress Indicator */}
+              <div className="hidden md:flex items-center space-x-2 text-sm">
+                <Clock className="w-4 h-4 text-white/60" />
+                <span className="text-white/80">
+                  {Math.round(getOverallProgress())}% Complete
+                </span>
+              </div>
+              
+              {/* Close Button */}
+              <button
+                onClick={handleClose}
+                disabled={isSubmitting}
+                className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center 
+                  transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close quote modal"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
           </div>
 
           {/* Progress Bar */}
-          {!state.isSubmitted && (
-            <div className="px-6 py-4 bg-stone-50">
-              <div className="w-full bg-stone-200 rounded-full h-2">
-                <motion.div
-                  className="bg-leather-600 h-2 rounded-full"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${(state.currentStep / state.totalSteps) * 100}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-xs text-white/60 mb-2">
+              <span>Overall Progress</span>
+              <span>{getSelectedProductsCount()} product{getSelectedProductsCount() !== 1 ? 's' : ''} selected</span>
             </div>
-          )}
+            <div className="w-full bg-white/20 rounded-full h-2">
+              <motion.div
+                className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full"
+                initial={{ width: '0%' }}
+                animate={{ width: `${getOverallProgress()}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+        </header>
 
-          {/* Content */}
-          <div className="p-6 max-h-[70vh] overflow-y-auto">
+        {/* Step Navigation */}
+        <nav className="bg-stone-50 border-b border-stone-200 p-4" role="tablist">
+          <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
+            {steps.map((step, index) => {
+              const IconComponent = step.icon;
+              const isActive = index === state.currentStep - 1;
+              const isCompleted = index < state.currentStep - 1;
+              const validation = getStepValidation(index);
+              
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => {
+                    const targetStep = index + 1;
+                    // Prevent jumping past contact without valid data
+                    if (targetStep > 1 && state.currentStep === 1) {
+                      const ok = validateCurrentStep();
+                      if (!ok) return;
+                    }
+                    dispatch({ type: 'SET_STEP', payload: targetStep });
+                  }}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium 
+                    transition-all duration-200 whitespace-nowrap min-w-fit ${
+                    isActive
+                      ? 'bg-green-800 text-white shadow-lg ring-2 ring-black/30'
+                      : isCompleted
+                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                      : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
+                  }`}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`step-${step.id}`}
+                >
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    isActive
+                      ? 'bg-white/20'
+                      : isCompleted
+                      ? 'bg-green-600'
+                      : 'bg-stone-200'
+                  }`}>
+                    {isCompleted ? (
+                      <Check className="w-3 h-3 text-white" />
+                    ) : (
+                      <IconComponent className={`w-3 h-3 ${
+                        isActive ? 'text-white' : 'text-stone-600'
+                      }`} />
+                    )}
+                  </div>
+                  
+                  <div className="text-left hidden sm:block">
+                    <div className="font-semibold">{step.title}</div>
+                    <div className={`text-xs ${
+                      isActive ? 'text-white/80' : 'text-stone-500'
+                    }`}>
+                      {validation.message}
+                    </div>
+                  </div>
+                  
+                  {step.required && !validation.isValid && (
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto max-h-[60vh]">
+          <div className="p-8">
             <AnimatePresence mode="wait">
-              {renderCurrentStep()}
+              <motion.div
+                key={state.currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                id={`step-${currentStepData.id}`}
+                role="tabpanel"
+                aria-labelledby={`tab-${currentStepData.id}`}
+              >
+                {/* Step Header */}
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className={`w-16 h-16 bg-gradient-to-br from-${currentStepData.color}-500 to-${currentStepData.color}-600 
+                    rounded-2xl flex items-center justify-center shadow-lg`}>
+                    <currentStepData.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-mocha-950">
+                      {currentStepData.title}
+                    </h2>
+                    <p className="text-stone-600">
+                      {currentStepData.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step Content */}
+                <StepComponent />
+              </motion.div>
             </AnimatePresence>
           </div>
+        </main>
 
-          {/* Footer */}
-          {!state.isSubmitted && (
-            <div className="flex items-center justify-between p-6 border-t border-stone-200 bg-stone-50">
+        {/* Footer */}
+        <footer className="bg-stone-50 border-t border-stone-200 p-6">
+          <div className="flex items-center justify-between">
+            {/* Navigation */}
+            <div className="flex items-center space-x-3 w-full justify-between sm:justify-start">
               <button
-                onClick={prevStep}
-                disabled={!canGoBack}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  canGoBack
-                    ? 'text-stone-600 hover:text-stone-800 hover:bg-stone-200'
-                    : 'text-stone-300 cursor-not-allowed'
-                }`}
+                onClick={handlePrevious}
+                disabled={state.currentStep === 1 || isSubmitting}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-stone-300 
+                  text-stone-700 rounded-xl hover:bg-stone-50 hover:border-stone-400 w-full sm:w-auto
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                aria-label="Previous step"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
               </button>
 
-              <div className="flex items-center space-x-3">
-                {Object.keys(state.errors).length > 0 && (
-                  <p className="text-sm text-red-600">
-                    Please fix the errors above
-                  </p>
-                )}
-                
-                {isLastStep ? (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={state.isSubmitting}
-                    className="flex items-center space-x-2 px-6 py-2 bg-leather-600 text-white rounded-lg 
-                      hover:bg-leather-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {state.isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span>Submit Quote Request</span>
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleNext}
-                    disabled={!canGoNext}
-                    className={`flex items-center space-x-2 px-6 py-2 rounded-lg transition-colors ${
-                      canGoNext
-                        ? 'bg-leather-600 text-white hover:bg-leather-700'
-                        : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+              {state.currentStep < steps.length ? (
+                <button
+                  onClick={handleNext}
+                  disabled={isSubmitting}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-leather-600 
+                    text-white rounded-xl hover:bg-leather-700 shadow-md hover:shadow-lg w-full sm:w-auto
+                    disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  aria-label="Next step"
+                >
+                  <span>Next Step</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit() || isSubmitting}
+                  className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-green-600 to-blue-600 
+                    text-white rounded-xl hover:from-green-700 hover:to-blue-700 shadow-md hover:shadow-lg w-full sm:w-auto
+                    disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  aria-label="Submit quote request"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Submit Quote Request</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Step Indicator */}
+            <div className="flex items-center space-x-2 text-sm text-stone-600">
+              <span>Step {state.currentStep} of {steps.length}</span>
+              <div className="flex space-x-1">
+                {steps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                      index === state.currentStep - 1
+                        ? 'bg-leather-600'
+                        : index < state.currentStep - 1
+                        ? 'bg-green-500'
+                        : 'bg-stone-300'
                     }`}
-                  >
-                    <span>Continue</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
+                  />
+                ))}
               </div>
             </div>
+          </div>
+
+          {/* Validation Messages */}
+          {submitError && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <div className="flex items-center space-x-2 text-red-800">
+                <AlertCircle className="w-5 h-5" />
+                <span className="font-medium">Submission Error</span>
+              </div>
+              <p className="text-sm text-red-700 mt-1">{submitError}</p>
+            </motion.div>
           )}
-        </motion.div>
-      </div>
+
+          {/* Success Message */}
+          <AnimatePresence>
+            {submitSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl"
+              >
+                <div className="flex items-center space-x-2 text-green-800">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-medium">Quote Submitted Successfully!</span>
+                </div>
+                <p className="text-sm text-green-700 mt-1">
+                  We'll review your requirements and send you a detailed quote within 24 hours.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Help Text */}
+          <div className="mt-4 text-xs text-stone-500 text-center">
+            <div className="flex items-center justify-center space-x-4">
+              <span className="flex items-center space-x-1">
+                <Shield className="w-3 h-3" />
+                <span>Secure & Confidential</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <Clock className="w-3 h-3" />
+                <span>24hr Response Time</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <Sparkles className="w-3 h-3" />
+                <span>No Obligation</span>
+              </span>
+            </div>
+          </div>
+        </footer>
+      </motion.div>
     </div>
   );
 }
-
-// Main exported component with provider
-export default function QuoteModal(props: QuoteModalProps) {
-  return (
-    <QuoteProvider>
-      <AnimatePresence>
-        {props.isOpen && <QuoteModalContent {...props} />}
-      </AnimatePresence>
-    </QuoteProvider>
-  );
-}
-

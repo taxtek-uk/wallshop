@@ -3,10 +3,14 @@ export type ProductCategory = 'smart-walls' | 'smart-devices' | 'wall-panels' | 
 
 export interface ContactFormData {
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   installationAddress: string;
   additionalNotes: string;
+  projectType?: string;
+  budget?: string;
 }
 
 export interface SmartWallsFormData {
@@ -19,9 +23,11 @@ export interface SmartWallsFormData {
   speakerType?: string;
   speakerQuantity?: number;
   surroundSetup?: string;
+  wirelessAudio?: boolean;
   lighting: boolean;
   lightingType?: string;
   colorControl?: boolean;
+  dimmingControl?: boolean;
   additionalFeatures: string[];
   // Added for Smart Wall specific quoting
   projectDetails?: {
