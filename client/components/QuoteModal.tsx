@@ -156,30 +156,32 @@ export default function QuoteModal({ isOpen, onClose, productCategory, entryPoin
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <motion.div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-        <motion.div className="relative w-full max-w-6xl max-h-[95vh] mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <motion.div className="relative w-full max-w-6xl h-[95vh] sm:h-auto sm:max-h-[95vh] mx-2 sm:mx-4 bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col">
           {/* Header */}
-          <header className="bg-gradient-to-r from-mocha-950 to-leather-900 text-white p-6 flex justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">Request a Quote</h1>
-              <p className="text-white/80">Fast, obligation-free quotation</p>
-              <div className="w-full h-2 bg-white/10 rounded mt-4">
+          <header className="bg-gradient-to-r from-mocha-950 to-leather-900 text-white p-4 sm:p-6 flex items-center justify-between">
+            <div className="min-w-0 flex-1 pr-4">
+              <h1 className="text-xl sm:text-2xl font-bold truncate">Request a Quote</h1>
+              <p className="text-white/80 text-sm sm:text-base">Fast, obligation-free quotation</p>
+              <div className="w-full h-2 bg-white/10 rounded mt-3 sm:mt-4">
                 <motion.div className="h-2 bg-gradient-to-r from-emerald-400 to-sky-400" animate={{ width: `${getOverallProgress()}%` }} />
               </div>
             </div>
-            <button onClick={onClose}><X /></button>
+            <button onClick={onClose} className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition" aria-label="Close quote modal">
+              <X className="w-5 h-5" />
+            </button>
           </header>
 
           {/* Step */}
-          <div className="p-8">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
             <StepComponent />
 
             {/* Controls */}
-            <div className="mt-10 flex justify-between">
-              <button onClick={handlePrevious} disabled={state.currentStep === 1 || isSubmitting} className="px-6 py-3 bg-stone-100 rounded-xl">Back</button>
+            <div className="mt-6 md:mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+              <button onClick={handlePrevious} disabled={state.currentStep === 1 || isSubmitting} className="px-5 py-3 bg-stone-100 rounded-xl disabled:opacity-50">Back</button>
               {!showSubmitOnThisStep ? (
-                <button onClick={handleNext} disabled={isSubmitting} className="px-6 py-3 bg-leather-600 text-white rounded-xl">Next</button>
+                <button onClick={handleNext} disabled={isSubmitting} className="px-6 py-3 bg-leather-600 text-white rounded-xl disabled:opacity-50">Next</button>
               ) : (
-                <button onClick={handleSubmit} disabled={!canSubmit() || isSubmitting} className="px-6 py-3 bg-green-600 text-white rounded-xl">
+                <button onClick={handleSubmit} disabled={!canSubmit() || isSubmitting} className="px-6 py-3 bg-green-600 text-white rounded-xl disabled:opacity-50">
                   {isSubmitting ? "Submitting..." : "Submit Quote Request"}
                 </button>
               )}
@@ -199,13 +201,7 @@ export default function QuoteModal({ isOpen, onClose, productCategory, entryPoin
           </div>
 
           {/* Footer */}
-          <footer className="bg-stone-50 p-4 text-sm flex flex-wrap justify-between">
-            <span><Mail className="inline w-4 h-4" /> info@thewallshop.co.uk</span>
-            <span><Phone className="inline w-4 h-4" /> +44 141 739 3377</span>
-            <span><MapPin className="inline w-4 h-4" /> SMK Business Centre, Glasgow</span>
-            <span><Clock className="inline w-4 h-4" /> Mon–Fri, 9am–6pm PST</span>
-            <span><Sparkles className="inline w-4 h-4" /> No Obligation</span>
-          </footer>
+           
         </motion.div>
       </div>
     </AnimatePresence>
