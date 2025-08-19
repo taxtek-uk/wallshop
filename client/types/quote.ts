@@ -12,35 +12,66 @@ export interface ContactFormData {
   projectType?: string;
   budget?: string;
 }
-
 export interface SmartWallsFormData {
+  // Dimensional specifications
+  dimensions: {
+    width: number;
+    height: number;
+    depth: '120mm' | '150mm' | '180mm' | 'custom';
+    customDepth?: number;
+    calculatedMaxWidth?: number;
+  };
+  
+  // Style selection
+  selectedStyle: {
+    category: string;
+    categoryId: string;
+    finish: string;
+    finishId: string;
+    finishImage: string;
+    finishDescription: string;
+  };
+  
+  // Accessories
+  accessories: {
+    tv: boolean;
+    fireplace: boolean;
+    soundbar: boolean;
+    shelving: boolean;
+  };
+  
+  // Smart devices (integrated from StepSmartDevices)
+  smartDevices: {
+    selectedDevices: Array<{
+      name: string;
+      category: string;
+    }>;
+    controlPanels: boolean;
+    securitySensors: boolean;
+    homeAutomation: boolean;
+  };
+  
+  // Gaming system
+  gamingSystem: {
+    type: 'PlayStation' | 'Xbox' | 'Nintendo' | 'PC Setup' | 'Custom' | null;
+    specifications?: string;
+  };
+  
+  // Existing fields for backward compatibility
   tvIntegration: boolean;
-  screenSize?: string;
-  mountType?: string;
-  avEquipment?: string;
-  consoles?: string;
   speakers: boolean;
-  speakerType?: string;
-  speakerQuantity?: number;
-  surroundSetup?: string;
-  wirelessAudio?: boolean;
   lighting: boolean;
-  lightingType?: string;
-  colorControl?: boolean;
-  dimmingControl?: boolean;
   additionalFeatures: string[];
-  // Added for Smart Wall specific quoting
   projectDetails?: {
-    propertyType: 'residential' | 'commercial' | 'other';
-    purpose: 'partition' | 'decorative' | 'soundproof' | 'other';
-    location?: string;
+    propertyType: 'residential' | 'commercial';
+    purpose: 'decorative' | 'functional' | 'both';
     installation: 'supply-only' | 'supply-install';
   };
   wallSpecifications?: {
-    width: number;     // meters
-    height: number;    // meters
-    thickness: string; // free text or mm
-    layout: 'straight' | 'l-shape' | 'u-shape' | 'custom';
+    width: number;
+    height: number;
+    thickness: string;
+    layout: 'straight' | 'curved' | 'angled';
   };
   technicalNeeds?: {
     soundproofing: boolean;
@@ -49,6 +80,70 @@ export interface SmartWallsFormData {
     ecoMaterials: boolean;
   };
 }
+
+// Dimensional calculation interfaces
+export interface DimensionalCalculation {
+  maxWidth: number;
+  modules: Array<{
+    size: number;
+    count: number;
+  }>;
+  warnings: string[];
+  isValid: boolean;
+}
+
+// Device catalog interface
+export interface SmartDevice {
+  name: string;
+  category: string;
+  description: string;
+  icon: any;
+  features: string[];
+  popular?: boolean;
+}
+
+// Texture category interface
+export interface TextureCategory {
+  id: string;
+  name: string;
+  desc: string;
+  icon: any;
+  color: string;
+  img: string;
+  accent: string;
+  panels: Array<{
+  id: number;
+  name: string;
+  img: string;
+  desc: string;
+  }>;
+}
+
+// Email data structure for enhanced smart walls
+export interface SmartWallsEmailData {
+  dimensions: {
+    width: number;
+    height: number;
+    depth: string;
+    calculatedMaxWidth: number;
+    warnings: string[];
+  };
+  style: {
+    category: string;
+    finish: string;
+    description: string;
+  };
+  accessories: string[];
+  smartDevices: Array<{
+    name: string;
+    category: string;
+  }>;
+  gamingSystem: {
+    type: string;
+    specifications?: string;
+  };
+}
+
 
 export interface SmartDevicesFormData {
   controlPanels: boolean;

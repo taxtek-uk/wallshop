@@ -314,20 +314,7 @@ export default function Navigation() {
                     <ExternalLink size={18} className="opacity-80" />
                   </div>
                 </Button>
-              </div>
-              
-              {/* Call to Action Button */}
-              <div className="p-4 bg-gray-50 border-t border-gray-200">
-                <Button
-                  className="w-full bg-[#b89773] hover:bg-[#a08666] text-white py-4 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                  onClick={() => {
-                    document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-                    closeMobileMenu();
-                  }}
-                >
-                  Free Consultation
-                </Button>
-              </div>
+              </div>             
             </div>
           </motion.div>
         )}

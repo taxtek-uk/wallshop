@@ -216,6 +216,7 @@ interface ContactData {
   timeline?: string;
   source?: string;
   newsletter?: boolean;
+  smartWalls?: any; // Added for smart walls data
 }
 
 interface ValidationResult {
@@ -247,7 +248,7 @@ function validateContactForm(body: any): ValidationResult {
     errors.fullName = "Name must be at least 2 characters long";
   } else if (fullName.length > 100) {
     errors.fullName = "Name must be less than 100 characters";
-  } else if (!/^[a-zA-Z\s\-'\.]+$/.test(fullName)) {
+  } else if (!/^[a-zA-Z\s\-\'\.]+$/.test(fullName)) {
     errors.fullName = "Name contains invalid characters";
   }
 
@@ -307,7 +308,8 @@ function validateContactForm(body: any): ValidationResult {
       budget: budget || undefined,
       timeline: timeline || undefined,
       source: source || undefined,
-      newsletter
+      newsletter,
+      smartWalls: body?.smartWalls || undefined, // Pass smartWalls data
     }
   };
 }
@@ -368,8 +370,16 @@ function generateEmailContent(data: ContactData): EmailContent {
   const referenceId = generateReferenceId();
   const esc = escapeHtml;
 
+  let smartWallsHtml = '';
+  let smartWallsText = '';
+
+  if (data.smartWalls) {
+    smartWallsHtml = generateSmartWallsEmailContent(data.smartWalls);
+    smartWallsText = generateSmartWallsTextContent(data.smartWalls);
+  }
+
   // Enhanced admin notification email
-  const adminHtml = `<!DOCTYPE html>
+  let adminHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -581,6 +591,8 @@ function generateEmailContent(data: ContactData): EmailContent {
         </div>
         ` : ''}
       </div>
+
+      ${smartWallsHtml} <!-- Smart Walls Section -->
 
       <div class="section">
         <h3 class="section-title">
@@ -918,6 +930,8 @@ Email: ${data.email}
 Phone: ${data.phone}
 ${data.company ? `Company: ${data.company}` : ''}
 
+${smartWallsText} <!-- Smart Walls Section -->
+
 INQUIRY DETAILS:
 Subject: ${data.subject}
 ${data.projectType ? `Project Type: ${data.projectType}` : ''}
@@ -978,7 +992,7 @@ function escapeHtml(text: string): string {
     '/': '&#x2F;'
   };
   
-  return String(text || '').replace(/[&<>"'\/]/g, (match) => escapeMap[match] || match);
+  return String(text || '').replace(/[&<>"'/]/g, (match) => escapeMap[match] || match);
 }
 
 interface EmailResults {
@@ -1055,5 +1069,142 @@ async function sendContactEmails(
       error: error instanceof Error ? error.message : "Unknown email error"
     };
   }
+}
+
+// New functions for Smart Walls email content generation
+export function generateSmartWallsEmailContent(smartWallsData: any): string {
+  const { dimensions, selectedStyle, accessories, smartDevices, gamingSystem } = smartWallsData;
+  
+  // Format accessories list
+  const accessoryList = accessories ? Object.entries(accessories)
+    .filter(([key, value]) => value)
+    .map(([key, value]) => {
+      const labels = {
+        tv: 'TV Integration',
+        fireplace: 'Fireplace',
+        soundbar: 'Soundbar',
+        shelving: 'Shelving'
+      };
+      return labels[key] || key;
+    }) : [];
+
+  // Format smart devices list
+  const devicesList = smartDevices?.selectedDevices || [];
+  
+  // Format gaming system
+  const gamingSystemText = gamingSystem?.type ? 
+    `${gamingSystem.type}${gamingSystem.specifications ? ` - ${gamingSystem.specifications}` : ''}` : 
+    'None selected';
+
+  return `
+    <div class="section">
+      <h3 class="section-title">
+        <div class="section-icon">SW</div>
+        Smart Wall Specifications
+      </h3>
+      
+      ${dimensions ? `
+      <div class="field-row">
+        <div class="field-label">Dimensions (W×H)</div>
+        <div class="field-value">${dimensions.width}m × ${dimensions.height}m</div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Depth</div>
+        <div class="field-value">${dimensions.depth}${dimensions.customDepth ? ` (${dimensions.customDepth}mm)` : ''}</div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Calculated Max Width</div>
+        <div class="field-value">${dimensions.calculatedMaxWidth?.toFixed(2) || 'Not calculated'}m</div>
+      </div>
+      ${dimensions.warnings && dimensions.warnings.length > 0 ? `
+      <div class="field-row">
+        <div class="field-label">Warnings</div>
+        <div class="field-value" style="color: #dc2626;">${dimensions.warnings.join(', ')}</div>
+      </div>
+      ` : ''}
+      ` : ''}
+      
+      ${selectedStyle ? `
+      <div class="field-row">
+        <div class="field-label">Selected Style</div>
+        <div class="field-value">${selectedStyle.category} - ${selectedStyle.finish}</div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">Style Description</div>
+        <div class="field-value">${selectedStyle.finishDescription}</div>
+      </div>
+      ` : ''}
+      
+      ${accessoryList.length > 0 ? `
+      <div class="field-row">
+        <div class="field-label">Accessories</div>
+        <div class="field-value">${accessoryList.join(', ')}</div>
+      </div>
+      ` : ''}
+      
+      ${devicesList.length > 0 ? `
+      <div class="field-row">
+        <div class="field-label">Smart Devices</div>
+        <div class="field-value">
+          ${devicesList.map(device => `${device.name} (${device.category})`).join(', ')}
+        </div>
+      </div>
+      ` : ''}
+      
+      <div class="field-row">
+        <div class="field-label">Gaming System</div>
+        <div class="field-value">${gamingSystemText}</div>
+      </div>
+    </div>
+  `;
+}
+
+export function generateSmartWallsTextContent(smartWallsData: any): string {
+  const { dimensions, selectedStyle, accessories, smartDevices, gamingSystem } = smartWallsData;
+  
+  let content = '\nSMART WALL SPECIFICATIONS:\n';
+  
+  if (dimensions) {
+    content += `Dimensions: ${dimensions.width}m × ${dimensions.height}m\n`;
+    content += `Depth: ${dimensions.depth}${dimensions.customDepth ? ` (${dimensions.customDepth}mm)` : ''}\n`;
+    content += `Calculated Max Width: ${dimensions.calculatedMaxWidth?.toFixed(2) || 'Not calculated'}m\n`;
+    
+    if (dimensions.warnings && dimensions.warnings.length > 0) {
+      content += `Warnings: ${dimensions.warnings.join(', ')}\n`;
+    }
+  }
+  
+  if (selectedStyle) {
+    content += `Selected Style: ${selectedStyle.category} - ${selectedStyle.finish}\n`;
+    content += `Style Description: ${selectedStyle.finishDescription}\n`;
+  }
+  
+  const accessoryList = accessories ? Object.entries(accessories)
+    .filter(([key, value]) => value)
+    .map(([key, value]) => {
+      const labels = {
+        tv: 'TV Integration',
+        fireplace: 'Fireplace',
+        soundbar: 'Soundbar',
+        shelving: 'Shelving'
+      };
+      return labels[key] || key;
+    }) : [];
+    
+  if (accessoryList.length > 0) {
+    content += `Accessories: ${accessoryList.join(', ')}\n`;
+  }
+  
+  const devicesList = smartDevices?.selectedDevices || [];
+  if (devicesList.length > 0) {
+    content += `Smart Devices: ${devicesList.map(device => `${device.name} (${device.category})`).join(', ')}\n`;
+  }
+  
+  const gamingSystemText = gamingSystem?.type ? 
+    `${gamingSystem.type}${gamingSystem.specifications ? ` - ${gamingSystem.specifications}` : ''}` : 
+    'None selected';
+  content += `Gaming System: ${gamingSystemText}\n`;
+  
+  return content;
 }
 

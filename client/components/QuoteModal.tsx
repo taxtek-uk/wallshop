@@ -174,6 +174,16 @@ export default function QuoteModal({
         }
         return { isValid: true, message: 'Complete' };
       }
+      case 'smart-walls': {
+        const sw = state.formData.smartWalls;
+        const hasDimensions = sw?.dimensions?.width > 0 && sw?.dimensions?.height > 0;
+        const hasStyle = !!sw?.selectedStyle?.finish;
+        // Add more validation for smart walls if needed
+        if (!hasDimensions || !hasStyle) {
+          return { isValid: false, message: 'Dimensions and style are required' };
+        }
+        return { isValid: true, message: 'Complete' };
+      }
       default:
         return { isValid: true, message: 'Optional' };
     }
@@ -199,7 +209,7 @@ export default function QuoteModal({
     let count = 0;
     if (state.formData.carbonRockBoards && Object.keys(state.formData.carbonRockBoards).length > 0) count++;
     if (state.formData.smartDevices && Object.keys(state.formData.smartDevices).length > 0) count++;
-    if (state.formData.smartWalls && Object.keys(state.formData.smartWalls).length > 0) count++;
+    if (state.formData.smartWalls && state.formData.smartWalls.dimensions?.width > 0) count++; // Check for smartWalls data presence
     if (state.formData.wallPanels && Object.keys(state.formData.wallPanels).length > 0) count++;
     return count;
   };
@@ -209,6 +219,11 @@ export default function QuoteModal({
     // Enforce contact validation before leaving step 1
     if (state.currentStep === 1) {
       const valid = validateCurrentStep();
+      if (!valid) return;
+    }
+    // Enforce smart-walls validation before leaving step 2 (if smart-walls is the product category)
+    if (state.currentStep === 2 && state.formData.productCategory === 'smart-walls') {
+      const valid = getStepValidation(1).isValid; // Validate the smart-walls step
       if (!valid) return;
     }
     if (state.currentStep < steps.length) {
@@ -259,7 +274,7 @@ export default function QuoteModal({
       },
     };
 
-    const res = await fetch('/api/sendQuote', {
+    const res = await fetch('/api/quote', { // Changed to /api/quote
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -288,27 +303,35 @@ export default function QuoteModal({
     return data;
   };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setSubmitError(null);
+const handleSubmit = async () => {
+  setIsSubmitting(true);
+  setSubmitError(null);
 
-    try {
-      const result = await submitQuote();
-      setSubmitSuccess(true);
-      const ref = result?.referenceId || result?.quoteId || '';
-      setSubmitMessage(`Thanks! Your quote request has been sent.${ref ? ` Reference: ${ref}` : ''}`);
+  try {
+    const result = await submitQuote();
+    setSubmitSuccess(true);
 
-      // Show success for ~10s, then refresh
-      setTimeout(() => {
-        try { window.location.reload(); } catch { /* noop */ }
-      }, 10000);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to submit quote');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const ref = result?.referenceId || result?.quoteId || '';
+    setSubmitMessage(
+      `Thanks! Your quote request has been sent.${ref ? ` Reference: ${ref}` : ''}`
+    );
 
+    // ✅ Immediately clear the wizard so the client can start a fresh quote
+    dispatch({ type: 'RESET_FORM' });                   // clears all fields & sets step to initial
+    dispatch({ type: 'SET_STEP', payload: 1 });         // ensure we're back to step 1
+    // Optional: close the modal after a short, friendly confirmation toast window
+    setTimeout(() => {
+      try { onClose(); } catch {}
+    }, 1200);
+
+    // ⛔️ Remove the page reload (was keeping UI on step 3 temporarily)
+    // setTimeout(() => { window.location.reload(); }, 10000);
+  } catch (error) {
+    setSubmitError(error instanceof Error ? error.message : 'Failed to submit quote');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   // Only allow submit when required steps valid AND on the last step
   const canSubmit = () => {
     const allRequiredOk = steps.every((step, index) => {
@@ -411,92 +434,92 @@ export default function QuoteModal({
 
               return (
                 <button
-                  key={step.id}
-                  onClick={() => {
-                    const targetStep = index + 1;
-                    // Prevent jumping past contact without valid data
-                    if (targetStep > 1 && state.currentStep === 1) {
-                      const ok = validateCurrentStep();
-                      if (!ok) return;
-                    }
-                    dispatch({ type: 'SET_STEP', payload: targetStep });
-                  }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap min-w-fit ${
-                    isActive
-                      ? 'bg-green-800 text-white shadow-lg ring-2 ring-black/30'
-                      : isCompleted
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                      : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
-                  }`}
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-controls={`step-${step.id}`}
-                  id={`tab-${step.id}`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                      isActive ? 'bg-white/20' : isCompleted ? 'bg-green-600' : 'bg-stone-200'
+                    key={step.id}
+                    onClick={() => {
+                      const targetStep = index + 1;
+                      // Prevent jumping past contact without valid data
+                      if (targetStep > 1 && state.currentStep === 1) {
+                        const ok = validateCurrentStep();
+                        if (!ok) return;
+                      }
+                      // Prevent jumping past smart-walls without valid data if it's the current product category
+                      if (
+                        targetStep > 2 &&
+                        state.currentStep === 2 &&
+                        state.formData.productCategory === "smart-walls"
+                      ) {
+                        const ok = getStepValidation(1).isValid;
+                        if (!ok) return;
+                      }
+                      dispatch({ type: "SET_STEP", payload: targetStep });
+                    }}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap min-w-fit ${
+                      isActive
+                        ? "bg-leather-900 shadow-lg ring-2 ring-black/30 !text-white"
+                        : isCompleted
+                        ? "bg-green-100 text-green-800 hover:bg-green-200"
+                        : "bg-white text-stone-600 hover:bg-stone-100 border border-stone-200"
                     }`}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`step-${step.id}`}
+                    id={`tab-${step.id}`}
                   >
-                    {isCompleted ? (
-                      <Check className="w-3 h-3 text-white" />
-                    ) : (
-                      <IconComponent className={`w-3 h-3 ${isActive ? 'text-white' : 'text-stone-600'}`} />
-                    )}
-                  </div>
-
-                  <div className="text-left hidden sm:block">
-                    <div className="font-semibold">{step.title}</div>
-                    <div className={`text-xs ${isActive ? 'text-white/80' : 'text-stone-500'}`}>
-                      {validation.message}
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        isActive
+                          ? "bg-white/20"
+                          : isCompleted
+                          ? "bg-green-600"
+                          : "bg-stone-200"
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <Check className="w-3 h-3 text-white" />
+                      ) : (
+                        <IconComponent
+                          className={`w-3 h-3 ${isActive ? "text-white" : "text-stone-600"}`}
+                        />
+                      )}
                     </div>
-                  </div>
 
-                  {step.required && !validation.isValid && (
-                    <AlertCircle className="w-4 h-4 text-red-500" aria-label="Step incomplete" />
-                  )}
-                </button>
+                    <div className="text-left hidden sm:block">
+                      <div
+                        className={`font-semibold ${
+                          isActive ? "!text-white" : "text-mocha-950"
+                        }`}
+                      >
+                        {step.title}
+                      </div>
+                      <div
+                        className={`text-xs ${
+                          isActive
+                            ? "!text-white/80"
+                            : isCompleted
+                            ? "text-green-700"
+                            : "text-stone-500"
+                        }`}
+                      >
+                        {isActive
+                          ? "Current Step"
+                          : isCompleted
+                          ? "Completed"
+                          : validation.message}
+                      </div>
+                    </div>
+                  </button>
+
               );
             })}
           </div>
         </nav>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={state.currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                id={`step-${currentStepData.id}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${currentStepData.id}`}
-              >
-                {/* Step Header */}
-                <div className="flex items-center space-x-4 mb-8">
-                  <div
-                    className={`w-16 h-16 bg-gradient-to-br ${
-                      colorBgMap[currentStepData.colorKey]
-                    } rounded-2xl flex items-center justify-center shadow-lg`}
-                    aria-hidden="true"
-                  >
-                    <currentStepData.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-mocha-950">{currentStepData.title}</h2>
-                    <p className="text-stone-600">{currentStepData.description}</p>
-                  </div>
-                </div>
-
-                {/* Step Content */}
-                <StepComponent />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </main>
+        <div className="flex-1 overflow-y-auto p-6 bg-stone-50">
+          <AnimatePresence mode="wait">
+            <StepComponent key={state.currentStep} />
+          </AnimatePresence>
+        </div>
 
         {/* Footer */}
         <footer className="bg-stone-50 border-t border-stone-200 p-6">
@@ -627,3 +650,4 @@ export default function QuoteModal({
     </div>
   );
 }
+

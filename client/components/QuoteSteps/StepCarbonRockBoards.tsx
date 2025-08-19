@@ -80,13 +80,8 @@ export default function StepCarbonRockBoards() {
   ];
 
   const thicknessOptions = [
-    { value: '6mm', description: 'Light applications', recommended: false },
-    { value: '9mm', description: 'Standard residential', recommended: false },
-    { value: '12mm', description: 'Most popular choice', recommended: true },
-    { value: '15mm', description: 'Enhanced durability', recommended: false },
-    { value: '18mm', description: 'Commercial grade', recommended: false },
-    { value: '20mm', description: 'Heavy-duty applications', recommended: false },
-    { value: '25mm', description: 'Maximum performance', recommended: false }
+    { value: '5mm', description: 'Standard applications', recommended: true },
+    { value: '8mm', description: 'Enhanced durability', recommended: false }
   ];
 
   return (

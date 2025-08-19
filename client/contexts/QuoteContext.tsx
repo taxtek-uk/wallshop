@@ -1,5 +1,21 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { QuoteFormData, ProductCategory, FormErrors } from '@/types/quote';
+import { ProductCategory, FormErrors, SmartWallsFormData } from '@/types/quote';
+
+// Extend QuoteFormData to include the new smartWalls structure
+interface QuoteFormData {
+  contact: {
+    fullName: string;
+    email: string;
+    phone: string;
+    installationAddress: string;
+    additionalNotes: string;
+  };
+  productCategory: ProductCategory;
+  smartWalls?: SmartWallsFormData;
+  smartDevices?: any;
+  wallPanels?: any;
+  carbonRockBoards?: any;
+}
 
 interface QuoteState {
   currentStep: number;
@@ -33,6 +49,41 @@ const initialState: QuoteState = {
       additionalNotes: '',
     },
     productCategory: 'smart-walls',
+    smartWalls: { // Initialize smartWalls data structure
+      dimensions: {
+        width: 0,
+        height: 2.1,
+        depth: '180mm',
+        calculatedMaxWidth: 0,
+      },
+      selectedStyle: {
+        category: '',
+        categoryId: '',
+        finish: '',
+        finishId: '',
+        finishImage: '',
+        finishDescription: '',
+      },
+      accessories: {
+        tv: false,
+        fireplace: false,
+        soundbar: false,
+        shelving: false,
+      },
+      smartDevices: {
+        selectedDevices: [],
+        controlPanels: false,
+        securitySensors: false,
+        homeAutomation: false,
+      },
+      gamingSystem: {
+        type: null,
+      },
+      tvIntegration: false,
+      speakers: false,
+      lighting: false,
+      additionalFeatures: [],
+    },
   },
   errors: {},
   isSubmitting: false,
@@ -160,6 +211,13 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
       else if (!/^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/.test(contact.phone)) {
         errors.phone = 'Please enter a valid phone number';
       }
+    } else if (state.currentStep === 2 && state.formData.productCategory === 'smart-walls') {
+      // Validate Smart Walls dimensions
+      const smartWalls = state.formData.smartWalls;
+      if (!smartWalls?.dimensions?.width || smartWalls.dimensions.width <= 0) {
+        errors.smartWalls_dimensions_width = 'Wall width is required and must be greater than 0';
+      }
+      // Add more specific smart walls validation here if needed
     }
     
     if (Object.keys(errors).length > 0) {
@@ -197,4 +255,3 @@ export function useQuote() {
   }
   return context;
 }
-

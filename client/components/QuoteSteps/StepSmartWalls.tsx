@@ -1,12 +1,277 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Tv, Volume2, Lightbulb, Plus, Check, Zap, Shield, Info, 
-  ChevronDown, Settings, Ruler, Home, Building, MapPin,
-  Wrench, CheckCircle, Monitor, Speaker, Palette
+  ChevronDown, Settings, Ruler, Home, Building, MapPin, Grid,
+  Wrench, CheckCircle, Monitor, Speaker, Palette, ArrowLeft,
+  Mountain, Layers, Square, Eye, Calculator,
+  Tablet, Lock, Camera, Thermometer, Search, Filter,
+  Wifi, Router, Smartphone, Gamepad2, AlertTriangle
 } from 'lucide-react';
 import { useQuote } from '@/contexts/QuoteContext';
-import { SmartWallsFormData } from '@/types/quote';
+import { SmartWallsFormData, DimensionalCalculation, TextureCategory, SmartDevice } from '@/types/quote';
+
+// Using SmartWallsFormData from '@/types/quote' directly to avoid duplicate type definitions
+
+
+
+function calculateMaxWallDimensions(
+  width: number, 
+  height: number, 
+  depth: string,
+  hasTV: boolean
+): DimensionalCalculation {
+  const warnings: string[] = [];
+  let isValid = true;
+
+  // Validate TV depth requirement
+  if (hasTV && (depth === '120mm' || depth === '150mm')) {
+    warnings.push('TV modules require minimum 180mm depth');
+    isValid = false;
+  }
+
+  // Standard modules in descending order for optimal configuration
+  const standardModules = [1000, 900, 800, 400]; // in mm
+  const widthMm = width * 1000; // convert to mm
+  
+  let remainingWidth = widthMm;
+  const modules: Array<{ size: number; count: number }> = [];
+  
+  // Calculate optimal module configuration
+  for (const moduleSize of standardModules) {
+    if (remainingWidth >= moduleSize) {
+      const count = Math.floor(remainingWidth / moduleSize);
+      if (count > 0) {
+        modules.push({ size: moduleSize, count });
+        remainingWidth -= count * moduleSize;
+      }
+    }
+  }
+  
+  // Calculate actual achievable width
+  const achievableWidthMm = widthMm - remainingWidth;
+  const maxWidth = achievableWidthMm / 1000; // convert back to meters
+  
+  if (remainingWidth > 0) {
+    warnings.push(`${remainingWidth}mm cannot be accommodated with standard modules`);
+  }
+
+  return {
+    maxWidth,
+    modules,
+    warnings,
+    isValid: isValid && remainingWidth === 0
+  };
+}
+
+// Device catalog from StepSmartDevices
+const deviceCatalog: SmartDevice[] = [
+  { 
+    name: 'MixPad X', 
+    category: 'Control Panel', 
+    description: 'Premium 10" touchscreen control center',
+    icon: Tablet,
+    features: ['10" HD Display', 'Voice Control', 'Wireless Connectivity'],
+    popular: true
+  },
+  { 
+    name: 'MixPad 7 Ultra', 
+    category: 'Control Panel', 
+    description: '7" advanced control panel',
+    icon: Tablet,
+    features: ['7" Display', 'Enhanced Processing', 'Multi-Zone Control']
+  },
+  { 
+    name: 'Smart Lock V5 Face', 
+    category: 'Security', 
+    description: 'Facial recognition smart lock',
+    icon: Lock,
+    features: ['Face Recognition', 'Keyless Entry', 'Mobile App']
+  },
+  { 
+    name: '2K Wireless Smart IP Camera S2', 
+    category: 'Surveillance', 
+    description: 'High-definition security camera',
+    icon: Camera,
+    features: ['2K Resolution', 'Night Vision', 'Motion Detection']
+  },
+  { 
+    name: 'Temperature Humidity Sensor', 
+    category: 'Sensors', 
+    description: 'Environmental monitoring sensor',
+    icon: Thermometer,
+    features: ['Temperature', 'Humidity', 'Data Logging']
+  },
+  { 
+    name: 'Sky Dome Pro Ceiling Light', 
+    category: 'Lighting', 
+    description: 'Smart ceiling lighting system',
+    icon: Lightbulb,
+    features: ['Dimmable', 'Color Changing', 'Voice Control']
+  },
+  { 
+    name: 'Smart Thermostat Pro', 
+    category: 'HVAC', 
+    description: 'Advanced climate control system',
+    icon: Thermometer,
+    features: ['Learning Algorithm', 'Energy Saving', 'Remote Control']
+  }
+];
+
+// Texture categories (condensed for space)
+const textureCategories: TextureCategory[] = [
+  {
+    id: 'wood',
+    name: "Wood Grain Series",
+    desc: "Warm wood aesthetics with durable surface.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/wood.jpg",
+    color: "from-amber-100 to-orange-100",
+    accent: "amber-600",
+    panels: [
+      { id: 1, name: "Natural Oak", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Classic oak texture with soft grain pattern" },
+      { id: 2, name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations" },
+      { id: 3, name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast" },
+      { id: 4, name: "Golden Maple", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm maple hue with straight grain" },
+      { id: 5, name: "Weathered Cedar", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Textured cedar look with aged character" },
+      { id: 6, name: "Rustic Pine", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Light pine tone with visible knots and streaks" },
+      { id: 7, name: "Charcoal Oak", img: "/images/carbon-rock-boards/wood/7.jpg", desc: "Deep grey oak with modern finish" },
+      { id: 8, name: "Amber Teak", img: "/images/carbon-rock-boards/wood/8.jpg", desc: "Teak-inspired golden tones and natural flow" },
+      { id: 9, name: "Espresso Birch", img: "/images/carbon-rock-boards/wood/9.jpg", desc: "Bold espresso hue on tight birch grains" },
+      { id: 10, name: "Sunbleached Timber", img: "/images/carbon-rock-boards/wood/10.jpg", desc: "Light grey-brown tone like weathered wood" },
+      { id: 11, name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical rosewood" },
+      { id: 12, name: "Whitewashed Oak", img: "/images/carbon-rock-boards/wood/12.jpg", desc: "Pale oak with a whitewashed soft grain" },
+      { id: 13, name: "Hazel Beech", img: "/images/carbon-rock-boards/wood/13.jpg", desc: "Light beech finish with smooth texture" },
+      { id: 14, name: "Dark Walnut", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep tones" },
+      { id: 15, name: "Bamboo Slate", img: "/images/carbon-rock-boards/wood/15.jpg", desc: "Neutral bamboo-inspired texture in muted finish" },
+      { id: 16, name: "Ash Greywood", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone" },
+      { id: 17, name: "Ivory Elm", img: "/images/carbon-rock-boards/wood/17.jpg", desc: "Smooth ivory tone with linear elm grain" },
+      { id: 18, name: "Toasted Mahogany", img: "/images/carbon-rock-boards/wood/18.jpg", desc: "Dark toasted tone with rich mahogany grain" },
+      { id: 19, name: "Copperwood", img: "/images/carbon-rock-boards/wood/19.jpg", desc: "Copper-tinged finish with clean grain lines" },
+      { id: 20, name: "Chestnut Brown", img: "/images/carbon-rock-boards/wood/20.jpg", desc: "Balanced brown chestnut-inspired finish" }
+    ]
+  },
+  {
+    id: 'solid',
+    name: "Solid Color Series",
+    desc: "Industrial elegance with raw, minimalist tones.",
+    icon: Palette,
+    img: "/images/carbon-rock-boards/wpc.jpg",
+    color: "from-slate-100 to-gray-100",
+    accent: "slate-600",
+    panels: [
+      { id: 1, name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism" },
+      { id: 2, name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look" },
+      { id: 3, name: "Muted Graphite", img: "/images/carbon-rock-boards/solid/3.jpg", desc: "Balanced dark silver tone for sleek walls" },
+      { id: 4, name: "Jet Black", img: "/images/carbon-rock-boards/solid/4.jpg", desc: "Deep black ideal for bold modern interiors" },
+      { id: 5, name: "Rose Brick", img: "/images/carbon-rock-boards/solid/5.jpg", desc: "Warm reddish tone inspired by natural clay" },
+      { id: 6, name: "Burnt Orange", img: "/images/carbon-rock-boards/solid/6.jpg", desc: "Bright terracotta with energetic character" },
+      { id: 7, name: "Sky Blue", img: "/images/carbon-rock-boards/solid/7.jpg", desc: "A cool pastel blue evoking calm environments" },
+      { id: 8, name: "Frost White", img: "/images/carbon-rock-boards/solid/8.jpg", desc: "Pure white with a crisp clean finish" },
+      { id: 9, name: "Stone Clay", img: "/images/carbon-rock-boards/solid/9.jpg", desc: "Earthy stone shade with balanced neutrality" },
+      { id: 10, name: "Slate Blue", img: "/images/carbon-rock-boards/solid/10.jpg", desc: "Dark blue-grey with a sophisticated edge" },
+      { id: 11, name: "Ivory", img: "/images/carbon-rock-boards/solid/11.jpg", desc: "Soft ivory tone perfect for elegant settings" },
+      { id: 12, name: "Desert Sand", img: "/images/carbon-rock-boards/solid/12.jpg", desc: "Warm tan reminiscent of natural sands" },
+      { id: 13, name: "Steel Grey", img: "/images/carbon-rock-boards/solid/13.jpg", desc: "Robust mid-grey with urban vibes" },
+      { id: 14, name: "Charcoal Navy", img: "/images/carbon-rock-boards/solid/14.jpg", desc: "Deep navy blend with a charcoal base" },
+      { id: 15, name: "Obsidian", img: "/images/carbon-rock-boards/solid/15.jpg", desc: "Matte black with premium depth and richness" },
+      { id: 16, name: "Fog Silver", img: "/images/carbon-rock-boards/solid/16.jpg", desc: "Light grey with misty undertones" },
+      { id: 17, name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/17.jpg", desc: "Soft pearl-beige tone for warm ambience" },
+      { id: 18, name: "Lavender Smoke", img: "/images/carbon-rock-boards/solid/18.jpg", desc: "Cool tone with leather-grey transitions" },
+      { id: 19, name: "Silken Stone", img: "/images/carbon-rock-boards/solid/19.jpg", desc: "Light sandy grey with smooth finish" },
+      { id: 20, name: "Deep leather", img: "/images/carbon-rock-boards/solid/20.jpg", desc: "Bold leather hue ideal for rich feature walls" }
+    ]
+  },
+  {
+    id: 'stone',
+    name: "Stone Grain Series",
+    desc: "Classic stone surface with timeless elegance.",
+    icon: Mountain,
+    img: "/images/carbon-rock-boards/stone.jpg",
+    color: "from-stone-100 to-slate-100",
+    accent: "stone-600",
+    panels: [
+      { id: 1, name: "T3006", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture T3006" },
+      { id: 2, name: "T3012", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture T3012" },
+      { id: 3, name: "T3017", img: "/images/carbon-rock-boards/stone/3.jpg", desc: "Stone texture T3017" },
+      { id: 4, name: "T3018", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture T3018" },
+      { id: 5, name: "T3019", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture T3019" },
+      { id: 6, name: "T3023", img: "/images/carbon-rock-boards/stone/6.jpg", desc: "Stone texture T3023" },
+      { id: 7, name: "T3024", img: "/images/carbon-rock-boards/stone/7.jpg", desc: "Stone texture T3024" },
+      { id: 8, name: "T3025", img: "/images/carbon-rock-boards/stone/8.jpg", desc: "Stone texture T3025" },
+      { id: 9, name: "T3201", img: "/images/carbon-rock-boards/stone/9.jpg", desc: "Stone texture T3201" },
+      { id: 10, name: "T3202", img: "/images/carbon-rock-boards/stone/10.jpg", desc: "Stone texture T3202" },
+      { id: 11, name: "T3203", img: "/images/carbon-rock-boards/stone/11.jpg", desc: "Stone texture T3203" },
+      { id: 12, name: "T3204", img: "/images/carbon-rock-boards/stone/12.jpg", desc: "Stone texture T3204" },
+      { id: 13, name: "T3205", img: "/images/carbon-rock-boards/stone/13.jpg", desc: "Stone texture T3205" },
+      { id: 14, name: "T3206", img: "/images/carbon-rock-boards/stone/14.jpg", desc: "Stone texture T3206" },
+      { id: 15, name: "T3207", img: "/images/carbon-rock-boards/stone/15.jpg", desc: "Stone texture T3207" },
+      { id: 16, name: "S239-2", img: "/images/carbon-rock-boards/stone/16.jpg", desc: "Stone texture S239-2" },
+      { id: 17, name: "Z7030", img: "/images/carbon-rock-boards/stone/17.jpg", desc: "Stone texture Z7030" },
+      { id: 18, name: "S240", img: "/images/carbon-rock-boards/stone/18.jpg", desc: "Stone texture S240" },
+      { id: 19, name: "S3004", img: "/images/carbon-rock-boards/stone/19.jpg", desc: "Stone texture S3004" }
+    ]
+  },
+  {
+    id: 'fabric',
+    name: "Cloth Pattern Series",
+    desc: "Soft textile pattern with acoustic value, premium quality.",
+    icon: Palette,
+    img: "/images/carbon-rock-boards/cloth.jpg",
+    color: "from-neutral-100 to-stone-100",
+    accent: "neutral-600",
+    panels: [
+      { id: 1, name: "Linen Weave", img: "/images/carbon-rock-boards/fabric/1.jpg", desc: "Linen Weave texture for contemporary interior walls" },
+      { id: 2, name: "Denim Texture", img: "/images/carbon-rock-boards/fabric/2.jpg", desc: "Denim Texture texture for contemporary interior walls" },
+      { id: 3, name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls" },
+      { id: 4, name: "Ivory Cotton", img: "/images/carbon-rock-boards/fabric/4.jpg", desc: "Ivory Cotton texture for contemporary interior walls" },
+      { id: 5, name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/5.jpg", desc: "Silver Mesh texture for contemporary interior walls" },
+      { id: 6, name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/6.jpg", desc: "Soft Gauze texture for contemporary interior walls" },
+      { id: 7, name: "Contrast Linen Panel", img: "/images/carbon-rock-boards/fabric/7.jpg", desc: "Contrast Linen Panel texture for contemporary interior walls" },
+      { id: 8, name: "Beige Canvas", img: "/images/carbon-rock-boards/fabric/8.jpg", desc: "Beige Canvas texture for contemporary interior walls" },
+      { id: 9, name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls" },
+      { id: 10, name: "Crosshatch Blend", img: "/images/carbon-rock-boards/fabric/10.jpg", desc: "Crosshatch Blend texture for contemporary interior walls" },
+      { id: 11, name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/11.jpg", desc: "Alabaster Cotton texture for contemporary interior walls" },
+      { id: 12, name: "Khaki Hemp", img: "/images/carbon-rock-boards/fabric/12.jpg", desc: "Khaki Hemp texture for contemporary interior walls" },
+      { id: 13, name: "Pebble Mesh", img: "/images/carbon-rock-boards/fabric/13.jpg", desc: "Pebble Mesh texture for contemporary interior walls" },
+      { id: 14, name: "Cream Wool", img: "/images/carbon-rock-boards/fabric/14.jpg", desc: "Cream Wool texture for contemporary interior walls" },
+    ]
+  },
+  {
+    id: 'metallic',
+    name: "Metal Series",
+    desc: "Luxury feel with metallic luster and reflectivity.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/metal.jpg",
+    color: "from-amber-100 to-yellow-100",
+    accent: "amber-600",
+    panels: [
+      { id: 1, name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/1.jpg", desc: "Elegant bronze with a brushed satin finish" },
+      { id: 2, name: "Antique Copper", img: "/images/carbon-rock-boards/metal/2.jpg", desc: "Warm copper tone with vintage character" },
+      { id: 3, name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/3.jpg", desc: "Subtle golden shimmer with soft elegance" },
+      { id: 4, name: "Urban Brass", img: "/images/carbon-rock-boards/metal/4.jpg", desc: "Contemporary brass with matte warmth" },
+      { id: 5, name: "Mirror Silver", img: "/images/carbon-rock-boards/metal/5.jpg", desc: "Sleek silver chrome for high reflectivity" },
+      { id: 6, name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/6.jpg", desc: "Modern titanium finish with silky texture" }
+    ]
+  },
+  {
+    id: 'mirror',
+    name: "Mirror Series",
+    desc: "Reflective brilliance with a sleek, high-gloss finish.",
+    icon: Square,
+    img: "/images/carbon-rock-boards/mirror.jpg",
+    color: "from-blue-100 to-leather-100",
+    accent: "blue-600",
+    panels: [
+      { id: 1, name: "Bronze Mirror", img: "/images/carbon-rock-boards/mirror/1.jpg", desc: "Warm bronze-tinted mirror with elegant shine" },
+      { id: 2, name: "Copper Reflection", img: "/images/carbon-rock-boards/mirror/2.jpg", desc: "Vintage copper tone with smooth mirrored surface" },
+      { id: 3, name: "Golden Glow", img: "/images/carbon-rock-boards/mirror/3.jpg", desc: "Champagne gold mirror finish with rich sheen" },
+      { id: 4, name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Matte brass reflection with subtle warmth" },
+      { id: 5, name: "Crystal Silver", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Sleek silver mirror with crisp reflectivity" },
+      { id: 6, name: "Titanium Gloss", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Cool titanium mirror with polished finish" }
+    ]
+  }
+];
 
 export default function StepSmartWalls() {
   const { state, updateProductData } = useQuote();
@@ -15,136 +280,140 @@ export default function StepSmartWalls() {
     speakers: false,
     lighting: false,
     additionalFeatures: [],
-    ...state.formData.smartWalls,
+    dimensions: {
+      width: 0,
+      height: 2.1, // Fixed height as specified
+      depth: '180mm',
+      calculatedMaxWidth: 0
+    },
+    selectedStyle: {
+      category: '',
+      categoryId: '',
+      finish: '',
+      finishId: '',
+      finishImage: '',
+      finishDescription: '',
+    },
+    accessories: {
+      tv: false,
+      fireplace: false,
+      soundbar: false,
+      shelving: false
+    },
+    smartDevices: {
+      selectedDevices: [],
+      controlPanels: false,
+      securitySensors: false,
+      homeAutomation: false
+    },
+    gamingSystem: {
+      type: null
+    },
+    ...(state.formData.smartWalls || {}),
   };
 
-  const [activeSection, setActiveSection] = useState<string>('overview');
+  // State management
+  const [activeSection, setActiveSection] = useState<string>('dimensions');
+  const [selectedStyleCategory, setSelectedStyleCategory] = useState<TextureCategory | null>(null);
+  const [selectedFinish, setSelectedFinish] = useState<TextureCategory['panels'][number] | null>(null);
+  const [isStyleDetailView, setIsStyleDetailView] = useState(false);
+  const [deviceSearchTerm, setDeviceSearchTerm] = useState('');
+  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState<string>('all');
 
+  // Dimensional calculation
+  const dimensionalCalculation = useMemo(() => {
+    if (!smartWallsData.dimensions?.width) {
+      return { maxWidth: 0, modules: [], warnings: [], isValid: true };
+    }
+    
+    return calculateMaxWallDimensions(
+      smartWallsData.dimensions.width,
+      smartWallsData.dimensions.height,
+      smartWallsData.dimensions.depth,
+      smartWallsData.accessories?.tv || false
+    );
+  }, [
+    smartWallsData.dimensions?.width,
+    smartWallsData.dimensions?.height,
+    smartWallsData.dimensions?.depth,
+    smartWallsData.accessories?.tv
+  ]);
+
+  // Update calculated max width when calculation changes
+  useEffect(() => {
+    if (dimensionalCalculation.maxWidth !== smartWallsData.dimensions?.calculatedMaxWidth) {
+      handleDimensionsChange('calculatedMaxWidth', dimensionalCalculation.maxWidth);
+    }
+  }, [dimensionalCalculation.maxWidth]);
+
+  // Event handlers
   const handleFieldChange = (field: keyof SmartWallsFormData, value: any) => {
     const updatedData = { ...smartWallsData, [field]: value };
     updateProductData('smart-walls', updatedData);
   };
 
-  const handleFeatureToggle = (feature: string) => {
-    const current = Array.isArray(smartWallsData.additionalFeatures) ? smartWallsData.additionalFeatures : [];
-    const set = new Set(current);
-    if (set.has(feature)) set.delete(feature); else set.add(feature);
-    handleFieldChange('additionalFeatures', Array.from(set));
+  const handleDimensionsChange = (field: keyof NonNullable<SmartWallsFormData['dimensions']>, value: any) => {
+    const current = smartWallsData.dimensions || { width: 0, height: 2.1, depth: '180mm' };
+    handleFieldChange('dimensions', { ...current, [field]: value });
   };
 
-  const handleProjectDetailsChange = (field: keyof NonNullable<SmartWallsFormData['projectDetails']>, value: any) => {
-    const current = smartWallsData.projectDetails || { 
-      propertyType: 'residential', 
-      purpose: 'decorative', 
-      installation: 'supply-install' 
-    } as NonNullable<SmartWallsFormData['projectDetails']>;
-    handleFieldChange('projectDetails', { ...current, [field]: value });
+  const handleAccessoryToggle = (accessory: keyof NonNullable<SmartWallsFormData['accessories']>) => {
+    const current = smartWallsData.accessories || { tv: false, fireplace: false, soundbar: false, shelving: false };
+    handleFieldChange('accessories', { ...current, [accessory]: !current[accessory] });
   };
 
-  const handleWallSpecsChange = (field: keyof NonNullable<SmartWallsFormData['wallSpecifications']>, value: any) => {
-    const current = smartWallsData.wallSpecifications || { 
-      width: 0, 
-      height: 0, 
-      thickness: '', 
-      layout: 'straight' 
-    } as NonNullable<SmartWallsFormData['wallSpecifications']>;
-    handleFieldChange('wallSpecifications', { ...current, [field]: value });
+  const handleDeviceToggle = (deviceName: string, deviceCategory: string) => {
+    const current = smartWallsData.smartDevices?.selectedDevices || [];
+    const exists = current.find(d => d.name === deviceName);
+    const updated = exists 
+      ? current.filter(d => d.name !== deviceName)
+      : [...current, { name: deviceName, category: deviceCategory }];
+    
+    const smartDevices = smartWallsData.smartDevices || { selectedDevices: [], controlPanels: false, securitySensors: false, homeAutomation: false };
+    handleFieldChange('smartDevices', { ...smartDevices, selectedDevices: updated });
   };
 
-  const handleTechnicalNeedsChange = (field: keyof NonNullable<SmartWallsFormData['technicalNeeds']>, value: boolean) => {
-    const current = smartWallsData.technicalNeeds || { 
-      soundproofing: false, 
-      fireRating: false, 
-      accessibility: false, 
-      ecoMaterials: false 
-    } as NonNullable<SmartWallsFormData['technicalNeeds']>;
-    handleFieldChange('technicalNeeds', { ...current, [field]: value });
+  const handleGamingSystemSelect = (type: SmartWallsFormData['gamingSystem']['type']) => {
+    handleFieldChange('gamingSystem', { ...smartWallsData.gamingSystem, type });
   };
 
-  const screenSizeOptions = [
-    { value: '32"', description: 'Compact spaces, bedrooms', popular: false },
-    { value: '43"', description: 'Small to medium rooms', popular: false },
-    { value: '55"', description: 'Living rooms, offices', popular: true },
-    { value: '65"', description: 'Large living spaces', popular: true },
-    { value: '75"', description: 'Premium home theaters', popular: false },
-    { value: '85"', description: 'Commercial spaces', popular: false },
-    { value: '100"+', description: 'Luxury installations', popular: false }
-  ];
+  const handleStyleCategoryClick = (category: TextureCategory) => {
+    setSelectedStyleCategory(category);
+    setIsStyleDetailView(true);
+  };
 
-  const mountTypeOptions = [
-    { value: 'Fixed Wall Mount', description: 'Secure, low-profile mounting', icon: Monitor },
-    { value: 'Tilting Mount', description: 'Adjustable viewing angle', icon: Monitor },
-    { value: 'Full Motion Mount', description: 'Maximum flexibility', icon: Monitor },
-    { value: 'Ceiling Mount', description: 'Overhead installation', icon: Monitor }
-  ];
+  const handleFinishSelect = (finish: TextureCategory['panels'][number]) => {
+    setSelectedFinish(finish);
+    handleFieldChange('selectedStyle', {
+      category: selectedStyleCategory?.name || '',
+      categoryId: selectedStyleCategory?.id || '',
+      finish: finish.name,
+      finishId: String(finish.id),
+      finishImage: finish.img,
+      finishDescription: finish.desc
+    });
+  };
 
-  const speakerTypeOptions = [
-    { value: 'In-Wall Speakers', description: 'Seamless integration', icon: Speaker, popular: true },
-    { value: 'Soundbar Integration', description: 'Premium audio bar', icon: Speaker, popular: false },
-    { value: 'Bookshelf Speakers', description: 'Traditional setup', icon: Speaker, popular: false },
-    { value: 'Floor Standing', description: 'Audiophile quality', icon: Speaker, popular: false }
-  ];
+  // Filtered devices for search
+  const filteredDevices = deviceCatalog.filter(device => {
+    const matchesSearch = device.name.toLowerCase().includes(deviceSearchTerm.toLowerCase()) ||
+                         device.description.toLowerCase().includes(deviceSearchTerm.toLowerCase());
+    const matchesCategory = selectedDeviceCategory === 'all' || device.category === selectedDeviceCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const lightingTypeOptions = [
-    { value: 'LED Strip Lighting', description: 'Ambient backlighting', popular: true },
-    { value: 'Recessed Spotlights', description: 'Focused illumination', popular: false },
-    { value: 'Accent Lighting', description: 'Decorative highlights', popular: false },
-    { value: 'Smart Bulbs', description: 'Color-changing options', popular: false }
-  ];
+  const deviceCategories = ['all', ...Array.from(new Set(deviceCatalog.map(d => d.category)))];
 
-  const additionalFeatureOptions = [
-    { name: 'Cable Management', description: 'Hidden cable routing', icon: Settings, category: 'Infrastructure' },
-    { name: 'Wireless Charging Pad', description: 'Built-in device charging', icon: Zap, category: 'Technology' },
-    { name: 'USB Outlets', description: 'Integrated power ports', icon: Zap, category: 'Technology' },
-    { name: 'Smart Home Hub Integration', description: 'Central control system', icon: Home, category: 'Technology' },
-    { name: 'Temperature Control', description: 'Climate management', icon: Settings, category: 'Environment' },
-    { name: 'Air Quality Monitoring', description: 'Environmental sensors', icon: Shield, category: 'Environment' },
-    { name: 'Security Camera Integration', description: 'Surveillance system', icon: Shield, category: 'Security' }
-  ];
-
-  const propertyTypeOptions = [
-    { value: 'residential', label: 'Residential', description: 'Home installations', icon: Home },
-    { value: 'commercial', label: 'Commercial', description: 'Business spaces', icon: Building },
-    { value: 'hospitality', label: 'Hospitality', description: 'Hotels, restaurants', icon: Building },
-    { value: 'retail', label: 'Retail', description: 'Shops, showrooms', icon: Building }
-  ];
-
-  const purposeOptions = [
-    { value: 'decorative', label: 'Decorative', description: 'Aesthetic enhancement' },
-    { value: 'functional', label: 'Functional', description: 'Practical applications' },
-    { value: 'acoustic', label: 'Acoustic', description: 'Sound management' },
-    { value: 'privacy', label: 'Privacy', description: 'Space division' }
-  ];
-
-  const installationOptions = [
-    { value: 'supply-install', label: 'Supply & Install', description: 'Complete service package', recommended: true },
-    { value: 'supply-only', label: 'Supply Only', description: 'Materials only', recommended: false },
-    { value: 'consultation', label: 'Consultation', description: 'Design advice only', recommended: false }
-  ];
-
-  const thicknessOptions = ['50mm', '75mm', '100mm', '125mm', '150mm', 'Custom'];
-  const layoutOptions = [
-    { value: 'straight', label: 'Straight Wall', description: 'Standard linear installation' },
-    { value: 'curved', label: 'Curved Wall', description: 'Curved or angled design' },
-    { value: 'corner', label: 'Corner Installation', description: 'L-shaped configuration' },
-    { value: 'island', label: 'Island Wall', description: 'Freestanding partition' }
-  ];
-
-  const navigationSections = [
-    { id: 'overview', label: 'Project Overview', icon: Info },
-    { id: 'tv', label: 'TV Integration', icon: Tv },
-    { id: 'audio', label: 'Audio System', icon: Volume2 },
-    { id: 'lighting', label: 'Smart Lighting', icon: Lightbulb },
-    { id: 'features', label: 'Additional Features', icon: Plus },
-    { id: 'specifications', label: 'Specifications', icon: Ruler }
-  ];
-
-  const getActiveFeaturesCount = () => {
+  // Count selected features for header display
+  const getSelectedFeaturesCount = () => {
     let count = 0;
-    if (smartWallsData.tvIntegration) count++;
-    if (smartWallsData.speakers) count++;
-    if (smartWallsData.lighting) count++;
-    count += (smartWallsData.additionalFeatures || []).length;
+    if (smartWallsData.dimensions?.width > 0) count++;
+    if (smartWallsData.selectedStyle) count++;
+    if (smartWallsData.accessories) {
+      count += Object.values(smartWallsData.accessories).filter(Boolean).length;
+    }
+    if (smartWallsData.smartDevices?.selectedDevices?.length > 0) count++;
+    if (smartWallsData.gamingSystem?.type) count++;
     return count;
   };
 
@@ -156,7 +425,7 @@ export default function StepSmartWalls() {
       transition={{ duration: 0.3 }}
       className="space-y-8"
       data-seo-title="Smart Walls Configuration"
-      data-seo-desc="Configure premium smart wall systems with TV integration, audio systems, smart lighting, and advanced home automation features"
+      data-seo-desc="Configure your premium smart wall solution with integrated technology and luxury finishes"
     >
       {/* Header Section */}
       <header className="text-center space-y-4">
@@ -166,7 +435,7 @@ export default function StepSmartWalls() {
           transition={{ delay: 0.1 }}
           className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-leather-600 to-leather-700 rounded-2xl shadow-lg"
         >
-          <Zap className="w-8 h-8 text-white" />
+          <Grid className="w-8 h-8 text-white" />
         </motion.div>
         
         <div className="space-y-2">
@@ -174,1073 +443,589 @@ export default function StepSmartWalls() {
             Smart Walls Configuration
           </h1>
           <p className="text-lg text-stone-600 max-w-3xl mx-auto leading-relaxed">
-            Design your perfect <span className="font-semibold text-mocha-950">smart wall system</span> with 
-            integrated technology, premium finishes, and intelligent automation tailored to your space.
+            Design your <span className="font-semibold text-mocha-950">intelligent wall solution</span> with 
+            integrated technology, premium finishes, and smart home devices.
           </p>
         </div>
         
-        {getActiveFeaturesCount() > 0 && (
+        {getSelectedFeaturesCount() > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-leather-100 text-leather-800 rounded-full text-sm font-medium"
           >
-            <Check className="w-4 h-4" />
-            {getActiveFeaturesCount()} feature{getActiveFeaturesCount() !== 1 ? 's' : ''} configured
+            <CheckCircle className="w-4 h-4" />
+            {getSelectedFeaturesCount()} feature{getSelectedFeaturesCount() !== 1 ? 's' : ''} configured
           </motion.div>
         )}
       </header>
 
-      {/* Navigation */}
-      <nav className="bg-white border border-stone-200 rounded-2xl p-2 shadow-sm">
-        <div className="flex flex-wrap gap-1">
-          {navigationSections.map((section) => {
+      {/* Section Navigation */}
+      <nav className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: 'dimensions', label: 'Dimensions', icon: Ruler },
+            { id: 'style', label: 'Style Selection', icon: Palette },
+            { id: 'accessories', label: 'Accessories', icon: Plus },
+            { id: 'devices', label: 'Smart Devices', icon: Zap },
+            { id: 'gaming', label: 'Gaming System', icon: Gamepad2 }
+          ].map(section => {
             const IconComponent = section.icon;
+            const isActive = activeSection === section.id;
+            
             return (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  activeSection === section.id
+                  isActive
                     ? 'bg-leather-600 text-white shadow-md'
-                    : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                 }`}
               >
                 <IconComponent className="w-4 h-4" />
-                <span className="hidden sm:inline">{section.label}</span>
+                {section.label}
               </button>
             );
           })}
         </div>
       </nav>
 
-      {/* Content Sections */}
-      <AnimatePresence mode="wait">
-        {/* Project Overview */}
-        {activeSection === 'overview' && (
-          <motion.section
-            key="overview"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-8"
-          >
-            {/* Project Details */}
-            <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-leather-100 rounded-xl flex items-center justify-center">
-                  <Info className="w-5 h-5 text-leather-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-mocha-950">Project Details</h2>
-                  <p className="text-sm text-stone-600">Tell us about your smart wall project</p>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Property Type */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-mocha-950">
-                    Property Type
-                  </label>
-                  <div className="space-y-2">
-                    {propertyTypeOptions.map(option => {
-                      const IconComponent = option.icon;
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => handleProjectDetailsChange('propertyType', option.value)}
-                          className={`w-full p-3 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 ${
-                            smartWallsData.projectDetails?.propertyType === option.value
-                              ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                              : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                          }`}
-                        >
-                          <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
-                            <IconComponent className="w-4 h-4 text-leather-600" />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-sm">{option.label}</div>
-                            <div className="text-xs text-stone-600">{option.description}</div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+      {/* Dimensions Section */}
+      {activeSection === 'dimensions' && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Ruler className="w-4 h-4 text-leather-600" />
+            </div>
+            <h2 className="text-xl font-bold text-mocha-950">Wall Dimensions</h2>
+          </div>
 
-                {/* Purpose */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-mocha-950">
-                    Primary Purpose
-                  </label>
-                  <div className="space-y-2">
-                    {purposeOptions.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleProjectDetailsChange('purpose', option.value)}
-                        className={`w-full p-3 rounded-xl border-2 text-left transition-all duration-200 ${
-                          smartWallsData.projectDetails?.purpose === option.value
-                            ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                            : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                        }`}
-                      >
-                        <div className="font-semibold text-sm">{option.label}</div>
-                        <div className="text-xs text-stone-600">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Installation Type */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-mocha-950">
-                    Service Type
-                  </label>
-                  <div className="space-y-2">
-                    {installationOptions.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleProjectDetailsChange('installation', option.value)}
-                        className={`w-full p-3 rounded-xl border-2 text-left transition-all duration-200 relative ${
-                          smartWallsData.projectDetails?.installation === option.value
-                            ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                            : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                        }`}
-                      >
-                        {option.recommended && (
-                          <div className="absolute top-2 right-2">
-                            <span className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded">
-                              Recommended
-                            </span>
-                          </div>
-                        )}
-                        <div className="font-semibold text-sm">{option.label}</div>
-                        <div className="text-xs text-stone-600">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="mt-6 space-y-3">
-                <label htmlFor="project-location" className="flex items-center text-sm font-semibold text-mocha-950 gap-2">
-                  <MapPin className="w-4 h-4 text-leather-600" />
-                  Project Location
+          <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
+            {/* Dimension Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-mocha-950">
+                  Width (meters) <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
-                  id="project-location"
-                  value={smartWallsData.projectDetails?.location || ''}
-                  onChange={(e) => handleProjectDetailsChange('location', e.target.value)}
-                  placeholder="e.g., Living room, Office reception, Hotel lobby..."
-                  className="w-full px-4 py-3 bg-white border-2 border-stone-300 rounded-xl text-mocha-950 
-                    focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                    transition-all duration-200 hover:border-stone-400"
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  max="10"
+                  value={smartWallsData.dimensions?.width || ''}
+                  onChange={(e) => handleDimensionsChange('width', parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
+                  placeholder="e.g., 3.5"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-mocha-950">
+                  Height (meters)
+                </label>
+                <input
+                  type="number"
+                  value={smartWallsData.dimensions?.height || 2.1}
+                  disabled
+                  className="w-full px-4 py-3 border-2 border-stone-200 rounded-xl bg-stone-50 text-stone-600"
+                />
+                <p className="text-xs text-stone-500">Fixed at 2.1m for smart walls</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-mocha-950">
+                  Depth
+                </label>
+                <select
+                  value={smartWallsData.dimensions?.depth || '180mm'}
+                  onChange={(e) => handleDimensionsChange('depth', e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
+                >
+                  <option value="120mm">120mm</option>
+                  <option value="150mm">150mm</option>
+                  <option value="180mm">180mm (Recommended)</option>
+                  <option value="custom">Custom</option>
+                </select>
               </div>
             </div>
 
-            {/* Wall Specifications */}
-            <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-leather-100 rounded-xl flex items-center justify-center">
-                  <Ruler className="w-5 h-5 text-leather-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-mocha-950">Wall Specifications</h2>
-                  <p className="text-sm text-stone-600">Define the physical requirements for your smart wall</p>
-                </div>
-              </div>
+            {/* Custom Depth Input */}
+            {smartWallsData.dimensions?.depth === 'custom' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-2"
+              >
+                <label className="block text-sm font-semibold text-mocha-950">
+                  Custom Depth (mm)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="300"
+                  value={smartWallsData.dimensions?.customDepth || ''}
+                  onChange={(e) => handleDimensionsChange('customDepth', parseInt(e.target.value) || 0)}
+                  className="w-full max-w-xs px-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
+                  placeholder="e.g., 200"
+                />
+              </motion.div>
+            )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Dimensions */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Dimensions</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="wall-width" className="block text-sm font-medium text-mocha-950">
-                        Width (meters)
-                      </label>
-                      <input
-                        type="number"
-                        id="wall-width"
-                        min="0.1"
-                        step="0.1"
-                        value={smartWallsData.wallSpecifications?.width || ''}
-                        onChange={(e) => handleWallSpecsChange('width', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 4.5"
-                        className="w-full px-3 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                          text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                          transition-all duration-200"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="wall-height" className="block text-sm font-medium text-mocha-950">
-                        Height (meters)
-                      </label>
-                      <input
-                        type="number"
-                        id="wall-height"
-                        min="0.1"
-                        step="0.1"
-                        value={smartWallsData.wallSpecifications?.height || ''}
-                        onChange={(e) => handleWallSpecsChange('height', parseFloat(e.target.value) || 0)}
-                        placeholder="e.g., 2.7"
-                        className="w-full px-3 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                          text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                          transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Calculated Area */}
-                  {(smartWallsData.wallSpecifications?.width && smartWallsData.wallSpecifications?.height) && (
-                    <div className="p-4 bg-leather-50 border border-leather-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span className="font-medium text-mocha-950">
-                          Total Area: {(smartWallsData.wallSpecifications.width * smartWallsData.wallSpecifications.height).toFixed(2)} m²
-                        </span>
-                      </div>
-                    </div>
-                  )}
+            {/* Calculation Results */}
+            {smartWallsData.dimensions?.width > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-leather-50 to-leather-50 border border-leather-200 rounded-xl p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Calculator className="w-5 h-5 text-leather-600" />
+                  <h3 className="font-bold text-leather-900">Calculation Results</h3>
                 </div>
 
-                {/* Configuration */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Configuration</h3>
-                  
-                  {/* Thickness */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-mocha-950">
-                      Wall Thickness
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {thicknessOptions.map(thickness => (
-                        <button
-                          key={thickness}
-                          onClick={() => handleWallSpecsChange('thickness', thickness)}
-                          className={`p-2 rounded-lg border-2 text-center text-sm font-medium transition-all duration-200 ${
-                            smartWallsData.wallSpecifications?.thickness === thickness
-                              ? 'border-leather-300 bg-leather-50 text-leather-700'
-                              : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50 hover:border-stone-300'
-                          }`}
-                        >
-                          {thickness}
-                        </button>
-                      ))}
-                    </div>
+                    <p className="text-sm text-leather-700">Maximum Achievable Width</p>
+                    <p className="text-2xl font-bold text-leather-900">
+                      {dimensionalCalculation.maxWidth.toFixed(2)}m
+                    </p>
                   </div>
 
-                  {/* Layout */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-mocha-950">
-                      Layout Type
-                    </label>
-                    <div className="space-y-2">
-                      {layoutOptions.map(layout => (
-                        <button
-                          key={layout.value}
-                          onClick={() => handleWallSpecsChange('layout', layout.value)}
-                          className={`w-full p-3 rounded-xl border-2 text-left transition-all duration-200 ${
-                            smartWallsData.wallSpecifications?.layout === layout.value
-                              ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                              : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                          }`}
-                        >
-                          <div className="font-semibold text-sm">{layout.label}</div>
-                          <div className="text-xs text-stone-600">{layout.description}</div>
-                        </button>
+                    <p className="text-sm text-leather-700">Module Configuration</p>
+                    <div className="space-y-1">
+                      {dimensionalCalculation.modules.map((module, index) => (
+                        <p key={index} className="text-sm text-leather-800">
+                          {module.count}× {module.size}mm modules
+                        </p>
                       ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Technical Requirements */}
-            <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-leather-100 rounded-xl flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-leather-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-mocha-950">Technical Requirements</h2>
-                  <p className="text-sm text-stone-600">Special requirements and compliance needs</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-leather-600" />
-                    <div>
-                      <div className="font-medium text-mocha-950">Soundproofing</div>
-                      <div className="text-sm text-stone-600">Acoustic insulation</div>
+                {/* Warnings */}
+                {dimensionalCalculation.warnings.length > 0 && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                      <span className="font-medium text-red-800">Warnings</span>
                     </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartWallsData.technicalNeeds?.soundproofing || false}
-                      onChange={(e) => handleTechnicalNeedsChange('soundproofing', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                      peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                      after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                      after:transition-all peer-checked:bg-leather-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-leather-600" />
-                    <div>
-                      <div className="font-medium text-mocha-950">Fire Rating</div>
-                      <div className="text-sm text-stone-600">Fire safety compliance</div>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartWallsData.technicalNeeds?.fireRating || false}
-                      onChange={(e) => handleTechnicalNeedsChange('fireRating', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                      peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                      after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                      after:transition-all peer-checked:bg-leather-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <Home className="w-5 h-5 text-leather-600" />
-                    <div>
-                      <div className="font-medium text-mocha-950">Accessibility</div>
-                      <div className="text-sm text-stone-600">ADA compliance</div>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartWallsData.technicalNeeds?.accessibility || false}
-                      onChange={(e) => handleTechnicalNeedsChange('accessibility', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                      peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                      after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                      after:transition-all peer-checked:bg-leather-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <Palette className="w-5 h-5 text-leather-600" />
-                    <div>
-                      <div className="font-medium text-mocha-950">Eco Materials</div>
-                      <div className="text-sm text-stone-600">Sustainable options</div>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartWallsData.technicalNeeds?.ecoMaterials || false}
-                      onChange={(e) => handleTechnicalNeedsChange('ecoMaterials', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                      peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                      peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                      after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                      after:transition-all peer-checked:bg-leather-600"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </motion.section>
-        )}
-
-        {/* TV Integration Section */}
-        {activeSection === 'tv' && (
-          <motion.section
-            key="tv"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
-                  <Tv className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-mocha-950">TV Integration</h2>
-                  <p className="text-sm text-stone-600">Mount and integrate your display seamlessly into the smart wall</p>
-                </div>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={smartWallsData.tvIntegration}
-                  onChange={(e) => handleFieldChange('tvIntegration', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                  peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                  peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                  after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                  after:transition-all peer-checked:bg-leather-600"></div>
-              </label>
-            </div>
-
-            {smartWallsData.tvIntegration && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-8"
-              >
-                {/* Screen Size */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Screen Size</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                    {screenSizeOptions.map((size) => (
-                      <button
-                        key={size.value}
-                        onClick={() => handleFieldChange('screenSize', size.value)}
-                        className={`group relative p-4 rounded-xl border-2 text-center transition-all duration-200 hover:shadow-md ${
-                          smartWallsData.screenSize === size.value
-                            ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                            : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                        }`}
-                      >
-                        {size.popular && (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-                            <span className="px-2 py-0.5 bg-green-500 text-white text-xs font-semibold rounded-full">
-                              Popular
-                            </span>
-                          </div>
-                        )}
-                        
-                        <div className="space-y-2">
-                          <span className="text-lg font-bold text-mocha-950">{size.value}</span>
-                          <p className="text-xs text-stone-600">{size.description}</p>
-                        </div>
-                      </button>
+                    {dimensionalCalculation.warnings.map((warning, index) => (
+                      <p key={index} className="text-sm text-red-700">{warning}</p>
                     ))}
                   </div>
-                </div>
-
-                {/* Mount Type */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Mount Type</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {mountTypeOptions.map(type => {
-                      const IconComponent = type.icon;
-                      return (
-                        <button
-                          key={type.value}
-                          onClick={() => handleFieldChange('mountType', type.value)}
-                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
-                            smartWallsData.mountType === type.value
-                              ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                              : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
-                              <IconComponent className="w-4 h-4 text-leather-600" />
-                            </div>
-                            <span className="font-semibold text-sm">{type.value}</span>
-                          </div>
-                          <p className="text-xs text-stone-600">{type.description}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Equipment */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label htmlFor="av-equipment" className="block text-sm font-semibold text-mocha-950">
-                      AV Equipment
-                    </label>
-                    <input
-                      type="text"
-                      id="av-equipment"
-                      value={smartWallsData.avEquipment || ''}
-                      onChange={(e) => handleFieldChange('avEquipment', e.target.value)}
-                      placeholder="e.g., Apple TV, Sky Box, Blu-ray player..."
-                      className="w-full px-4 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                        text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                        transition-all duration-200"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label htmlFor="gaming-consoles" className="block text-sm font-semibold text-mocha-950">
-                      Gaming Consoles
-                    </label>
-                    <input
-                      type="text"
-                      id="gaming-consoles"
-                      value={smartWallsData.consoles || ''}
-                      onChange={(e) => handleFieldChange('consoles', e.target.value)}
-                      placeholder="e.g., PlayStation 5, Xbox Series X..."
-                      className="w-full px-4 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                        text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                        transition-all duration-200"
-                    />
-                  </div>
-                </div>
+                )}
               </motion.div>
             )}
-          </motion.section>
-        )}
+          </div>
+        </motion.section>
+      )}
 
-        {/* Audio System Section */}
-        {activeSection === 'audio' && (
-          <motion.section
-            key="audio"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                  <Volume2 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-mocha-950">Audio System</h2>
-                  <p className="text-sm text-stone-600">Integrate speakers for immersive sound experience</p>
-                </div>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={smartWallsData.speakers}
-                  onChange={(e) => handleFieldChange('speakers', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                  peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                  peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                  after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                  after:transition-all peer-checked:bg-leather-600"></div>
-              </label>
+      {/* Style Selection Section */}
+      {activeSection === 'style' && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Palette className="w-4 h-4 text-leather-600" />
             </div>
+            <h2 className="text-xl font-bold text-mocha-950">Style Selection</h2>
+          </div>
 
-            {smartWallsData.speakers && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-8"
-              >
-                {/* Speaker Type */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Speaker Type</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {speakerTypeOptions.map(type => {
-                      const IconComponent = type.icon;
-                      return (
-                        <button
-                          key={type.value}
-                          onClick={() => handleFieldChange('speakerType', type.value)}
-                          className={`group relative p-4 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
-                            smartWallsData.speakerType === type.value
-                              ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                              : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                          }`}
-                        >
-                          {type.popular && (
-                            <div className="absolute top-2 right-2">
-                              <span className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded">
-                                Popular
-                              </span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
-                              <IconComponent className="w-4 h-4 text-leather-600" />
-                            </div>
-                            <span className="font-semibold text-sm">{type.value}</span>
-                          </div>
-                          <p className="text-xs text-stone-600">{type.description}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Configuration */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-3">
-                    <label htmlFor="speaker-quantity" className="block text-sm font-semibold text-mocha-950">
-                      Quantity
-                    </label>
-                    <input
-                      type="number"
-                      id="speaker-quantity"
-                      min="1"
-                      max="20"
-                      value={smartWallsData.speakerQuantity || ''}
-                      onChange={(e) => handleFieldChange('speakerQuantity', parseInt(e.target.value))}
-                      placeholder="Number of speakers"
-                      className="w-full px-4 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                        text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                        transition-all duration-200"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label htmlFor="surround-setup" className="block text-sm font-semibold text-mocha-950">
-                      Surround Setup
-                    </label>
-                    <select
-                      id="surround-setup"
-                      value={smartWallsData.surroundSetup || ''}
-                      onChange={(e) => handleFieldChange('surroundSetup', e.target.value)}
-                      className="w-full px-4 py-3 bg-white border-2 border-stone-300 rounded-xl 
-                        text-mocha-950 focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 
-                        transition-all duration-200"
-                    >
-                      <option value="">Select setup</option>
-                      <option value="2.0 Stereo">2.0 Stereo</option>
-                      <option value="2.1 with Subwoofer">2.1 with Subwoofer</option>
-                      <option value="5.1 Surround">5.1 Surround</option>
-                      <option value="7.1 Surround">7.1 Surround</option>
-                      <option value="Atmos">Dolby Atmos</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                    <div>
-                      <div className="font-medium text-mocha-950">Wireless Audio</div>
-                      <div className="text-sm text-stone-600">Bluetooth/WiFi connectivity</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={smartWallsData.wirelessAudio || false}
-                        onChange={(e) => handleFieldChange('wirelessAudio', e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                        peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                        after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                        after:transition-all peer-checked:bg-leather-600"></div>
-                    </label>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </motion.section>
-        )}
-
-        {/* Smart Lighting Section */}
-        {activeSection === 'lighting' && (
-          <motion.section
-            key="lighting"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-md">
-                  <Lightbulb className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-mocha-950">Smart Lighting</h2>
-                  <p className="text-sm text-stone-600">Add ambient and accent lighting to enhance your smart wall</p>
-                </div>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={smartWallsData.lighting}
-                  onChange={(e) => handleFieldChange('lighting', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                  peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                  peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                  after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                  after:transition-all peer-checked:bg-leather-600"></div>
-              </label>
-            </div>
-
-            {smartWallsData.lighting && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-8"
-              >
-                {/* Lighting Type */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950">Lighting Type</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {lightingTypeOptions.map(type => (
-                      <button
-                        key={type.value}
-                        onClick={() => handleFieldChange('lightingType', type.value)}
-                        className={`group relative p-4 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
-                          smartWallsData.lightingType === type.value
-                            ? 'border-leather-300 bg-leather-50 ring-2 ring-leather-200'
-                            : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
-                        }`}
-                      >
-                        {type.popular && (
-                          <div className="absolute top-2 right-2">
-                            <span className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded">
-                              Popular
-                            </span>
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                            <Lightbulb className="w-4 h-4 text-yellow-600" />
-                          </div>
-                          <span className="font-semibold text-sm">{type.value}</span>
-                        </div>
-                        <p className="text-xs text-stone-600">{type.description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Lighting Controls */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                    <div>
-                      <div className="font-medium text-mocha-950">Color Control</div>
-                      <div className="text-sm text-stone-600">RGB color changing capability</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={smartWallsData.colorControl || false}
-                        onChange={(e) => handleFieldChange('colorControl', e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                        peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                        after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                        after:transition-all peer-checked:bg-leather-600"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl">
-                    <div>
-                      <div className="font-medium text-mocha-950">Dimming Control</div>
-                      <div className="text-sm text-stone-600">Adjustable brightness levels</div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={smartWallsData.dimmingControl || false}
-                        onChange={(e) => handleFieldChange('dimmingControl', e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 
-                        peer-focus:ring-leather-300 rounded-full peer peer-checked:after:translate-x-full 
-                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                        after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 
-                        after:transition-all peer-checked:bg-leather-600"></div>
-                    </label>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </motion.section>
-        )}
-
-        {/* Additional Features Section */}
-        {activeSection === 'features' && (
-          <motion.section
-            key="features"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md">
-                <Plus className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-mocha-950">Additional Features</h2>
-                <p className="text-sm text-stone-600">Enhance your smart wall with premium add-ons and integrations</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {additionalFeatureOptions.map(feature => {
-                const IconComponent = feature.icon;
+          {!isStyleDetailView ? (
+            // Category Selection
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {textureCategories.map((category) => {
+                const IconComponent = category.icon;
                 return (
-                  <button
-                    key={feature.name}
-                    onClick={() => handleFeatureToggle(feature.name)}
-                    className={`flex items-center justify-between p-5 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-                      smartWallsData.additionalFeatures?.includes(feature.name)
-                        ? 'bg-leather-50 border-leather-300 text-leather-700 ring-2 ring-leather-200'
-                        : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50 hover:border-stone-300'
-                    }`}
+                  <motion.button
+                    key={category.id}
+                    onClick={() => handleStyleCategoryClick(category)}
+                    className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br ${category.color} border-stone-200 hover:border-stone-300`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-leather-100 rounded-xl flex items-center justify-center">
-                        <IconComponent className="w-5 h-5 text-leather-600" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-semibold text-sm">{feature.name}</div>
-                        <div className="text-xs text-stone-600">{feature.description}</div>
-                        <div className="text-xs text-stone-500 mt-1">
-                          <span className="px-1.5 py-0.5 bg-stone-100 rounded">{feature.category}</span>
-                        </div>
-                      </div>
+                    <div className={`w-12 h-12 bg-${category.accent} rounded-xl flex items-center justify-center mb-4 shadow-md`}>
+                      <IconComponent className="w-6 h-6 text-white" />
                     </div>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                      smartWallsData.additionalFeatures?.includes(feature.name)
-                        ? 'bg-leather-600 text-white'
-                        : 'bg-stone-200 text-stone-400'
-                    }`}>
-                      {smartWallsData.additionalFeatures?.includes(feature.name) ? (
-                        <Check className="w-3 h-3" />
-                      ) : (
-                        <Plus className="w-3 h-3" />
-                      )}
+                    
+                    <h3 className="font-bold text-mocha-950 text-lg mb-2">{category.name}</h3>
+                    <p className="text-stone-600 text-sm leading-relaxed mb-4">{category.desc}</p>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-stone-500">{category.panels.length} options</span>
+                      <ArrowLeft className="w-4 h-4 text-stone-400 rotate-180 group-hover:translate-x-1 transition-transform" />
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
-          </motion.section>
-        )}
-
-        {/* Specifications Summary */}
-        {activeSection === 'specifications' && (
-          <motion.section
-            key="specifications"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
-          >
-            <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-leather-100 rounded-xl flex items-center justify-center">
-                  <Ruler className="w-5 h-5 text-leather-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-mocha-950">Configuration Summary</h2>
-                  <p className="text-sm text-stone-600">Review your smart wall specifications</p>
-                </div>
+          ) : (
+            // Finish Selection within Category
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setIsStyleDetailView(false)}
+                  className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Categories
+                </button>
+                <h3 className="text-xl font-bold text-mocha-950">{selectedStyleCategory?.name}</h3>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Project Details */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950 border-b border-stone-200 pb-2">
-                    Project Details
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Property Type:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.projectDetails?.propertyType || 'Not specified'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Purpose:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.projectDetails?.purpose || 'Not specified'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Service Type:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.projectDetails?.installation || 'Not specified'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Location:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.projectDetails?.location || 'Not specified'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {selectedStyleCategory?.panels.map((finish) => {
+                  const isSelected = selectedFinish?.id === finish.id;
+                  return (
+                    <motion.button
+                      key={finish.id}
+                      onClick={() => handleFinishSelect(finish)}
+                      className={`group relative p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                        isSelected
+                          ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                          : 'bg-white border-stone-200 hover:border-stone-300'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-3 right-3">
+                          <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
+                      )}
 
-                {/* Wall Specifications */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-mocha-950 border-b border-stone-200 pb-2">
-                    Wall Specifications
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Dimensions:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.wallSpecifications?.width && smartWallsData.wallSpecifications?.height
-                          ? `${smartWallsData.wallSpecifications.width}m × ${smartWallsData.wallSpecifications.height}m`
-                          : 'Not specified'}
+                      <div className="w-full h-24 bg-stone-200 rounded-lg mb-3 overflow-hidden">
+                        <img 
+                          src={finish.img} 
+                          alt={finish.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      
+                      <h4 className="font-bold text-mocha-950 text-sm mb-1">{finish.name}</h4>
+                      <p className="text-xs text-stone-600 leading-relaxed">{finish.desc}</p>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </motion.section>
+      )}
+
+
+      {/* Accessories Section */}
+      {activeSection === 'accessories' && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Plus className="w-4 h-4 text-leather-600" />
+            </div>
+            <h2 className="text-xl font-bold text-mocha-950">Accessories</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { 
+                key: 'tv', 
+                label: 'TV Integration', 
+                icon: Tv, 
+                description: 'Integrated TV mounting and cable management',
+                popular: true 
+              },
+              { 
+                key: 'fireplace', 
+                label: 'Fireplace', 
+                icon: Home, 
+                description: 'Electric fireplace integration with smart controls' 
+              },
+              { 
+                key: 'soundbar', 
+                label: 'Soundbar', 
+                icon: Speaker, 
+                description: 'Premium audio integration with hidden wiring' 
+              },
+              { 
+                key: 'shelving', 
+                label: 'Shelving', 
+                icon: Layers, 
+                description: 'Floating shelves with integrated lighting' 
+              }
+            ].map((accessory) => {
+              const IconComponent = accessory.icon;
+              const isSelected = smartWallsData.accessories?.[accessory.key] || false;
+              
+              return (
+                <motion.button
+                  key={accessory.key}
+                  onClick={() => handleAccessoryToggle(accessory.key as keyof NonNullable<SmartWallsFormData['accessories']>)}
+                  className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    isSelected
+                      ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                      : 'bg-white border-stone-200 hover:border-stone-300'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {accessory.popular && (
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                        Popular
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Thickness:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.wallSpecifications?.thickness || 'Not specified'}
-                      </span>
+                  )}
+
+                  {isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-stone-600">Layout:</span>
-                      <span className="font-medium text-mocha-950">
-                        {smartWallsData.wallSpecifications?.layout || 'Not specified'}
-                      </span>
-                    </div>
-                    {smartWallsData.wallSpecifications?.width && smartWallsData.wallSpecifications?.height && (
-                      <div className="flex justify-between">
-                        <span className="text-stone-600">Total Area:</span>
-                        <span className="font-medium text-mocha-950">
-                          {(smartWallsData.wallSpecifications.width * smartWallsData.wallSpecifications.height).toFixed(2)} m²
+                  )}
+
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
+                    isSelected ? 'bg-leather-600 shadow-md' : 'bg-leather-100 group-hover:bg-leather-200'
+                  }`}>
+                    <IconComponent className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-leather-600'}`} />
+                  </div>
+
+                  <h3 className="font-bold text-mocha-950 text-lg mb-2">{accessory.label}</h3>
+                  <p className="text-stone-600 text-sm leading-relaxed">{accessory.description}</p>
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.section>
+      )}
+
+      {/* Smart Devices Section */}
+      {activeSection === 'devices' && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Zap className="w-4 h-4 text-leather-600" />
+            </div>
+            <h2 className="text-xl font-bold text-mocha-950">Smart Devices</h2>
+          </div>
+
+          {/* Device Search and Filter */}
+          <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                <input
+                  type="text"
+                  placeholder="Search devices..."
+                  value={deviceSearchTerm}
+                  onChange={(e) => setDeviceSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
+                />
+              </div>
+              
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                <select
+                  value={selectedDeviceCategory}
+                  onChange={(e) => setSelectedDeviceCategory(e.target.value)}
+                  className="pl-10 pr-8 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 appearance-none bg-white min-w-[160px]"
+                >
+                  {deviceCategories.map(category => (
+                    <option key={category} value={category}>
+                      {category === 'all' ? 'All Categories' : category}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+              </div>
+            </div>
+            
+            <div className="mt-4 flex items-center justify-between text-sm text-stone-600">
+              <span>Showing {filteredDevices.length} of {deviceCatalog.length} devices</span>
+              <span>{smartWallsData.smartDevices?.selectedDevices?.length || 0} selected</span>
+            </div>
+          </div>
+
+          {/* Device Catalog */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <AnimatePresence mode="popLayout">
+              {filteredDevices.map((device, index) => {
+                const IconComponent = device.icon;
+                const isSelected = smartWallsData.smartDevices?.selectedDevices?.some(d => d.name === device.name) || false;
+                
+                return (
+                  <motion.button
+                    key={device.name}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => handleDeviceToggle(device.name, device.category)}
+                    className={`group relative p-5 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                      isSelected
+                        ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                        : 'bg-white border-stone-200 hover:border-stone-300'
+                    }`}
+                  >
+                    {device.popular && (
+                      <div className="absolute top-3 right-3">
+                        <span className="px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                          Popular
                         </span>
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
 
-              {/* Features Summary */}
-              <div className="mt-8 pt-6 border-t border-stone-200">
-                <h3 className="text-lg font-semibold text-mocha-950 mb-4">Selected Features</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {smartWallsData.tvIntegration && (
-                    <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <Tv className="w-5 h-5 text-green-600" />
-                      <div>
-                        <div className="font-medium text-sm">TV Integration</div>
-                        <div className="text-xs text-stone-600">
-                          {smartWallsData.screenSize && `${smartWallsData.screenSize} display`}
+                    {isSelected && (
+                      <div className="absolute top-3 right-3">
+                        <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
                         </div>
                       </div>
-                    </div>
-                  )}
-                  
-                  {smartWallsData.speakers && (
-                    <div className="flex items-center gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                      <Volume2 className="w-5 h-5 text-purple-600" />
-                      <div>
-                        <div className="font-medium text-sm">Audio System</div>
-                        <div className="text-xs text-stone-600">
-                          {smartWallsData.speakerType || 'Speakers configured'}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {smartWallsData.lighting && (
-                    <div className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <Lightbulb className="w-5 h-5 text-yellow-600" />
-                      <div>
-                        <div className="font-medium text-sm">Smart Lighting</div>
-                        <div className="text-xs text-stone-600">
-                          {smartWallsData.lightingType || 'Lighting configured'}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {(smartWallsData.additionalFeatures || []).map(feature => (
-                    <div key={feature} className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <Plus className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <div className="font-medium text-sm">{feature}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
 
-                {getActiveFeaturesCount() === 0 && (
-                  <div className="text-center py-8 text-stone-500">
-                    <Plus className="w-12 h-12 mx-auto mb-3 text-stone-300" />
-                    <p>No features selected yet. Use the navigation above to configure your smart wall.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.section>
-        )}
-      </AnimatePresence>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
+                      isSelected ? 'bg-leather-600 shadow-md' : 'bg-leather-100 group-hover:bg-leather-200'
+                    }`}>
+                      <IconComponent className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-leather-600'}`} />
+                    </div>
 
-      {/* Professional Installation Notice */}
-      <section className="bg-gradient-to-r from-clay-50 to-stone-50 border border-clay-200 rounded-2xl p-8 shadow-sm">
-        <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0">
-            <div className="w-10 h-10 bg-leather-600 rounded-xl flex items-center justify-center shadow-sm">
-              <Info className="w-5 h-5 text-white" />
-            </div>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-mocha-950 text-sm leading-tight">
+                          {device.name}
+                        </h3>
+                        <p className="text-xs text-stone-600 leading-relaxed">
+                          {device.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
+                          {device.category}
+                        </span>
+                      </div>
+
+                      {device.features && (
+                        <div className="space-y-1">
+                          {device.features.slice(0, 2).map((feature, idx) => (
+                            <div key={idx} className="flex items-center gap-1">
+                              <div className="w-1 h-1 bg-stone-400 rounded-full"></div>
+                              <span className="text-xs text-stone-500">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
           </div>
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-mocha-950">
-              Professional Smart Wall Installation
-            </h3>
-            <div className="prose prose-sm text-stone-700 max-w-none">
-              <p className="leading-relaxed">
-                Our <strong>certified installation specialists</strong> ensure flawless integration of all smart wall components. 
-                From structural mounting to technology integration, we deliver a seamless, professional finish that exceeds expectations.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-mocha-950 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-green-600" />
-                    Expert Installation
-                  </h4>
-                  <ul className="space-y-1 text-sm">
-                    <li>• Structural assessment & preparation</li>
-                    <li>• Precision mounting & alignment</li>
-                    <li>• Cable management & concealment</li>
-                    <li>• Quality testing & calibration</li>
-                  </ul>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-mocha-950 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-blue-600" />
-                    Technology Integration
-                  </h4>
-                  <ul className="space-y-1 text-sm">
-                    <li>• Smart home system setup</li>
-                    <li>• Network configuration & optimization</li>
-                    <li>• User training & support</li>
-                    <li>• Ongoing maintenance programs</li>
-                  </ul>
-                </div>
-              </div>
+        </motion.section>
+      )}
+
+      {/* Gaming System Section */}
+      {activeSection === 'gaming' && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Gamepad2 className="w-4 h-4 text-leather-600" />
             </div>
+            <h2 className="text-xl font-bold text-mocha-950">Gaming System</h2>
           </div>
-        </div>
-      </section>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {([
+              { type: 'PlayStation', label: 'PlayStation 5', description: 'Sony PlayStation 5 integration with optimized display settings' },
+              { type: 'Xbox', label: 'Xbox Series X/S', description: 'Microsoft Xbox Series X/S with 4K gaming support' },
+              { type: 'Nintendo', label: 'Nintendo Switch', description: 'Nintendo Switch with docking station integration' },
+              { type: 'PC Setup', label: 'Gaming PC', description: 'Custom gaming PC setup with high-performance specifications' },
+              { type: 'Custom', label: 'Custom Setup', description: 'Specify your own gaming system requirements' }
+            ] satisfies Array<{ type: SmartWallsFormData['gamingSystem']['type']; label: string; description: string }>).map((system) => {
+              const isSelected = smartWallsData.gamingSystem?.type === system.type;
+              
+              return (
+                <motion.button
+                  key={system.type}
+                  onClick={() => handleGamingSystemSelect(system.type)}
+                  className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    isSelected
+                      ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                      : 'bg-white border-stone-200 hover:border-stone-300'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
+                    isSelected ? 'bg-leather-600 shadow-md' : 'bg-leather-100 group-hover:bg-leather-200'
+                  }`}>
+                    <Gamepad2 className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-leather-600'}`} />
+                  </div>
+
+                  <h3 className="font-bold text-mocha-950 text-lg mb-2">{system.label}</h3>
+                  <p className="text-stone-600 text-sm leading-relaxed">{system.description}</p>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Custom Gaming System Specifications */}
+          {smartWallsData.gamingSystem?.type === 'Custom' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm"
+            >
+              <h3 className="font-bold text-mocha-950 mb-4">Custom Gaming System Specifications</h3>
+              <textarea
+                value={smartWallsData.gamingSystem?.specifications || ''}
+                onChange={(e) => handleFieldChange('gamingSystem', { 
+                  ...smartWallsData.gamingSystem, 
+                  specifications: e.target.value 
+                })}
+                placeholder="Please describe your custom gaming system requirements, including hardware specifications, display preferences, and any special installation needs..."
+                className="w-full h-32 px-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 resize-none"
+              />
+            </motion.div>
+          )}
+        </motion.section>
+      )}
     </motion.div>
   );
 }
+
