@@ -12,14 +12,14 @@ import {
   type EmailTemplateOptions,
   type BrandConfig,
   type CTALinks
-} from './emailTemplate';
+} from './emailTemplate.js';
 
 import {
   generateModularEmail,
   EmailComponentBuilder,
   EXTENDED_THEME_VARIANTS,
   applyThemeToBrandConfig
-} from './modularComponents';
+} from './modularComponents.js';
 
 /* =========================
    CORS / SECURITY / LIMITS
