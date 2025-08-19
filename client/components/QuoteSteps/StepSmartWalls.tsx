@@ -499,12 +499,19 @@ export default function StepSmartWalls() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-leather-100 rounded-lg flex items-center justify-center">
-              <Ruler className="w-4 h-4 text-leather-600" />
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 bg-leather-100 rounded-lg flex items-center justify-center">
+              <Ruler className="w-6 h-6 text-leather-600" />
             </div>
-            <h2 className="text-xl font-bold text-mocha-950">Wall Dimensions</h2>
+            <div>
+              <h2 className="text-xl font-bold text-mocha-950">Wall Dimensions</h2>
+              <p className="text-stone-600">
+                Start by entering your wall dimensions to get personalized module recommendations.
+              </p>
+            </div>
           </div>
+
+        
 
           <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
             {/* Dimension Inputs */}
@@ -655,7 +662,7 @@ export default function StepSmartWalls() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className={`w-12 h-12 bg-${category.accent} rounded-xl flex items-center justify-center mb-4 shadow-md`}>
-                      <IconComponent className="w-6 h-6 text-white" />
+                      <IconComponent className="w-6 h-6 text-leather-600" />
                     </div>
                     
                     <h3 className="font-bold text-mocha-950 text-lg mb-2">{category.name}</h3>

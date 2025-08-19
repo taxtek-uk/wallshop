@@ -1,6 +1,25 @@
-// api/sendQuote.ts — Enhanced Professional Quote Modal Handler (Consolidated & Fixed)
+// sendQuote_enhanced.ts — Enhanced Professional Quote Modal Handler with Modern Email Templates
+// Integrated with Wall Shop branding, multilingual support, and modular email components
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
+
+// Import our new email template system
+import { 
+  generateWallShopEmailTemplate,
+  getThemeVariants,
+  getDefaultBrandConfig,
+  type EmailTemplateOptions,
+  type BrandConfig,
+  type CTALinks
+} from './emailTemplate';
+
+import {
+  generateModularEmail,
+  EmailComponentBuilder,
+  EXTENDED_THEME_VARIANTS,
+  applyThemeToBrandConfig
+} from './modularComponents';
 
 /* =========================
    CORS / SECURITY / LIMITS
@@ -26,7 +45,7 @@ enum ModalQuotePriority {
   PREMIUM = "premium",
 }
 
-interface QuoteModalData {
+export interface QuoteModalData {
   fullName: string;
   email: string;
   phone: string;
@@ -54,7 +73,7 @@ interface ValidationResult {
   errors?: Record<string, string>;
 }
 
-interface QuoteModalAnalysis {
+export interface QuoteModalAnalysis {
   priority: ModalQuotePriority;
   estimatedValue: number;
   productCount: number;
@@ -79,6 +98,43 @@ interface EmailResults {
   };
 }
 
+/* ===============================
+   ENHANCED EMAIL CONFIGURATION
+   =============================== */
+
+// Enhanced brand configuration with Wall Shop specifics
+const WALL_SHOP_BRAND_CONFIG: BrandConfig = {
+  primaryColor: '#2C3E50', // Deep navy/charcoal from website analysis
+  accentColor: '#E67E22',  // Vibrant orange/gold from website analysis
+  neutralBg: '#F8F9FA',    // Light grey
+  textColor: '#2C3E50',    // Dark text for light backgrounds
+  logoUrl: '{{logoUrl}}',  // Placeholder for logo
+  companyName: 'The Wall Shop',
+  tagline: 'Elevate your walls with style',
+  website: 'https://thewallshop.co.uk',
+  address: 'SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK',
+  phone: '+44 141 739 3377',
+  email: 'info@thewallshop.co.uk',
+  socialLinks: {
+    linkedin: 'https://linkedin.com/company/thewallshop',
+    instagram: 'https://instagram.com/thewallshop',
+    website: 'https://thewallshop.co.uk'
+  }
+};
+
+// Enhanced CTA links with actual Wall Shop URLs
+const WALL_SHOP_CTA_LINKS: CTALinks = {
+  viewLink: '{{viewLink}}', // Dynamic placeholder - will be populated with actual quote URL
+  pdfLink: '{{pdfLink}}', // Dynamic placeholder - will be populated with PDF download URL
+  approveLink: '{{approveLink}}', // Dynamic placeholder - will be populated with approval URL
+  requestChangesLink: '{{requestChangesLink}}', // Dynamic placeholder - will be populated with changes URL
+  requestCallbackLink: 'https://thewallshop.co.uk/contact', // Actual contact page
+  forwardLink: '{{forwardLink}}', // Dynamic placeholder - internal forwarding
+  scheduleConsultationLink: 'https://thewallshop.co.uk/contact', // Actual contact page for scheduling
+  exploreSmartWallsLink: 'https://thewallshop.co.uk/smart-walls', // Actual smart walls page
+  contactLink: 'https://thewallshop.co.uk/contact' // Actual contact page
+};
+
 /* ==============
    MAIN HANDLER
    ============== */
@@ -90,7 +146,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization");
   res.setHeader("Access-Control-Max-Age", "86400");
-  // Security
+  
+  // Enhanced Security Headers
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("X-XSS-Protection", "1; mode=block");
@@ -126,7 +183,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Env check
+    // Environment check
     if (!process.env.RESEND_API_KEY) {
       console.error("Missing RESEND_API_KEY");
       return res.status(500).json({
@@ -136,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Parse + validate
+    // Parse and validate
     const body = await parseRequestBody(req);
     const validation = validateQuoteModalData(body);
     if (!validation.isValid || !validation.data) {
@@ -150,20 +207,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const data = validation.data;
     const analysis = analyzeQuoteModal(data);
-    const content = generateQuoteModalEmailContent(data, analysis);
+    
+    // Generate enhanced email content using our new template system
+    const content = generateEnhancedQuoteModalEmailContent(data, analysis, {
+      theme: body.emailTheme || 'default', // Allow theme selection from request
+      language: body.language || 'en', // Allow language selection from request
+      variant: 'external', // Customer-facing email
+      trackingPixel: generateTrackingPixelUrl(data, analysis)
+    });
 
     // Resend
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // Send Emails (admin + customer) & return IDs
-    const emailResults = await sendQuoteModalEmails(resend, data, content, analysis);
+    // Send enhanced emails
+    const emailResults = await sendEnhancedQuoteModalEmails(resend, data, content, analysis);
     if (!emailResults.success) throw new Error(emailResults.error || "Failed to process quote modal submission");
 
-    // SUCCESS
+    // Enhanced SUCCESS response
     return res.status(200).json({
       success: true,
       message: "Quote request submitted successfully! Our team will prepare your personalized proposal.",
-      // Top-level IDs for the modal UI:
       referenceId: emailResults.quoteId,
       quoteId: emailResults.quoteId,
       details: {
@@ -172,6 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         priority: analysis.priority,
         estimatedValue: analysis.estimatedValue,
         estimatedResponse: getModalResponseTimeEstimate(analysis.priority),
+        availableThemes: EXTENDED_THEME_VARIANTS.map(t => ({ name: t.name, description: t.description })),
         nextSteps: [
           "Immediate technical review and feasibility assessment",
           "Detailed cost analysis with material specifications",
@@ -184,14 +248,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           hours: "Monday - Friday, 9:00 AM - 6:00 PM GMT",
           emergency: "stephen@thewallshop.co.uk",
         },
+        links: {
+          exploreSmartWalls: WALL_SHOP_CTA_LINKS.exploreSmartWallsLink,
+          scheduleConsultation: WALL_SHOP_CTA_LINKS.scheduleConsultationLink,
+          contact: WALL_SHOP_CTA_LINKS.contactLink
+        }
       },
       tracking: {
         emailIds: emailResults.emailIds,
         referenceId: emailResults.quoteId,
+        trackingEnabled: true
       },
     });
   } catch (error) {
-    console.error("Quote Modal Submission Error:", {
+    console.error("Enhanced Quote Modal Submission Error:", {
       error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString(),
@@ -222,9 +292,157 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+/* ===============================
+   ENHANCED EMAIL GENERATION
+   =============================== */
+
+/**
+ * Generate enhanced email content using the new template system
+ */
+function generateEnhancedQuoteModalEmailContent(
+  data: QuoteModalData,
+  analysis: QuoteModalAnalysis,
+  options: {
+    theme?: string;
+    language?: 'en' | 'fr' | 'es' | 'ar' | 'ur';
+    variant?: 'external' | 'internal';
+    trackingPixel?: string;
+  } = {}
+): EmailContent {
+  const { theme = 'default', language = 'en', variant = 'external', trackingPixel } = options;
+
+  // Generate customer email using new template system
+  const customerEmailOptions: EmailTemplateOptions = {
+    variant: 'external',
+    theme,
+    language,
+    brandConfig: WALL_SHOP_BRAND_CONFIG,
+    ctaLinks: WALL_SHOP_CTA_LINKS,
+    trackingPixel
+  };
+
+  const customerEmail = generateWallShopEmailTemplate(data, analysis, customerEmailOptions);
+
+  // Generate admin email using modular system
+  const adminEmailOptions: EmailTemplateOptions = {
+    variant: 'internal',
+    theme: 'default', // Always use default theme for internal emails
+    language: 'en', // Always use English for internal emails
+    brandConfig: WALL_SHOP_BRAND_CONFIG,
+    ctaLinks: WALL_SHOP_CTA_LINKS
+  };
+
+  const adminEmail = generateWallShopEmailTemplate(data, analysis, adminEmailOptions);
+
+  return {
+    customerHtml: customerEmail.html,
+    customerText: customerEmail.text,
+    adminHtml: adminEmail.html,
+    adminText: adminEmail.text
+  };
+}
+
+/**
+ * Generate tracking pixel URL with analytics data
+ */
+function generateTrackingPixelUrl(data: QuoteModalData, analysis: QuoteModalAnalysis): string {
+  const baseUrl = 'https://analytics.thewallshop.co.uk/pixel.gif';
+  const params = new URLSearchParams({
+    event: 'quote_email_opened',
+    customer: data.email,
+    priority: analysis.priority,
+    value: analysis.estimatedValue.toString(),
+    entry_point: data.entryPoint,
+    timestamp: Date.now().toString()
+  });
+
+  return `${baseUrl}?${params.toString()}`;
+}
+
+/**
+ * Send enhanced emails using the Resend API
+ */
+async function sendEnhancedQuoteModalEmails(
+  resend: Resend,
+  data: QuoteModalData,
+  content: EmailContent,
+  analysis: QuoteModalAnalysis
+): Promise<EmailResults> {
+  const quoteId = generateQuoteModalId();
+
+  try {
+    const [adminResult, customerResult] = await Promise.allSettled([
+      // Admin email with enhanced subject and headers
+      resend.emails.send({
+        from: "The Wall Shop Quotes <quotes@thewallshop.co.uk>",
+        to: ["stephen@thewallshop.co.uk"],
+        subject: `[${analysis.priority.toUpperCase()}] New Quote Request — £${analysis.estimatedValue.toLocaleString()} — ${data.fullName} [${quoteId}]`,
+        html: content.adminHtml,
+        text: content.adminText,
+        headers: {
+          "X-Quote-ID": quoteId,
+          "X-Entry-Point": data.entryPoint,
+          "X-Priority": analysis.priority,
+          "X-Customer-Email": data.email,
+          "X-Estimated-Value": analysis.estimatedValue.toString(),
+          "X-Wall-Shop-System": "enhanced-v2"
+        },
+        tags: [
+          { name: "type", value: "quote-admin" },
+          { name: "priority", value: analysis.priority },
+          { name: "entry-point", value: data.entryPoint }
+        ]
+      }),
+      // Customer email with enhanced subject and headers
+      resend.emails.send({
+        from: "The Wall Shop <quotes@thewallshop.co.uk>",
+        to: [data.email],
+        subject: `Your Quote Request Received — ${quoteId} | The Wall Shop`,
+        html: content.customerHtml,
+        text: content.customerText,
+        headers: {
+          "X-Quote-ID": quoteId,
+          "X-Entry-Point": data.entryPoint,
+          "X-Wall-Shop-System": "enhanced-v2"
+        },
+        tags: [
+          { name: "type", value: "quote-customer" },
+          { name: "priority", value: analysis.priority },
+          { name: "entry-point", value: data.entryPoint }
+        ]
+      }),
+    ]);
+
+    const adminSuccess = adminResult.status === "fulfilled" && !(adminResult as any).value?.error;
+    const customerSuccess = customerResult.status === "fulfilled" && !(customerResult as any).value?.error;
+
+    if (!adminSuccess && !customerSuccess) {
+      throw new Error("Failed to send both emails");
+    }
+
+    return {
+      success: true,
+      quoteId,
+      emailIds: {
+        admin: adminSuccess ? (adminResult as any).value?.data?.id : undefined,
+        customer: customerSuccess ? (customerResult as any).value?.data?.id : undefined,
+      },
+    };
+  } catch (error) {
+    console.error("Enhanced email sending error:", error);
+    return {
+      success: false,
+      quoteId,
+      error: error instanceof Error ? error.message : "Unknown email error",
+    };
+  }
+}
+
 /* =========================
    UTILITIES / VALIDATION
+   (Keeping existing functions but with enhanced error handling)
    ========================= */
+
 function getClientIP(req: VercelRequest): string {
   const cf = req.headers["cf-connecting-ip"];
   if (typeof cf === "string") return cf.trim();
@@ -339,9 +557,6 @@ function validateQuoteModalData(body: any): ValidationResult {
   };
 }
 
-/* ==================
-   ANALYSIS & IDs
-   ================== */
 function analyzeQuoteModal(data: QuoteModalData): QuoteModalAnalysis {
   let priority: ModalQuotePriority = ModalQuotePriority.STANDARD;
   let complexity = "Standard";
@@ -399,379 +614,7 @@ function generateQuoteModalId(): string {
   return `QTM-${timestamp}-${random}`.toUpperCase();
 }
 
-/* =========================
-   EMAIL CONTENT (HTML/TXT)
-   ========================= */
-function generateQuoteModalEmailContent(data: QuoteModalData, analysis: QuoteModalAnalysis): EmailContent {
-  const ts = new Date().toLocaleString("en-GB", { timeZone: "Europe/London", dateStyle: "full", timeStyle: "short" });
-  const entry = data.entryPoint.replace("-", " ").toUpperCase();
+// Export types for external use
+export type { QuoteModalData, QuoteModalAnalysis, EmailContent, EmailResults, ValidationResult };
+export { ModalQuotePriority, WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
 
-  const productSections = buildProductSections(data);
-
-  // ADMIN HTML
-  const adminHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Quote Request - ${escapeHtml(data.fullName)}</title>
-  <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#333;margin:0;padding:20px;background:#f8f9fa}
-    .container{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden}
-    .header{background:linear-gradient(135deg,#8B4513 0%,#A0522D 100%);color:#fff;padding:30px;text-align:center}
-    .content{padding:30px}
-    .section{margin-bottom:25px;padding:20px;background:#f8f9fa;border-radius:8px;border-left:4px solid #8B4513}
-    .field{margin-bottom:12px}
-    .label{font-weight:600;color:#495057;margin-bottom:4px}
-    .value{color:#212529}
-    .footer{background:#f8f9fa;padding:20px;text-align:center;color:#6c757d;font-size:14px}
-    .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;background:#e9ecef;color:#495057}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>New Quote Request</h1>
-      <p>Entry Point: ${entry}</p>
-      <span class="badge">${analysis.priority.toUpperCase()}</span>
-    </div>
-    <div class="content">
-      <div class="section">
-        <h2>Contact Information</h2>
-        <div class="field"><div class="label">Name:</div><div class="value">${escapeHtml(data.fullName)}</div></div>
-        <div class="field"><div class="label">Email:</div><div class="value">${escapeHtml(data.email)}</div></div>
-        <div class="field"><div class="label">Phone:</div><div class="value">${escapeHtml(data.phone)}</div></div>
-        ${data.installationAddress ? `<div class="field"><div class="label">Installation Address:</div><div class="value">${escapeHtml(data.installationAddress)}</div></div>` : ""}
-        ${data.additionalNotes ? `<div class="field"><div class="label">Additional Notes:</div><div class="value">${escapeHtml(data.additionalNotes)}</div></div>` : ""}
-      </div>
-
-      ${productSections}
-
-      <div class="section">
-        <h2>Quote Analysis</h2>
-        <div class="field"><div class="label">Priority:</div><div class="value">${analysis.priority.toUpperCase()}</div></div>
-        <div class="field"><div class="label">Estimated Value:</div><div class="value">£${analysis.estimatedValue.toLocaleString()}</div></div>
-        <div class="field"><div class="label">Product Count:</div><div class="value">${analysis.productCount}</div></div>
-        <div class="field"><div class="label">Complexity:</div><div class="value">${analysis.complexity}</div></div>
-        ${analysis.specialRequirements.length ? `<div class="field"><div class="label">Special Requirements:</div><div class="value">${analysis.specialRequirements.map(escapeHtml).join(", ")}</div></div>` : ""}
-      </div>
-    </div>
-    <div class="footer">
-      <p>Submitted: ${ts}</p>
-      <p>Response Time Target: ${getModalResponseTimeEstimate(analysis.priority)}</p>
-    </div>
-  </div>
-</body>
-</html>`.trim();
-
-  // CUSTOMER HTML
-  const customerHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quote Request Received - The Wall Shop</title>
-  <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#333;margin:0;padding:20px;background:#f8f9fa}
-    .container{max-width:600px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden}
-    .header{background:linear-gradient(135deg,#8B4513 0%,#A0522D 100%);color:#fff;padding:30px;text-align:center}
-    .content{padding:30px}
-    .section{margin-bottom:20px}
-    .footer{background:#f8f9fa;padding:20px;text-align:center;color:#6c757d;font-size:14px}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Thank You, ${escapeHtml(data.fullName)}!</h1>
-      <p>Your quote request has been received</p>
-    </div>
-
-    <div class="content">
-      <div class="section">
-        <h2>What happens next?</h2>
-        <p>Our expert team will review your requirements and prepare a detailed, personalized quote for you.</p>
-        <p><strong>Expected response time:</strong> ${getModalResponseTimeEstimate(analysis.priority)}</p>
-      </div>
-
-      <div class="section">
-        <h2>Your Request Summary</h2>
-        <p><strong>Entry Point:</strong> ${entry}</p>
-        <p><strong>Estimated Project Value:</strong> £${analysis.estimatedValue.toLocaleString()}</p>
-        ${analysis.specialRequirements.length ? `<p><strong>Special Requirements:</strong> ${analysis.specialRequirements.map(escapeHtml).join(", ")}</p>` : ""}
-      </div>
-
-      <div class="section">
-        <h2>Need immediate assistance?</h2>
-        <p><strong>Phone:</strong> +44 141 739 3377</p>
-        <p><strong>Email:</strong> stephen@thewallshop.co.uk</p>
-        <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM GMT</p>
-      </div>
-    </div>
-
-    <div class="footer">
-      <p>The Wall Shop - Premium Wall Solutions</p>
-      <p>This email was sent in response to your quote request on ${ts}</p>
-    </div>
-  </div>
-</body>
-</html>`.trim();
-
-  // TEXT
-  const adminText = `
-New Quote Request - ${data.fullName}
-Entry Point: ${entry}
-Priority: ${analysis.priority.toUpperCase()}
-
-CONTACT INFORMATION:
-Name: ${data.fullName}
-Email: ${data.email}
-Phone: ${data.phone}
-${data.installationAddress ? `Installation Address: ${data.installationAddress}` : ""}
-${data.additionalNotes ? `Additional Notes: ${data.additionalNotes}` : ""}
-
-QUOTE ANALYSIS:
-Priority: ${analysis.priority.toUpperCase()}
-Estimated Value: £${analysis.estimatedValue.toLocaleString()}
-Product Count: ${analysis.productCount}
-Complexity: ${analysis.complexity}
-${analysis.specialRequirements.length ? `Special Requirements: ${analysis.specialRequirements.join(", ")}` : ""}
-
-Submitted: ${ts}
-Response Time Target: ${getModalResponseTimeEstimate(analysis.priority)}
-  `.trim();
-
-  const customerText = `
-Thank You, ${data.fullName}!
-
-Your quote request has been received and our expert team will review your requirements.
-
-Expected response time: ${getModalResponseTimeEstimate(analysis.priority)}
-
-Your Request Summary:
-- Entry Point: ${entry}
-- Estimated Project Value: £${analysis.estimatedValue.toLocaleString()}
-${analysis.specialRequirements.length ? `- Special Requirements: ${analysis.specialRequirements.join(", ")}` : ""}
-
-Need immediate assistance?
-Phone: +44 141 739 3377
-Email: stephen@thewallshop.co.uk
-Hours: Monday - Friday, 9:00 AM - 6:00 PM GMT
-
-The Wall Shop - Premium Wall Solutions
-Submitted: ${ts}
-  `.trim();
-
-  return { adminHtml, adminText, customerHtml, customerText };
-}
-
-function buildProductSections(data: QuoteModalData): string {
-  const sections: string[] = [];
-  const push = (html: string) => sections.push(html);
-
-  if (data.entryPoint === "home") {
-    if (data.smartWalls) push(generateSmartWallsSection(data.smartWalls));
-    if (data.smartDevices) push(generateSmartDevicesSection(data.smartDevices));
-    if (data.wallPanels) push(generateWallPanelsSection(data.wallPanels));
-    if (data.carbonRockBoards) push(generateCarbonRockBoardsSection(data.carbonRockBoards));
-  } else {
-    switch (data.entryPoint) {
-      case "smart-walls":
-        if (data.smartWalls) push(generateSmartWallsSection(data.smartWalls));
-        break;
-      case "smart-devices":
-        if (data.smartDevices) push(generateSmartDevicesSection(data.smartDevices));
-        break;
-      case "wall-panels":
-        if (data.wallPanels) push(generateWallPanelsSection(data.wallPanels));
-        break;
-      case "carbon-rock-boards":
-        if (data.carbonRockBoards) push(generateCarbonRockBoardsSection(data.carbonRockBoards));
-        break;
-    }
-  }
-  return sections.join("\n\n");
-}
-
-function generateSmartWallsSection(smartWalls: any): string {
-  const dims = smartWalls.dimensions || {};
-  const style = smartWalls.selectedStyle || {};
-  const acc = smartWalls.accessories || {};
-  const sd = smartWalls.smartDevices || {};
-  const gs = smartWalls.gamingSystem || {};
-
-  return `
-    <div class="section">
-      <h2>Smart Walls Configuration</h2>
-
-      ${dims.width ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width} × ${dims.height ?? ''}</div></div>` : ''}
-      ${dims.depth ? `<div class="field"><div class="label">Depth:</div><div class="value">${escapeHtml(String(dims.depth))}${dims.depth === 'custom' && dims.customDepth ? ` (${dims.customDepth}mm)` : ''}</div></div>` : ''}
-      ${typeof dims.calculatedMaxWidth !== 'undefined' ? `<div class="field"><div class="label">Calculated Max Width:</div><div class="value">${dims.calculatedMaxWidth}</div></div>` : ''}
-
-      ${(style.category || style.finish) ? `<div class="field"><div class="label">Selected Style:</div><div class="value">${[style.category, style.finish].filter(Boolean).map((s: string) => escapeHtml(String(s))).join(' — ')}</div></div>` : ''}
-      ${style.finishDescription ? `<div class="field"><div class="label">Style Notes:</div><div class="value">${escapeHtml(String(style.finishDescription))}</div></div>` : ''}
-
-      <div class="field"><div class="label">Accessories - TV:</div><div class="value">${acc.tv ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Accessories - Fireplace:</div><div class="value">${acc.fireplace ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Accessories - Soundbar:</div><div class="value">${acc.soundbar ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Accessories - Shelving:</div><div class="value">${acc.shelving ? 'Yes' : 'No'}</div></div>
-
-      <div class="field"><div class="label">Smart Devices - Control Panels:</div><div class="value">${sd.controlPanels ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Smart Devices - Security Sensors:</div><div class="value">${sd.securitySensors ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Smart Devices - Home Automation:</div><div class="value">${sd.homeAutomation ? 'Yes' : 'No'}</div></div>
-      ${Array.isArray(sd.selectedDevices) && sd.selectedDevices.length ? `<div class="field"><div class="label">Selected Devices:</div><div class="value">${sd.selectedDevices.map((d: any) => escapeHtml(d.name || String(d))).join(', ')}</div></div>` : ''}
-
-      ${gs.type ? `<div class="field"><div class="label">Gaming System:</div><div class="value">${escapeHtml(String(gs.type))}${gs.specifications ? ` — ${escapeHtml(String(gs.specifications))}` : ''}</div></div>` : ''}
-
-      <div class="field"><div class="label">TV Integration (Legacy):</div><div class="value">${smartWalls.tvIntegration ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Speakers (Legacy):</div><div class="value">${smartWalls.speakers ? 'Yes' : 'No'}</div></div>
-      <div class="field"><div class="label">Lighting (Legacy):</div><div class="value">${smartWalls.lighting ? 'Yes' : 'No'}</div></div>
-      ${smartWalls.additionalFeatures?.length ? `<div class="field"><div class="label">Additional Features:</div><div class="value">${smartWalls.additionalFeatures.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
-    </div>
-  `.trim();
-}
-
-function generateSmartDevicesSection(smartDevices: any): string {
-  const sec = Array.isArray(smartDevices.securityFeatures) ? smartDevices.securityFeatures : [];
-  const auto = Array.isArray(smartDevices.automationFeatures) ? smartDevices.automationFeatures : [];
-  const selected = Array.isArray(smartDevices.selectedDevices) ? smartDevices.selectedDevices : [];
-
-  return `
-    <div class="section">
-      <h2>Smart Devices Configuration</h2>
-
-      <div class="field"><div class="label">Control Panels:</div><div class="value">${smartDevices.controlPanels ? "Yes" : "No"}</div></div>
-      ${smartDevices.panelModel ? `<div class="field"><div class="label">Panel Model:</div><div class="value">${escapeHtml(String(smartDevices.panelModel))}</div></div>` : ''}
-      ${smartDevices.panelRoom ? `<div class="field"><div class="label">Panel Room:</div><div class="value">${escapeHtml(String(smartDevices.panelRoom))}</div></div>` : ''}
-      ${smartDevices.panelMountType ? `<div class="field"><div class="label">Panel Mount:</div><div class="value">${escapeHtml(String(smartDevices.panelMountType))}</div></div>` : ''}
-
-      <div class="field"><div class="label">Security Sensors:</div><div class="value">${smartDevices.securitySensors ? "Yes" : "No"}</div></div>
-      ${sec.length ? `<div class="field"><div class="label">Security Features:</div><div class="value">${sec.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
-
-      <div class="field"><div class="label">Home Automation:</div><div class="value">${smartDevices.homeAutomation ? "Yes" : "No"}</div></div>
-      ${auto.length ? `<div class="field"><div class="label">Automation Features:</div><div class="value">${auto.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
-
-      ${selected.length ? `<div class="field"><div class="label">Selected Devices:</div><div class="value">${selected.map((d: any) => escapeHtml(d.name || String(d))).join(", ")}</div></div>` : ""}
-    </div>
-  `.trim();
-}
-
-function generateWallPanelsSection(wallPanels: any): string {
-  const dims = wallPanels.dimensions || {};
-
-  return `
-    <div class="section">
-      <h2>Wall Panels Configuration</h2>
-      ${wallPanels.panelType ? `<div class="field"><div class="label">Panel Type:</div><div class="value">${escapeHtml(String(wallPanels.panelType))}</div></div>` : ""}
-      ${wallPanels.finish ? `<div class="field"><div class="label">Finish:</div><div class="value">${escapeHtml(String(wallPanels.finish))}</div></div>` : ""}
-
-      ${(dims.width || dims.height) ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width ?? ''} × ${dims.height ?? ''}</div></div>` : ''}
-      ${typeof dims.area !== 'undefined' ? `<div class="field"><div class="label">Area:</div><div class="value">${dims.area} m²</div></div>` : ''}
-
-      ${wallPanels.flutedGrooveDepth ? `<div class="field"><div class="label">Fluted Groove Depth:</div><div class="value">${escapeHtml(String(wallPanels.flutedGrooveDepth))}</div></div>` : ''}
-      ${wallPanels.flutedSpacing ? `<div class="field"><div class="label">Fluted Spacing:</div><div class="value">${escapeHtml(String(wallPanels.flutedSpacing))}</div></div>` : ''}
-      ${wallPanels.hdPrintingPattern ? `<div class="field"><div class="label">HD Printing Pattern:</div><div class="value">${escapeHtml(String(wallPanels.hdPrintingPattern))}</div></div>` : ''}
-      ${wallPanels.textureType ? `<div class="field"><div class="label">Texture Type:</div><div class="value">${escapeHtml(String(wallPanels.textureType))}</div></div>` : ''}
-
-      ${wallPanels.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${escapeHtml(String(wallPanels.installation))}</div></div>` : ""}
-    </div>
-  `.trim();
-}
-
-function generateCarbonRockBoardsSection(carbonRockBoards: any): string {
-  const dims = carbonRockBoards.dimensions || {};
-
-  return `
-    <div class="section">
-      <h2>Carbon Rock Boards Configuration</h2>
-      ${carbonRockBoards.boardType ? `<div class="field"><div class="label">Board Type:</div><div class="value">${escapeHtml(String(carbonRockBoards.boardType))}</div></div>` : ""}
-      ${carbonRockBoards.thickness ? `<div class="field"><div class="label">Thickness:</div><div class="value">${escapeHtml(String(carbonRockBoards.thickness))}</div></div>` : ""}
-
-      ${(dims.width || dims.height) ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width ?? ''} × ${dims.height ?? ''}</div></div>` : ''}
-      ${typeof dims.area !== 'undefined' ? `<div class="field"><div class="label">Area:</div><div class="value">${dims.area} m²</div></div>` : ''}
-
-      ${carbonRockBoards.acousticNrcRating ? `<div class="field"><div class="label">Acoustic NRC Rating:</div><div class="value">${escapeHtml(String(carbonRockBoards.acousticNrcRating))}</div></div>` : ''}
-      ${carbonRockBoards.acousticFabricColor ? `<div class="field"><div class="label">Acoustic Fabric Color:</div><div class="value">${escapeHtml(String(carbonRockBoards.acousticFabricColor))}</div></div>` : ''}
-      ${carbonRockBoards.mirrorTint ? `<div class="field"><div class="label">Mirror Tint:</div><div class="value">${escapeHtml(String(carbonRockBoards.mirrorTint))}</div></div>` : ''}
-
-      ${carbonRockBoards.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${escapeHtml(String(carbonRockBoards.installation))}</div></div>` : ""}
-    </div>
-  `.trim();
-}
-
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#x27;",
-    "/": "&#x2F;",
-  };
-  return String(text || "").replace(/[&<>"'\/]/g, (m) => map[m] || m);
-}
-
-/* ===========================
-   EMAIL SENDER (RESEND)
-   =========================== */
-async function sendQuoteModalEmails(
-  resend: Resend,
-  data: QuoteModalData,
-  content: EmailContent,
-  analysis: QuoteModalAnalysis
-): Promise<EmailResults> {
-  const quoteId = generateQuoteModalId();
-
-  try {
-    const [adminResult, customerResult] = await Promise.allSettled([
-      resend.emails.send({
-        from: "The Wall Shop <quotes@thewallshop.co.uk>",
-        to: ["stephen@thewallshop.co.uk"],
-        subject: `[${analysis.priority.toUpperCase()}] New Quote Request — £${analysis.estimatedValue.toLocaleString()} — ${data.fullName} [${quoteId}]`,
-        html: content.adminHtml,
-        text: content.adminText,
-        headers: {
-          "X-Quote-ID": quoteId,
-          "X-Entry-Point": data.entryPoint,
-          "X-Priority": analysis.priority,
-        },
-      }),
-      resend.emails.send({
-        from: "The Wall Shop <quotes@thewallshop.co.uk>",
-        to: [data.email],
-        subject: `Quote Request Received — ${quoteId} | The Wall Shop`,
-        html: content.customerHtml,
-        text: content.customerText,
-        headers: {
-          "X-Quote-ID": quoteId,
-          "X-Entry-Point": data.entryPoint,
-        },
-      }),
-    ]);
-
-    const adminSuccess = adminResult.status === "fulfilled" && !(adminResult as any).value?.error;
-    const customerSuccess = customerResult.status === "fulfilled" && !(customerResult as any).value?.error;
-
-    if (!adminSuccess && !customerSuccess) {
-      throw new Error("Failed to send both emails");
-    }
-
-    return {
-      success: true,
-      quoteId,
-      emailIds: {
-        admin: adminSuccess ? (adminResult as any).value?.data?.id : undefined,
-        customer: customerSuccess ? (customerResult as any).value?.data?.id : undefined,
-      },
-    };
-  } catch (error) {
-    console.error("Email sending error:", error);
-    return {
-      success: false,
-      quoteId,
-      error: error instanceof Error ? error.message : "Unknown email error",
-    };
-  }
-}
