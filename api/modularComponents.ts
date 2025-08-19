@@ -10,69 +10,70 @@ import type { QuoteModalData, QuoteModalAnalysis, BrandConfig, CTALinks, ThemeVa
 export const EXTENDED_THEME_VARIANTS: ThemeVariant[] = [
   {
     name: 'default',
-    primaryColor: '#2C3E50',
-    accentColor: '#E67E22',
-    neutralBg: '#F8F9FA',
-    textColor: '#2C3E50',
-    description: 'Professional navy and orange theme'
+    primaryColor: "#8B5A2B",  // leather[500]
+    accentColor: "#D1A678",   // leather[300]
+    neutralBg: "#F5E6DA",     // leather[100]
+    textColor: "#2C1A0C",     // leather[900]
+    description: 'Classic leather brown theme'
   },
   {
     name: 'pastel',
-    primaryColor: '#6C7B7F',
-    accentColor: '#F39C12',
-    neutralBg: '#FDF6E3',
-    textColor: '#5D4E75',
-    description: 'Soft pastel theme with warm tones'
+    primaryColor: "#B97D47",  // leather[400]
+    accentColor: "#EAD0B8",   // leather[200]
+    neutralBg: "#FDF6E3",     // soft neutral
+    textColor: "#5C391A",     // leather[700]
+    description: 'Soft pastel leather theme with warm tones'
   },
   {
     name: 'dark',
-    primaryColor: '#1A1A1A',
-    accentColor: '#FF6B35',
-    neutralBg: '#2D2D2D',
-    textColor: '#FFFFFF',
-    description: 'Dark mode with vibrant accent'
+    primaryColor: "#432913",  // leather[800]
+    accentColor: "#B97D47",   // leather[400]
+    neutralBg: "#2C1A0C",     // leather[900]
+    textColor: "#F5E6DA",     // leather[100]
+    description: 'Dark leather theme with warm highlights'
   },
   {
     name: 'high-contrast',
-    primaryColor: '#000000',
-    accentColor: '#FFD700',
-    neutralBg: '#FFFFFF',
-    textColor: '#000000',
-    description: 'High contrast for accessibility'
+    primaryColor: "#000000",  // black
+    accentColor: "#FFD700",   // gold
+    neutralBg: "#FFFFFF",     // white
+    textColor: "#000000",     // black
+    description: 'High contrast black, white, and gold theme'
   },
   {
     name: 'luxury',
-    primaryColor: '#1B1B1B',
-    accentColor: '#D4AF37',
-    neutralBg: '#F5F5DC',
-    textColor: '#2F2F2F',
-    description: 'Luxury gold and black theme'
+    primaryColor: "#754921",  // leather[600]
+    accentColor: "#FFD700",   // luxury gold
+    neutralBg: "#EAD0B8",     // leather[200]
+    textColor: "#2C1A0C",     // leather[900]
+    description: 'Luxury leather and gold theme'
   },
   {
     name: 'modern-blue',
-    primaryColor: '#0F4C75',
-    accentColor: '#3282B8',
-    neutralBg: '#BBE1FA',
-    textColor: '#0F3460',
-    description: 'Modern blue gradient theme'
+    primaryColor: "#8B5A2B",  // keep leather base
+    accentColor: "#FFD700",   // gold highlight
+    neutralBg: "#F5E6DA",     // leather[100]
+    textColor: "#2C1A0C",     // leather[900]
+    description: 'Modern leather & gold interpretation'
   },
   {
     name: 'earth-tone',
-    primaryColor: '#8B4513',
-    accentColor: '#CD853F',
-    neutralBg: '#F5DEB3',
-    textColor: '#654321',
-    description: 'Warm earth tone theme'
+    primaryColor: "#8B5A2B",  // leather[500]
+    accentColor: "#B97D47",   // leather[400]
+    neutralBg: "#EAD0B8",     // leather[200]
+    textColor: "#2C1A0C",     // leather[900]
+    description: 'Warm earth tone leather theme'
   },
   {
     name: 'minimalist',
-    primaryColor: '#333333',
-    accentColor: '#007BFF',
-    neutralBg: '#FAFAFA',
-    textColor: '#333333',
-    description: 'Clean minimalist theme'
+    primaryColor: "#2C1A0C",  // leather[900]
+    accentColor: "#FFD700",   // gold accent
+    neutralBg: "#FAFAFA",     // clean neutral
+    textColor: "#2C1A0C",     // leather[900]
+    description: 'Minimalist leather & gold theme'
   }
 ];
+
 
 /* ===============================
    MODULAR COMPONENT SYSTEM
@@ -107,16 +108,7 @@ export class EmailComponentBuilder {
       border-radius: 12px 12px 0 0;
     ">
       <!-- Logo -->
-      <img src="${this.brandConfig.logoUrl}" 
-           alt="${this.brandConfig.companyName}" 
-           style="
-             max-width: 200px;
-             height: auto;
-             margin-bottom: 15px;
-             display: block;
-             margin-left: auto;
-             margin-right: auto;
-           ">
+       
       
       <!-- Company Name -->
       <h1 style="

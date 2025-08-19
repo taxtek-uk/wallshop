@@ -10,7 +10,7 @@ import type { QuoteModalData, QuoteModalAnalysis, BrandConfig, CTALinks, ThemeVa
 // Default Wall Shop brand configuration
 const DEFAULT_BRAND_CONFIG: BrandConfig = {
   primaryColor: '#2C3E50', // Deep navy/charcoal
-  accentColor: '#E67E22', // Vibrant orange/gold
+  accentColor: '#754921', // Vibrant orange/gold
   neutralBg: '#F8F9FA',   // Light grey
   textColor: '#2C3E50',   // Dark text for light backgrounds
   logoUrl: '{{logoUrl}}', // Placeholder for logo
@@ -116,35 +116,27 @@ const DEFAULT_CTA_LINKS: CTALinks = {
 const THEME_VARIANTS: ThemeVariant[] = [
   {
     name: 'default',
-    primaryColor: '#2C3E50',
-    accentColor: '#E67E22',
-    neutralBg: '#F8F9FA',
-    textColor: '#2C3E50',
-    description: 'Professional navy and orange theme'
-  },
-  {
-    name: 'pastel',
-    primaryColor: '#6C7B7F',
-    accentColor: '#F39C12',
-    neutralBg: '#FDF6E3',
-    textColor: '#5D4E75',
-    description: 'Soft pastel theme with warm tones'
+    primaryColor: "#8B5A2B", // leather[500]
+    accentColor: "#D1A678", // leather[300]
+    neutralBg: "#F5E6DA",   // leather[100]
+    textColor: "#2C1A0C",   // leather[900]
+    description: 'Classic leather brown theme'
   },
   {
     name: 'dark',
-    primaryColor: '#1A1A1A',
-    accentColor: '#FF6B35',
-    neutralBg: '#2D2D2D',
-    textColor: '#FFFFFF',
-    description: 'Dark mode with vibrant accent'
+    primaryColor: "#432913", // leather[800]
+    accentColor: "#B97D47", // leather[400]
+    neutralBg: "#2C1A0C",   // leather[900]
+    textColor: "#F5E6DA",   // leather[100]
+    description: 'Dark leather theme with warm highlights'
   },
   {
-    name: 'high-contrast',
-    primaryColor: '#000000',
-    accentColor: '#FFD700',
-    neutralBg: '#FFFFFF',
-    textColor: '#000000',
-    description: 'High contrast for accessibility'
+    name: 'luxury',
+    primaryColor: "#754921", // leather[600]
+    accentColor: "#FFD700",  // gold accent
+    neutralBg: "#EAD0B8",    // leather[200]
+    textColor: "#2C1A0C",    // leather[900]
+    description: 'Luxury leather & gold theme'
   }
 ];
 
@@ -223,7 +215,6 @@ class WallShopEmailTemplate {
     ${this.generateHeader(language)}
     ${this.generateGreeting(data.fullName, language)}
     ${this.generateQuoteTable(quoteId, currentDate, expiryDate, analysis)}
-    ${this.generateCTAButtons()}
     ${this.generateProductSummary(data, analysis)}
     ${this.generateNextSteps(language)}
     ${this.generateFooter()}
@@ -267,14 +258,19 @@ class WallShopEmailTemplate {
       <p><strong>Customer:</strong> ${this.escapeHtml(data.fullName)}</p>
       <p><strong>Email:</strong> ${this.escapeHtml(data.email)}</p>
       <p><strong>Phone:</strong> ${this.escapeHtml(data.phone)}</p>
+      ${data.installationAddress ? `<p><strong>Installation Address:</strong> ${this.escapeHtml(data.installationAddress)}</p>` : ''}
+      ${data.additionalNotes ? `<p><strong>Additional Notes:</strong> ${this.escapeHtml(data.additionalNotes)}</p>` : ''}
+      <p><strong>Entry Point:</strong> ${data.entryPoint.replace('-',' ').toUpperCase()}</p>
+      ${data.productCategory ? `<p><strong>Product Category:</strong> ${this.escapeHtml(data.productCategory)}</p>` : ''}
+      ${data.smartWalls ? `<p><strong>Smart Walls Data:</strong> ${this.escapeHtml(JSON.stringify(data.smartWalls))}</p>` : ''}
+      ${data.smartDevices ? `<p><strong>Smart Devices Data:</strong> ${this.escapeHtml(JSON.stringify(data.smartDevices))}</p>` : ''}
+      ${data.wallPanels ? `<p><strong>Wall Panels Data:</strong> ${this.escapeHtml(JSON.stringify(data.wallPanels))}</p>` : ''}
+      ${data.carbonRockBoards ? `<p><strong>Carbon Rock Boards Data:</strong> ${this.escapeHtml(JSON.stringify(data.carbonRockBoards))}</p>` : ''}
       <p><strong>Priority:</strong> ${analysis.priority.toUpperCase()}</p>
       <p><strong>Estimated Value:</strong> £${analysis.estimatedValue.toLocaleString()}</p>
-      <p><strong>Entry Point:</strong> ${data.entryPoint.replace('-', ' ').toUpperCase()}</p>
     </div>
-    <div class="actions">
-      <a href="${this.ctaLinks.viewLink}" class="btn-primary">View Full Quote</a>
-      <a href="mailto:${data.email}" class="btn-secondary">Reply to Customer</a>
-    </div>
+    <p><strong>View Full Quote Details:</strong> <a href="${this.ctaLinks.viewLink}">${this.ctaLinks.viewLink}</a></p>
+    <p><strong>Reply to Customer:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
   </div>
 </body>
 </html>`.trim();
@@ -285,11 +281,18 @@ New Quote Request - ${quoteId}
 Customer: ${data.fullName}
 Email: ${data.email}
 Phone: ${data.phone}
+${data.installationAddress ? `Installation Address: ${data.installationAddress}` : ''}
+${data.additionalNotes ? `Additional Notes: ${data.additionalNotes}` : ''}
+Entry Point: ${data.entryPoint.replace('-',' ').toUpperCase()}
+${data.productCategory ? `Product Category: ${data.productCategory}` : ''}
+${data.smartWalls ? `Smart Walls Data: ${JSON.stringify(data.smartWalls)}` : ''}
+${data.smartDevices ? `Smart Devices Data: ${JSON.stringify(data.smartDevices)}` : ''}
+${data.wallPanels ? `Wall Panels Data: ${JSON.stringify(data.wallPanels)}` : ''}
+${data.carbonRockBoards ? `Carbon Rock Boards Data: ${JSON.stringify(data.carbonRockBoards)}` : ''}
 Priority: ${analysis.priority.toUpperCase()}
 Estimated Value: £${analysis.estimatedValue.toLocaleString()}
-Entry Point: ${data.entryPoint.replace('-', ' ').toUpperCase()}
 
-View Quote: ${this.ctaLinks.viewLink}
+View Full Quote Details: ${this.ctaLinks.viewLink}
 Reply to Customer: mailto:${data.email}
     `.trim();
 
@@ -757,7 +760,6 @@ Reply to Customer: mailto:${data.email}
   private generateHeader(language: string): string {
     return `
     <div class="header">
-      <img src="${this.brandConfig.logoUrl}" alt="${this.brandConfig.companyName}" class="logo">
       <h1 class="company-name">${this.brandConfig.companyName}</h1>
       <p class="tagline">${this.brandConfig.tagline}</p>
     </div>
@@ -836,24 +838,7 @@ Reply to Customer: mailto:${data.email}
     `;
   }
 
-  /**
-   * Generate CTA buttons section
-   */
-  private generateCTAButtons(): string {
-    return `
-    <div class="cta-section">
-      <h3>Take Action on Your Quote</h3>
-      <div class="cta-grid">
-        <a href="${this.ctaLinks.viewLink}" class="cta-button cta-primary">View Quote Online</a>
-        <a href="${this.ctaLinks.pdfLink}" class="cta-button cta-secondary">Download PDF</a>
-        <a href="${this.ctaLinks.approveLink}" class="cta-button cta-primary">Approve Quote</a>
-        <a href="${this.ctaLinks.requestChangesLink}" class="cta-button cta-secondary">Request Changes</a>
-        <a href="${this.ctaLinks.requestCallbackLink}" class="cta-button cta-primary">Request Callback</a>
-        <a href="${this.ctaLinks.scheduleConsultationLink}" class="cta-button cta-secondary">Schedule Consultation</a>
-      </div>
-    </div>
-    `;
-  }
+
 
   /**
    * Generate product summary section
@@ -863,53 +848,55 @@ Reply to Customer: mailto:${data.email}
 
     if (data.smartWalls) {
       productItems += `
-        <div class="product-item">
+        <li>
           <h4>Smart Walls System</h4>
           <p>Pre-manufactured smart walls with integrated technology for TV, sound, gaming, security, and lighting control.</p>
-        </div>
+        </li>
       `;
     }
 
     if (data.smartDevices) {
       productItems += `
-        <div class="product-item">
+        <li>
           <h4>Smart Devices Integration</h4>
           <p>Advanced IoT systems with AI control, security sensors, and home automation features.</p>
-        </div>
+        </li>
       `;
     }
 
     if (data.wallPanels) {
       productItems += `
-        <div class="product-item">
+        <li>
           <h4>Wall Panels</h4>
           <p>Premium wall panels with luxury finishes and professional installation.</p>
-        </div>
+        </li>
       `;
     }
 
     if (data.carbonRockBoards) {
       productItems += `
-        <div class="product-item">
+        <li>
           <h4>Carbon Rock Boards</h4>
           <p>A1 fire-resistant boards with exceptional thermal and acoustic insulation properties.</p>
-        </div>
+        </li>
       `;
     }
 
     if (!productItems) {
       productItems = `
-        <div class="product-item">
+        <li>
           <h4>Custom Wall Solution</h4>
           <p>Tailored wall solution based on your specific requirements and preferences.</p>
-        </div>
+        </li>
       `;
     }
 
     return `
     <div class="product-summary">
       <h3>Your Selected Products</h3>
-      ${productItems}
+      <ul>
+        ${productItems}
+      </ul>
       <p style="margin-top: 20px; color: #666; font-style: italic;">
         Estimated project complexity: ${analysis.complexity} | 
         Products included: ${analysis.productCount} | 
@@ -954,11 +941,7 @@ Reply to Customer: mailto:${data.email}
         <p>Website: ${this.brandConfig.website}</p>
       </div>
 
-      <div class="social-links">
-        ${this.brandConfig.socialLinks.linkedin ? `<a href="${this.brandConfig.socialLinks.linkedin}" class="social-link">in</a>` : ''}
-        ${this.brandConfig.socialLinks.instagram ? `<a href="${this.brandConfig.socialLinks.instagram}" class="social-link">ig</a>` : ''}
-        ${this.brandConfig.socialLinks.website ? `<a href="${this.brandConfig.socialLinks.website}" class="social-link">web</a>` : ''}
-      </div>
+
 
       <div class="legal-disclaimer">
         <p>This email and its attachments are confidential and intended solely for the addressee. 
