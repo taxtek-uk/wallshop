@@ -256,25 +256,29 @@ export default function QuoteModal({
     const { formData } = state;
 
     const payload = {
-      fullName: formData.contact?.fullName || '',
-      email: formData.contact?.email || '',
-      phone: formData.contact?.phone || '',
-      installationAddress: formData.contact?.installationAddress || '',
-      additionalNotes: formData.contact?.additionalNotes || '',
-      productCategory: state.formData.productCategory || 'general',
-      entryPoint: resolvedEntryPoint,
-      smartWalls: formData.smartWalls || null,
-      smartDevices: formData.smartDevices || null,
-      wallPanels: formData.wallPanels || null,
-      carbonRockBoards: formData.carbonRockBoards || null,
-      clientMeta: {
-        urlPath: location.pathname,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        submittedAt: new Date().toISOString(),
-      },
+  fullName: formData.contact?.fullName || '',
+  email: formData.contact?.email || '',
+  phone: formData.contact?.phone || '',
+  installationAddress: formData.contact?.installationAddress || '',
+  additionalNotes: formData.contact?.additionalNotes || '',
+  productCategory: state.formData.productCategory || 'general',
+  entryPoint: resolvedEntryPoint,
+  smartWalls: formData.smartWalls || null,
+  smartDevices: formData.smartDevices || null,
+  wallPanels: formData.wallPanels || null,
+  carbonRockBoards: formData.carbonRockBoards || null,
+  clientMeta: {
+    urlPath: location.pathname,
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    submittedAt: new Date().toISOString(),
+  },
+
+
+  
     };
 
-    const res = await fetch('/api/quote', { // Changed to /api/quote
+    
+    const res = await fetch('/api/sendQuote', { // Use dedicated Quote Modal endpoint
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

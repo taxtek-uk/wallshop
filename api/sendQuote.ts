@@ -596,49 +596,107 @@ function buildProductSections(data: QuoteModalData): string {
 }
 
 function generateSmartWallsSection(smartWalls: any): string {
+  const dims = smartWalls.dimensions || {};
+  const style = smartWalls.selectedStyle || {};
+  const acc = smartWalls.accessories || {};
+  const sd = smartWalls.smartDevices || {};
+  const gs = smartWalls.gamingSystem || {};
+
   return `
     <div class="section">
       <h2>Smart Walls Configuration</h2>
-      <div class="field"><div class="label">TV Integration:</div><div class="value">${smartWalls.tvIntegration ? "Yes" : "No"}</div></div>
-      <div class="field"><div class="label">Speakers:</div><div class="value">${smartWalls.speakers ? "Yes" : "No"}</div></div>
-      <div class="field"><div class="label">Lighting:</div><div class="value">${smartWalls.lighting ? "Yes" : "No"}</div></div>
-      ${smartWalls.additionalFeatures?.length ? `<div class="field"><div class="label">Additional Features:</div><div class="value">${smartWalls.additionalFeatures.join(", ")}</div></div>` : ""}
+
+      ${dims.width ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width} × ${dims.height ?? ''}</div></div>` : ''}
+      ${dims.depth ? `<div class="field"><div class="label">Depth:</div><div class="value">${escapeHtml(String(dims.depth))}${dims.depth === 'custom' && dims.customDepth ? ` (${dims.customDepth}mm)` : ''}</div></div>` : ''}
+      ${typeof dims.calculatedMaxWidth !== 'undefined' ? `<div class="field"><div class="label">Calculated Max Width:</div><div class="value">${dims.calculatedMaxWidth}</div></div>` : ''}
+
+      ${(style.category || style.finish) ? `<div class="field"><div class="label">Selected Style:</div><div class="value">${[style.category, style.finish].filter(Boolean).map((s: string) => escapeHtml(String(s))).join(' — ')}</div></div>` : ''}
+      ${style.finishDescription ? `<div class="field"><div class="label">Style Notes:</div><div class="value">${escapeHtml(String(style.finishDescription))}</div></div>` : ''}
+
+      <div class="field"><div class="label">Accessories - TV:</div><div class="value">${acc.tv ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Accessories - Fireplace:</div><div class="value">${acc.fireplace ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Accessories - Soundbar:</div><div class="value">${acc.soundbar ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Accessories - Shelving:</div><div class="value">${acc.shelving ? 'Yes' : 'No'}</div></div>
+
+      <div class="field"><div class="label">Smart Devices - Control Panels:</div><div class="value">${sd.controlPanels ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Smart Devices - Security Sensors:</div><div class="value">${sd.securitySensors ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Smart Devices - Home Automation:</div><div class="value">${sd.homeAutomation ? 'Yes' : 'No'}</div></div>
+      ${Array.isArray(sd.selectedDevices) && sd.selectedDevices.length ? `<div class="field"><div class="label">Selected Devices:</div><div class="value">${sd.selectedDevices.map((d: any) => escapeHtml(d.name || String(d))).join(', ')}</div></div>` : ''}
+
+      ${gs.type ? `<div class="field"><div class="label">Gaming System:</div><div class="value">${escapeHtml(String(gs.type))}${gs.specifications ? ` — ${escapeHtml(String(gs.specifications))}` : ''}</div></div>` : ''}
+
+      <div class="field"><div class="label">TV Integration (Legacy):</div><div class="value">${smartWalls.tvIntegration ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Speakers (Legacy):</div><div class="value">${smartWalls.speakers ? 'Yes' : 'No'}</div></div>
+      <div class="field"><div class="label">Lighting (Legacy):</div><div class="value">${smartWalls.lighting ? 'Yes' : 'No'}</div></div>
+      ${smartWalls.additionalFeatures?.length ? `<div class="field"><div class="label">Additional Features:</div><div class="value">${smartWalls.additionalFeatures.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
     </div>
   `.trim();
 }
 
 function generateSmartDevicesSection(smartDevices: any): string {
+  const sec = Array.isArray(smartDevices.securityFeatures) ? smartDevices.securityFeatures : [];
+  const auto = Array.isArray(smartDevices.automationFeatures) ? smartDevices.automationFeatures : [];
+  const selected = Array.isArray(smartDevices.selectedDevices) ? smartDevices.selectedDevices : [];
+
   return `
     <div class="section">
       <h2>Smart Devices Configuration</h2>
+
       <div class="field"><div class="label">Control Panels:</div><div class="value">${smartDevices.controlPanels ? "Yes" : "No"}</div></div>
+      ${smartDevices.panelModel ? `<div class="field"><div class="label">Panel Model:</div><div class="value">${escapeHtml(String(smartDevices.panelModel))}</div></div>` : ''}
+      ${smartDevices.panelRoom ? `<div class="field"><div class="label">Panel Room:</div><div class="value">${escapeHtml(String(smartDevices.panelRoom))}</div></div>` : ''}
+      ${smartDevices.panelMountType ? `<div class="field"><div class="label">Panel Mount:</div><div class="value">${escapeHtml(String(smartDevices.panelMountType))}</div></div>` : ''}
+
       <div class="field"><div class="label">Security Sensors:</div><div class="value">${smartDevices.securitySensors ? "Yes" : "No"}</div></div>
+      ${sec.length ? `<div class="field"><div class="label">Security Features:</div><div class="value">${sec.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
+
       <div class="field"><div class="label">Home Automation:</div><div class="value">${smartDevices.homeAutomation ? "Yes" : "No"}</div></div>
-      ${smartDevices.selectedDevices?.length ? `<div class="field"><div class="label">Selected Devices:</div><div class="value">${smartDevices.selectedDevices.map((d: any) => d.name || d).join(", ")}</div></div>` : ""}
+      ${auto.length ? `<div class="field"><div class="label">Automation Features:</div><div class="value">${auto.map((s: string) => escapeHtml(String(s))).join(', ')}</div></div>` : ''}
+
+      ${selected.length ? `<div class="field"><div class="label">Selected Devices:</div><div class="value">${selected.map((d: any) => escapeHtml(d.name || String(d))).join(", ")}</div></div>` : ""}
     </div>
   `.trim();
 }
 
 function generateWallPanelsSection(wallPanels: any): string {
+  const dims = wallPanels.dimensions || {};
+
   return `
     <div class="section">
       <h2>Wall Panels Configuration</h2>
-      ${wallPanels.panelType ? `<div class="field"><div class="label">Panel Type:</div><div class="value">${wallPanels.panelType}</div></div>` : ""}
-      ${wallPanels.finish ? `<div class="field"><div class="label">Finish:</div><div class="value">${wallPanels.finish}</div></div>` : ""}
-      ${wallPanels.dimensions?.area ? `<div class="field"><div class="label">Area:</div><div class="value">${wallPanels.dimensions.area} m²</div></div>` : ""}
-      ${wallPanels.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${wallPanels.installation}</div></div>` : ""}
+      ${wallPanels.panelType ? `<div class="field"><div class="label">Panel Type:</div><div class="value">${escapeHtml(String(wallPanels.panelType))}</div></div>` : ""}
+      ${wallPanels.finish ? `<div class="field"><div class="label">Finish:</div><div class="value">${escapeHtml(String(wallPanels.finish))}</div></div>` : ""}
+
+      ${(dims.width || dims.height) ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width ?? ''} × ${dims.height ?? ''}</div></div>` : ''}
+      ${typeof dims.area !== 'undefined' ? `<div class="field"><div class="label">Area:</div><div class="value">${dims.area} m²</div></div>` : ''}
+
+      ${wallPanels.flutedGrooveDepth ? `<div class="field"><div class="label">Fluted Groove Depth:</div><div class="value">${escapeHtml(String(wallPanels.flutedGrooveDepth))}</div></div>` : ''}
+      ${wallPanels.flutedSpacing ? `<div class="field"><div class="label">Fluted Spacing:</div><div class="value">${escapeHtml(String(wallPanels.flutedSpacing))}</div></div>` : ''}
+      ${wallPanels.hdPrintingPattern ? `<div class="field"><div class="label">HD Printing Pattern:</div><div class="value">${escapeHtml(String(wallPanels.hdPrintingPattern))}</div></div>` : ''}
+      ${wallPanels.textureType ? `<div class="field"><div class="label">Texture Type:</div><div class="value">${escapeHtml(String(wallPanels.textureType))}</div></div>` : ''}
+
+      ${wallPanels.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${escapeHtml(String(wallPanels.installation))}</div></div>` : ""}
     </div>
   `.trim();
 }
 
 function generateCarbonRockBoardsSection(carbonRockBoards: any): string {
+  const dims = carbonRockBoards.dimensions || {};
+
   return `
     <div class="section">
       <h2>Carbon Rock Boards Configuration</h2>
-      ${carbonRockBoards.boardType ? `<div class="field"><div class="label">Board Type:</div><div class="value">${carbonRockBoards.boardType}</div></div>` : ""}
-      ${carbonRockBoards.thickness ? `<div class="field"><div class="label">Thickness:</div><div class="value">${carbonRockBoards.thickness}</div></div>` : ""}
-      ${carbonRockBoards.dimensions?.area ? `<div class="field"><div class="label">Area:</div><div class="value">${carbonRockBoards.dimensions.area} m²</div></div>` : ""}
-      ${carbonRockBoards.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${carbonRockBoards.installation}</div></div>` : ""}
+      ${carbonRockBoards.boardType ? `<div class="field"><div class="label">Board Type:</div><div class="value">${escapeHtml(String(carbonRockBoards.boardType))}</div></div>` : ""}
+      ${carbonRockBoards.thickness ? `<div class="field"><div class="label">Thickness:</div><div class="value">${escapeHtml(String(carbonRockBoards.thickness))}</div></div>` : ""}
+
+      ${(dims.width || dims.height) ? `<div class="field"><div class="label">Dimensions (W×H):</div><div class="value">${dims.width ?? ''} × ${dims.height ?? ''}</div></div>` : ''}
+      ${typeof dims.area !== 'undefined' ? `<div class="field"><div class="label">Area:</div><div class="value">${dims.area} m²</div></div>` : ''}
+
+      ${carbonRockBoards.acousticNrcRating ? `<div class="field"><div class="label">Acoustic NRC Rating:</div><div class="value">${escapeHtml(String(carbonRockBoards.acousticNrcRating))}</div></div>` : ''}
+      ${carbonRockBoards.acousticFabricColor ? `<div class="field"><div class="label">Acoustic Fabric Color:</div><div class="value">${escapeHtml(String(carbonRockBoards.acousticFabricColor))}</div></div>` : ''}
+      ${carbonRockBoards.mirrorTint ? `<div class="field"><div class="label">Mirror Tint:</div><div class="value">${escapeHtml(String(carbonRockBoards.mirrorTint))}</div></div>` : ''}
+
+      ${carbonRockBoards.installation ? `<div class="field"><div class="label">Installation:</div><div class="value">${escapeHtml(String(carbonRockBoards.installation))}</div></div>` : ""}
     </div>
   `.trim();
 }
