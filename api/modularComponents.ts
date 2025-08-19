@@ -1,8 +1,7 @@
 // modularComponents.ts - Modular Email Template Components for Wall Shop
 // Reusable, customizable email components with advanced theming support
 
-import type { QuoteModalData, QuoteModalAnalysis } from './sendQuote';
-import type { BrandConfig, CTALinks, ThemeVariant } from './emailTemplate';
+import type { QuoteModalData, QuoteModalAnalysis, BrandConfig, CTALinks, ThemeVariant } from './types';
 
 /* ===============================
    EXTENDED THEME VARIANTS

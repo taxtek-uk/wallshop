@@ -1,30 +1,11 @@
 // emailTemplate.ts - Modern Wall Shop Email Template System
 // Professional, branded email templates with multilingual support and dark/light mode compatibility
 
-import type { QuoteModalData, QuoteModalAnalysis } from './sendQuote';
+import type { QuoteModalData, QuoteModalAnalysis, BrandConfig, CTALinks, ThemeVariant, EmailTemplateOptions } from './types';
 
 /* ===============================
    BRAND CONFIGURATION SYSTEM
    =============================== */
-
-interface BrandConfig {
-  primaryColor: string;
-  accentColor: string;
-  neutralBg: string;
-  textColor: string;
-  logoUrl: string;
-  companyName: string;
-  tagline: string;
-  website: string;
-  address: string;
-  phone: string;
-  email: string;
-  socialLinks: {
-    linkedin?: string;
-    instagram?: string;
-    website?: string;
-  };
-}
 
 // Default Wall Shop brand configuration
 const DEFAULT_BRAND_CONFIG: BrandConfig = {
@@ -116,18 +97,6 @@ const MULTILINGUAL_CONTENT: MultilingualContent = {
    CTA LINKS CONFIGURATION
    =============================== */
 
-interface CTALinks {
-  viewLink: string;
-  pdfLink: string;
-  approveLink: string;
-  requestChangesLink: string;
-  requestCallbackLink: string;
-  forwardLink: string;
-  scheduleConsultationLink: string;
-  exploreSmartWallsLink: string;
-  contactLink: string;
-}
-
 const DEFAULT_CTA_LINKS: CTALinks = {
   viewLink: '{{viewLink}}', // Dynamic placeholder
   pdfLink: '{{pdfLink}}', // Dynamic placeholder
@@ -143,15 +112,6 @@ const DEFAULT_CTA_LINKS: CTALinks = {
 /* ===============================
    THEME VARIANTS SYSTEM
    =============================== */
-
-interface ThemeVariant {
-  name: string;
-  primaryColor: string;
-  accentColor: string;
-  neutralBg: string;
-  textColor: string;
-  description: string;
-}
 
 const THEME_VARIANTS: ThemeVariant[] = [
   {
@@ -191,15 +151,6 @@ const THEME_VARIANTS: ThemeVariant[] = [
 /* ===============================
    EMAIL TEMPLATE GENERATOR
    =============================== */
-
-interface EmailTemplateOptions {
-  variant?: 'external' | 'internal';
-  theme?: string;
-  language?: 'en' | 'fr' | 'es' | 'ar' | 'ur';
-  brandConfig?: Partial<BrandConfig>;
-  ctaLinks?: Partial<CTALinks>;
-  trackingPixel?: string;
-}
 
 class WallShopEmailTemplate {
   private brandConfig: BrandConfig;

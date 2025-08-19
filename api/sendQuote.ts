@@ -4,14 +4,24 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
+// Import shared types
+import type {
+  QuoteModalData,
+  QuoteModalAnalysis,
+  ValidationResult,
+  EmailContent,
+  EmailResults,
+  ModalQuotePriority,
+  BrandConfig,
+  CTALinks,
+  EmailTemplateOptions
+} from './types';
+
 // Import our new email template system
 import { 
   generateWallShopEmailTemplate,
   getThemeVariants,
-  getDefaultBrandConfig,
-  type EmailTemplateOptions,
-  type BrandConfig,
-  type CTALinks
+  getDefaultBrandConfig
 } from './emailTemplate';
 
 import {
@@ -39,64 +49,7 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 /* ===============
    DOMAIN MODELS
    =============== */
-enum ModalQuotePriority {
-  STANDARD = "standard",
-  URGENT = "urgent",
-  PREMIUM = "premium",
-}
-
-export interface QuoteModalData {
-  fullName: string;
-  email: string;
-  phone: string;
-  installationAddress?: string;
-  additionalNotes?: string;
-
-  entryPoint: "home" | "smart-walls" | "smart-devices" | "wall-panels" | "carbon-rock-boards";
-  productCategory?: string;
-
-  smartWalls?: any;
-  smartDevices?: any;
-  wallPanels?: any;
-  carbonRockBoards?: any;
-
-  clientMeta?: {
-    urlPath?: string;
-    userAgent?: string;
-    submittedAt?: string;
-  };
-}
-
-interface ValidationResult {
-  isValid: boolean;
-  data?: QuoteModalData;
-  errors?: Record<string, string>;
-}
-
-export interface QuoteModalAnalysis {
-  priority: ModalQuotePriority;
-  estimatedValue: number;
-  productCount: number;
-  complexity: string;
-  specialRequirements: string[];
-}
-
-interface EmailContent {
-  adminHtml: string;
-  adminText: string;
-  customerHtml: string;
-  customerText: string;
-}
-
-interface EmailResults {
-  success: boolean;
-  error?: string;
-  quoteId: string;
-  emailIds?: {
-    admin?: string;
-    customer?: string;
-  };
-}
+// Types are now imported from './types' to avoid circular dependencies
 
 /* ===============================
    ENHANCED EMAIL CONFIGURATION
@@ -185,11 +138,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Environment check
     if (!process.env.RESEND_API_KEY) {
-      console.error("Missing RESEND_API_KEY");
+      console.error("Missing RESEND_API_KEY environment variable");
       return res.status(500).json({
         error: "Service Configuration Error",
         message: "Quote submission service is temporarily unavailable. Please try again later or contact us directly.",
         contact: { phone: "+44 141 739 3377", email: "quotes@thewallshop.co.uk" },
+        debug: process.env.NODE_ENV === 'development' ? { 
+          env: Object.keys(process.env).filter(k => k.includes('RESEND')),
+          hasKey: !!process.env.RESEND_API_KEY 
+        } : undefined
       });
     }
 
@@ -614,7 +571,6 @@ function generateQuoteModalId(): string {
   return `QTM-${timestamp}-${random}`.toUpperCase();
 }
 
-// Export types for external use
-export type { QuoteModalData, QuoteModalAnalysis, EmailContent, EmailResults, ValidationResult };
-export { ModalQuotePriority, WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
+// Export configurations for external use
+export { WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
 
