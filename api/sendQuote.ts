@@ -4,24 +4,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
-// Import shared types
-import type {
-  QuoteModalData,
-  QuoteModalAnalysis,
-  ValidationResult,
-  EmailContent,
-  EmailResults,
-  ModalQuotePriority,
-  BrandConfig,
-  CTALinks,
-  EmailTemplateOptions
-} from './types';
-
 // Import our new email template system
 import { 
   generateWallShopEmailTemplate,
   getThemeVariants,
-  getDefaultBrandConfig
+  getDefaultBrandConfig,
+  type EmailTemplateOptions,
+  type BrandConfig,
+  type CTALinks
 } from './emailTemplate';
 
 import {
@@ -49,7 +39,64 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 /* ===============
    DOMAIN MODELS
    =============== */
-// Types are now imported from './types' to avoid circular dependencies
+enum ModalQuotePriority {
+  STANDARD = "standard",
+  URGENT = "urgent",
+  PREMIUM = "premium",
+}
+
+export interface QuoteModalData {
+  fullName: string;
+  email: string;
+  phone: string;
+  installationAddress?: string;
+  additionalNotes?: string;
+
+  entryPoint: "home" | "smart-walls" | "smart-devices" | "wall-panels" | "carbon-rock-boards";
+  productCategory?: string;
+
+  smartWalls?: any;
+  smartDevices?: any;
+  wallPanels?: any;
+  carbonRockBoards?: any;
+
+  clientMeta?: {
+    urlPath?: string;
+    userAgent?: string;
+    submittedAt?: string;
+  };
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  data?: QuoteModalData;
+  errors?: Record<string, string>;
+}
+
+export interface QuoteModalAnalysis {
+  priority: ModalQuotePriority;
+  estimatedValue: number;
+  productCount: number;
+  complexity: string;
+  specialRequirements: string[];
+}
+
+interface EmailContent {
+  adminHtml: string;
+  adminText: string;
+  customerHtml: string;
+  customerText: string;
+}
+
+interface EmailResults {
+  success: boolean;
+  error?: string;
+  quoteId: string;
+  emailIds?: {
+    admin?: string;
+    customer?: string;
+  };
+}
 
 /* ===============================
    ENHANCED EMAIL CONFIGURATION
@@ -92,48 +139,37 @@ const WALL_SHOP_CTA_LINKS: CTALinks = {
    MAIN HANDLER
    ============== */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log("🚀 sendQuote API called", { method: req.method, origin: req.headers.origin });
+  // CORS
+  const origin = String(req.headers.origin || "");
+  if (ALLOWED_ORIGINS.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization");
+  res.setHeader("Access-Control-Max-Age", "86400");
   
+  // Enhanced Security Headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Content-Security-Policy", "default-src 'none'; img-src data: https:; style-src 'unsafe-inline'");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+  if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res.status(405).json({
+      error: "Method Not Allowed",
+      message: "This endpoint only accepts POST requests for quote modal submissions.",
+      allowedMethods: ["POST", "OPTIONS"],
+    });
+  }
+
   try {
-    // CORS
-    const origin = String(req.headers.origin || "");
-    if (ALLOWED_ORIGINS.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Vary", "Origin");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization");
-    res.setHeader("Access-Control-Max-Age", "86400");
-    
-    // Enhanced Security Headers
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("X-Frame-Options", "DENY");
-    res.setHeader("X-XSS-Protection", "1; mode=block");
-    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    res.setHeader("Content-Security-Policy", "default-src 'none'; img-src data: https:; style-src 'unsafe-inline'");
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-
-    if (req.method === "OPTIONS") {
-      console.log("✅ OPTIONS request handled");
-      return res.status(204).end();
-    }
-    
-    if (req.method !== "POST") {
-      console.log("❌ Invalid method:", req.method);
-      res.setHeader("Allow", "POST, OPTIONS");
-      return res.status(405).json({
-        error: "Method Not Allowed",
-        message: "This endpoint only accepts POST requests for quote modal submissions.",
-        allowedMethods: ["POST", "OPTIONS"],
-      });
-    }
-
-    console.log("📝 Processing POST request...");
-    
     // Rate limit
-    console.log("🔒 Checking rate limit...");
     const clientIP = getClientIP(req);
     const rl = checkRateLimit(clientIP);
     if (!rl.allowed) {
-      console.log("❌ Rate limit exceeded for IP:", clientIP);
       return res.status(429).json({
         error: "Rate Limit Exceeded",
         message: "Too many quote submissions. Please wait before submitting another request.",
@@ -148,31 +184,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Environment check
-    console.log("🔑 Checking environment variables...");
-    console.log("Environment keys:", Object.keys(process.env).filter(k => k.includes('RESEND')));
-    console.log("Has RESEND_API_KEY:", !!process.env.RESEND_API_KEY);
-    
     if (!process.env.RESEND_API_KEY) {
-      console.error("❌ Missing RESEND_API_KEY environment variable");
+      console.error("Missing RESEND_API_KEY");
       return res.status(500).json({
         error: "Service Configuration Error",
         message: "Quote submission service is temporarily unavailable. Please try again later or contact us directly.",
         contact: { phone: "+44 141 739 3377", email: "quotes@thewallshop.co.uk" },
-        debug: { 
-          env: Object.keys(process.env).filter(k => k.includes('RESEND')),
-          hasKey: !!process.env.RESEND_API_KEY 
-        }
       });
     }
 
     // Parse and validate
-    console.log("📋 Parsing request body...");
     const body = await parseRequestBody(req);
-    console.log("📋 Request body parsed, validating...");
-    
     const validation = validateQuoteModalData(body);
     if (!validation.isValid || !validation.data) {
-      console.log("❌ Validation failed:", validation.errors);
       return res.status(400).json({
         error: "Quote Modal Validation Failed",
         message: "Please review and correct the highlighted fields before resubmitting your quote.",
@@ -181,55 +205,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    console.log("✅ Validation passed, analyzing quote...");
     const data = validation.data;
     const analysis = analyzeQuoteModal(data);
-    console.log("📊 Quote analysis complete:", { priority: analysis.priority, value: analysis.estimatedValue });
     
     // Generate enhanced email content using our new template system
-    console.log("📧 Generating email content...");
-    let content;
-    try {
-      content = generateEnhancedQuoteModalEmailContent(data, analysis, {
-        theme: body.emailTheme || 'default',
-        language: body.language || 'en',
-        variant: 'external',
-        trackingPixel: generateTrackingPixelUrl(data, analysis)
-      });
-      console.log("✅ Email content generated");
-    } catch (emailError) {
-      console.error("❌ Email content generation failed:", emailError);
-      throw new Error(`Email template generation failed: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
-    }
+    const content = generateQuoteModalEmailContent(data, analysis, {
+      theme: body.emailTheme || 'default', // Allow theme selection from request
+      language: body.language || 'en', // Allow language selection from request
+      variant: 'external', // Customer-facing email
+      trackingPixel: generateTrackingPixelUrl(data, analysis)
+    });
 
     // Resend
-    console.log("📤 Initializing Resend...");
-    let resend;
-    try {
-      resend = new Resend(process.env.RESEND_API_KEY);
-      console.log("✅ Resend initialized");
-    } catch (resendError) {
-      console.error("❌ Resend initialization failed:", resendError);
-      throw new Error(`Resend initialization failed: ${resendError instanceof Error ? resendError.message : 'Unknown error'}`);
-    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Send enhanced emails
-    console.log("📧 Sending emails...");
-    let emailResults;
-    try {
-      emailResults = await sendEnhancedQuoteModalEmails(resend, data, content, analysis);
-      if (!emailResults.success) {
-        console.error("❌ Email sending failed:", emailResults.error);
-        throw new Error(emailResults.error || "Failed to process quote modal submission");
-      }
-      console.log("✅ Emails sent successfully");
-    } catch (emailSendError) {
-      console.error("❌ Email sending process failed:", emailSendError);
-      throw new Error(`Email sending failed: ${emailSendError instanceof Error ? emailSendError.message : 'Unknown error'}`);
-    }
+    const emailResults = await sendQuoteModalEmails(resend, data, content, analysis);
+    if (!emailResults.success) throw new Error(emailResults.error || "Failed to process quote modal submission");
 
     // Enhanced SUCCESS response
-    console.log("🎉 Quote submission successful");
     return res.status(200).json({
       success: true,
       message: "Quote request submitted successfully! Our team will prepare your personalized proposal.",
@@ -267,25 +261,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     });
   } catch (error) {
-    console.error("💥 CRITICAL ERROR in sendQuote API:", {
+    console.error("Quote Modal Submission Error:", {
       error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString(),
       userAgent: req.headers["user-agent"],
       origin: req.headers.origin,
       ip: getClientIP(req),
-      method: req.method,
-      hasResendKey: !!process.env.RESEND_API_KEY,
-      nodeVersion: process.version,
-      platform: process.platform
     });
 
     return res.status(500).json({
       error: "Quote Modal Processing Error",
-      message: "We're experiencing technical difficulties processing your quote request. Please try again or contact us directly.",
+      message:
+        "We're experiencing technical difficulties processing your quote request. Please try again or contact us directly.",
       details: {
         timestamp: new Date().toISOString(),
-        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
         supportContact: {
           phone: "+44 141 739 3377",
           email: "support@thewallshop.co.uk",
@@ -309,7 +299,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 /**
  * Generate enhanced email content using the new template system
  */
-function generateEnhancedQuoteModalEmailContent(
+function generateQuoteModalEmailContent(
   data: QuoteModalData,
   analysis: QuoteModalAnalysis,
   options: {
@@ -372,7 +362,7 @@ function generateTrackingPixelUrl(data: QuoteModalData, analysis: QuoteModalAnal
 /**
  * Send enhanced emails using the Resend API
  */
-async function sendEnhancedQuoteModalEmails(
+async function sendQuoteModalEmails(
   resend: Resend,
   data: QuoteModalData,
   content: EmailContent,
@@ -439,7 +429,7 @@ async function sendEnhancedQuoteModalEmails(
       },
     };
   } catch (error) {
-    console.error("Enhanced email sending error:", error);
+    console.error("Email sending error:", error);
     return {
       success: false,
       quoteId,
@@ -624,6 +614,6 @@ function generateQuoteModalId(): string {
   return `QTM-${timestamp}-${random}`.toUpperCase();
 }
 
-// Export configurations for external use
-export { WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
+// Export types for external use
+export { ModalQuotePriority, WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
 
