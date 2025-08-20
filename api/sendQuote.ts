@@ -1,25 +1,5 @@
-// sendQuote_enhanced.ts — Enhanced Professional Quote Modal Handler with Modern Email Templates
-// Integrated with Wall Shop branding, multilingual support, and modular email components
-
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-
-// Import our new email template system
-import { 
-  generateWallShopEmailTemplate,
-  getThemeVariants,
-  getDefaultBrandConfig,
-  type EmailTemplateOptions,
-  type BrandConfig,
-  type CTALinks
-} from './emailTemplate.js';
-
-import {
-  generateModularEmail,
-  EmailComponentBuilder,
-  EXTENDED_THEME_VARIANTS,
-  applyThemeToBrandConfig
-} from './modularComponents.js';
 
 /* =========================
    CORS / SECURITY / LIMITS
@@ -33,7 +13,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 2;   // testing-protective
+const RATE_LIMIT_MAX_REQUESTS = 2;
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 /* ===============
@@ -97,43 +77,6 @@ interface EmailResults {
     customer?: string;
   };
 }
-
-/* ===============================
-   ENHANCED EMAIL CONFIGURATION
-   =============================== */
-
-// Enhanced brand configuration with Wall Shop specifics
-const WALL_SHOP_BRAND_CONFIG: BrandConfig = {
-  primaryColor: '#2C3E50', // Deep navy/charcoal from website analysis
-  accentColor: '#E67E22',  // Vibrant orange/gold from website analysis
-  neutralBg: '#F8F9FA',    // Light grey
-  textColor: '#2C3E50',    // Dark text for light backgrounds
-  logoUrl: '{{logoUrl}}',  // Placeholder for logo
-  companyName: 'The Wall Shop',
-  tagline: 'Elevate your walls with style',
-  website: 'https://thewallshop.co.uk',
-  address: 'SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK',
-  phone: '+44 141 739 3377',
-  email: 'info@thewallshop.co.uk',
-  socialLinks: {
-    linkedin: 'https://linkedin.com/company/thewallshop',
-    instagram: 'https://instagram.com/thewallshop',
-    website: 'https://thewallshop.co.uk'
-  }
-};
-
-// Enhanced CTA links with actual Wall Shop URLs
-const WALL_SHOP_CTA_LINKS: CTALinks = {
-  viewLink: '{{viewLink}}', // Dynamic placeholder - will be populated with actual quote URL
-  pdfLink: '{{pdfLink}}', // Dynamic placeholder - will be populated with PDF download URL
-  approveLink: '{{approveLink}}', // Dynamic placeholder - will be populated with approval URL
-  requestChangesLink: '{{requestChangesLink}}', // Dynamic placeholder - will be populated with changes URL
-  requestCallbackLink: 'https://thewallshop.co.uk/contact', // Actual contact page
-  forwardLink: '{{forwardLink}}', // Dynamic placeholder - internal forwarding
-  scheduleConsultationLink: 'https://thewallshop.co.uk/contact', // Actual contact page for scheduling
-  exploreSmartWallsLink: 'https://thewallshop.co.uk/smart-walls', // Actual smart walls page
-  contactLink: 'https://thewallshop.co.uk/contact' // Actual contact page
-};
 
 /* ==============
    MAIN HANDLER
@@ -208,22 +151,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = validation.data;
     const analysis = analyzeQuoteModal(data);
     
-    // Generate enhanced email content using our new template system
-    const content = generateQuoteModalEmailContent(data, analysis, {
-      theme: body.emailTheme || 'default', // Allow theme selection from request
-      language: body.language || 'en', // Allow language selection from request
-      variant: 'external', // Customer-facing email
-      trackingPixel: generateTrackingPixelUrl(data, analysis)
-    });
+    // Generate route-specific email content
+    const content = generateRouteSpecificEmailContent(data, analysis);
 
     // Resend
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // Send enhanced emails
+    // Send emails
     const emailResults = await sendQuoteModalEmails(resend, data, content, analysis);
     if (!emailResults.success) throw new Error(emailResults.error || "Failed to process quote modal submission");
 
-    // Enhanced SUCCESS response
+    // SUCCESS response
     return res.status(200).json({
       success: true,
       message: "Quote request submitted successfully! Our team will prepare your personalized proposal.",
@@ -235,7 +173,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         priority: analysis.priority,
         estimatedValue: analysis.estimatedValue,
         estimatedResponse: getModalResponseTimeEstimate(analysis.priority),
-        availableThemes: EXTENDED_THEME_VARIANTS.map(t => ({ name: t.name, description: t.description })),
         nextSteps: [
           "Immediate technical review and feasibility assessment",
           "Detailed cost analysis with material specifications",
@@ -248,11 +185,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           hours: "Monday - Friday, 9:00 AM - 6:00 PM GMT",
           emergency: "stephen@thewallshop.co.uk",
         },
-        links: {
-          exploreSmartWalls: WALL_SHOP_CTA_LINKS.exploreSmartWallsLink,
-          scheduleConsultation: WALL_SHOP_CTA_LINKS.scheduleConsultationLink,
-          contact: WALL_SHOP_CTA_LINKS.contactLink
-        }
       },
       tracking: {
         emailIds: emailResults.emailIds,
@@ -293,75 +225,470 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 }
 
 /* ===============================
-   ENHANCED EMAIL GENERATION
+   ROUTE-SPECIFIC EMAIL GENERATION
    =============================== */
 
 /**
- * Generate enhanced email content using the new template system
+ * Generate route-specific email content based on the entry point
  */
-function generateQuoteModalEmailContent(
+function generateRouteSpecificEmailContent(
   data: QuoteModalData,
-  analysis: QuoteModalAnalysis,
-  options: {
-    theme?: string;
-    language?: 'en' | 'fr' | 'es' | 'ar' | 'ur';
-    variant?: 'external' | 'internal';
-    trackingPixel?: string;
-  } = {}
+  analysis: QuoteModalAnalysis
 ): EmailContent {
-  const { theme = 'default', language = 'en', variant = 'external', trackingPixel } = options;
+  const quoteId = generateQuoteModalId();
+  
+  // Generate route-specific content based on entry point
+  let productSpecificContent = '';
+  let customerProductContent = '';
+  
+  switch (data.entryPoint) {
+    case 'smart-walls':
+      if (data.smartWalls) {
+        productSpecificContent = generateSmartWallsContent(data.smartWalls);
+        customerProductContent = generateCustomerSmartWallsContent(data.smartWalls);
+      }
+      break;
+    case 'smart-devices':
+      if (data.smartDevices) {
+        productSpecificContent = generateSmartDevicesContent(data.smartDevices);
+        customerProductContent = generateCustomerSmartDevicesContent(data.smartDevices);
+      }
+      break;
+    case 'wall-panels':
+      if (data.wallPanels) {
+        productSpecificContent = generateWallPanelsContent(data.wallPanels);
+        customerProductContent = generateCustomerWallPanelsContent(data.wallPanels);
+      }
+      break;
+    case 'carbon-rock-boards':
+      if (data.carbonRockBoards) {
+        productSpecificContent = generateCarbonRockBoardsContent(data.carbonRockBoards);
+        customerProductContent = generateCustomerCarbonRockBoardsContent(data.carbonRockBoards);
+      }
+      break;
+    default:
+      productSpecificContent = '<p>General inquiry - no specific product data provided.</p>';
+      customerProductContent = '<p>Thank you for your general inquiry. Our team will contact you to discuss your requirements.</p>';
+  }
 
-  // Generate customer email using new template system
-  const customerEmailOptions: EmailTemplateOptions = {
-    variant: 'external',
-    theme,
-    language,
-    brandConfig: WALL_SHOP_BRAND_CONFIG,
-    ctaLinks: WALL_SHOP_CTA_LINKS,
-    trackingPixel
-  };
+  // Generate admin email
+  const adminHtml = generateAdminEmailHtml(data, analysis, productSpecificContent, quoteId);
+  const adminText = generateAdminEmailText(data, analysis, quoteId);
 
-  const customerEmail = generateWallShopEmailTemplate(data, analysis, customerEmailOptions);
-
-  // Generate admin email using modular system
-  const adminEmailOptions: EmailTemplateOptions = {
-    variant: 'internal',
-    theme: 'default', // Always use default theme for internal emails
-    language: 'en', // Always use English for internal emails
-    brandConfig: WALL_SHOP_BRAND_CONFIG,
-    ctaLinks: WALL_SHOP_CTA_LINKS
-  };
-
-  const adminEmail = generateWallShopEmailTemplate(data, analysis, adminEmailOptions);
+  // Generate customer email
+  const customerHtml = generateCustomerEmailHtml(data, analysis, customerProductContent, quoteId);
+  const customerText = generateCustomerEmailText(data, analysis, quoteId);
 
   return {
-    customerHtml: customerEmail.html,
-    customerText: customerEmail.text,
-    adminHtml: adminEmail.html,
-    adminText: adminEmail.text
+    adminHtml,
+    adminText,
+    customerHtml,
+    customerText
   };
 }
 
-/**
- * Generate tracking pixel URL with analytics data
- */
-function generateTrackingPixelUrl(data: QuoteModalData, analysis: QuoteModalAnalysis): string {
-  const baseUrl = 'https://analytics.thewallshop.co.uk/pixel.gif';
-  const params = new URLSearchParams({
-    event: 'quote_email_opened',
-    customer: data.email,
-    priority: analysis.priority,
-    value: analysis.estimatedValue.toString(),
-    entry_point: data.entryPoint,
-    timestamp: Date.now().toString()
-  });
+/* ===============================
+   PRODUCT-SPECIFIC CONTENT GENERATORS
+   =============================== */
 
-  return `${baseUrl}?${params.toString()}`;
+function generateSmartWallsContent(smartWalls: any): string {
+  return `
+    <h3 style="color: #2C3E50; margin: 20px 0 10px 0;">Smart Walls Configuration</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Dimensions:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartWalls.dimensions?.width || 'N/A'}m (W) × ${smartWalls.dimensions?.height || 'N/A'}m (H) × ${smartWalls.dimensions?.depth || 'N/A'}</td>
+      </tr>
+      ${smartWalls.dimensions?.calculatedMaxWidth ? `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Calculated Max Width:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartWalls.dimensions.calculatedMaxWidth.toFixed(2)}m</td>
+      </tr>
+      ` : ''}
+      ${smartWalls.selectedStyle ? `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Selected Style:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartWalls.selectedStyle.category} - ${smartWalls.selectedStyle.finish}</td>
+      </tr>
+      ` : ''}
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Accessories:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${Object.entries(smartWalls.accessories || {}).filter(([, value]) => value).map(([key]) => key.charAt(0).toUpperCase() + key.slice(1)).join(', ') || 'None'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Smart Devices:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${(smartWalls.smartDevices?.selectedDevices || []).map(d => d.name).join(', ') || 'None'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Gaming System:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartWalls.gamingSystem?.type || 'None'}</td>
+      </tr>
+    </table>
+  `;
 }
 
-/**
- * Send enhanced emails using the Resend API
- */
+function generateSmartDevicesContent(smartDevices: any): string {
+  return `
+    <h3 style="color: #2C3E50; margin: 20px 0 10px 0;">Smart Devices Configuration</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Control Panels:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartDevices.controlPanels ? 'Yes' : 'No'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Security Sensors:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartDevices.securitySensors ? 'Yes' : 'No'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Home Automation:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${smartDevices.homeAutomation ? 'Yes' : 'No'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Selected Devices:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${(smartDevices.selectedDevices || []).map(d => d.name).join(', ') || 'None specified'}</td>
+      </tr>
+    </table>
+  `;
+}
+
+function generateWallPanelsContent(wallPanels: any): string {
+  return `
+    <h3 style="color: #2C3E50; margin: 20px 0 10px 0;">Wall Panels Configuration</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Panel Type:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${wallPanels.panelType || 'N/A'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Finish:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${wallPanels.finish || 'N/A'}</td>
+      </tr>
+      ${wallPanels.dimensions?.area ? `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Area:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${wallPanels.dimensions.area} m²</td>
+      </tr>
+      ` : ''}
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Installation:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${wallPanels.installation === 'diy' ? 'DIY' : 'Professional Installation'}</td>
+      </tr>
+    </table>
+  `;
+}
+
+function generateCarbonRockBoardsContent(carbonRockBoards: any): string {
+  return `
+    <h3 style="color: #2C3E50; margin: 20px 0 10px 0;">Carbon Rock Boards Configuration</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Board Type:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${carbonRockBoards.boardType || 'N/A'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Thickness:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${carbonRockBoards.thickness || 'N/A'}</td>
+      </tr>
+      ${carbonRockBoards.dimensions?.area ? `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Area:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${carbonRockBoards.dimensions.area} m²</td>
+      </tr>
+      ` : ''}
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Installation:</td>
+        <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${carbonRockBoards.installation === 'diy' ? 'DIY' : 'Professional Installation'}</td>
+      </tr>
+    </table>
+  `;
+}
+
+/* ===============================
+   CUSTOMER-FACING CONTENT GENERATORS
+   =============================== */
+
+function generateCustomerSmartWallsContent(smartWalls: any): string {
+  return `
+    <div style="background-color: #F8F9FA; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #2C3E50; margin: 0 0 15px 0;">Your Smart Walls Configuration</h3>
+      <p style="margin: 0 0 10px 0;"><strong>Dimensions:</strong> ${smartWalls.dimensions?.width || 'N/A'}m × ${smartWalls.dimensions?.height || 'N/A'}m × ${smartWalls.dimensions?.depth || 'N/A'}</p>
+      ${smartWalls.selectedStyle ? `<p style="margin: 0 0 10px 0;"><strong>Style:</strong> ${smartWalls.selectedStyle.category} - ${smartWalls.selectedStyle.finish}</p>` : ''}
+      <p style="margin: 0 0 10px 0;"><strong>Accessories:</strong> ${Object.entries(smartWalls.accessories || {}).filter(([, value]) => value).map(([key]) => key.charAt(0).toUpperCase() + key.slice(1)).join(', ') || 'None'}</p>
+      <p style="margin: 0;"><strong>Smart Features:</strong> ${(smartWalls.smartDevices?.selectedDevices || []).map(d => d.name).join(', ') || 'None'}</p>
+    </div>
+  `;
+}
+
+function generateCustomerSmartDevicesContent(smartDevices: any): string {
+  return `
+    <div style="background-color: #F8F9FA; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #2C3E50; margin: 0 0 15px 0;">Your Smart Devices Configuration</h3>
+      <p style="margin: 0 0 10px 0;"><strong>Control Panels:</strong> ${smartDevices.controlPanels ? 'Included' : 'Not included'}</p>
+      <p style="margin: 0 0 10px 0;"><strong>Security Sensors:</strong> ${smartDevices.securitySensors ? 'Included' : 'Not included'}</p>
+      <p style="margin: 0 0 10px 0;"><strong>Home Automation:</strong> ${smartDevices.homeAutomation ? 'Included' : 'Not included'}</p>
+      <p style="margin: 0;"><strong>Selected Devices:</strong> ${(smartDevices.selectedDevices || []).map(d => d.name).join(', ') || 'To be discussed'}</p>
+    </div>
+  `;
+}
+
+function generateCustomerWallPanelsContent(wallPanels: any): string {
+  return `
+    <div style="background-color: #F8F9FA; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #2C3E50; margin: 0 0 15px 0;">Your Wall Panels Configuration</h3>
+      <p style="margin: 0 0 10px 0;"><strong>Panel Type:</strong> ${wallPanels.panelType || 'To be discussed'}</p>
+      <p style="margin: 0 0 10px 0;"><strong>Finish:</strong> ${wallPanels.finish || 'To be discussed'}</p>
+      ${wallPanels.dimensions?.area ? `<p style="margin: 0 0 10px 0;"><strong>Area:</strong> ${wallPanels.dimensions.area} m²</p>` : ''}
+      <p style="margin: 0;"><strong>Installation:</strong> ${wallPanels.installation === 'diy' ? 'DIY (Supply only)' : 'Professional Installation'}</p>
+    </div>
+  `;
+}
+
+function generateCustomerCarbonRockBoardsContent(carbonRockBoards: any): string {
+  return `
+    <div style="background-color: #F8F9FA; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <h3 style="color: #2C3E50; margin: 0 0 15px 0;">Your Carbon Rock Boards Configuration</h3>
+      <p style="margin: 0 0 10px 0;"><strong>Board Type:</strong> ${carbonRockBoards.boardType || 'To be discussed'}</p>
+      <p style="margin: 0 0 10px 0;"><strong>Thickness:</strong> ${carbonRockBoards.thickness || 'To be discussed'}</p>
+      ${carbonRockBoards.dimensions?.area ? `<p style="margin: 0 0 10px 0;"><strong>Area:</strong> ${carbonRockBoards.dimensions.area} m²</p>` : ''}
+      <p style="margin: 0;"><strong>Installation:</strong> ${carbonRockBoards.installation === 'diy' ? 'DIY (Supply only)' : 'Professional Installation'}</p>
+    </div>
+  `;
+}
+
+/* ===============================
+   EMAIL HTML GENERATORS
+   =============================== */
+
+function generateAdminEmailHtml(data: QuoteModalData, analysis: QuoteModalAnalysis, productContent: string, quoteId: string): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Quote Request - ${quoteId}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #F3F4F6;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF;">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%); padding: 30px 20px; text-align: center;">
+      <h1 style="color: #FFFFFF; margin: 0; font-size: 24px; font-weight: bold;">New Quote Request</h1>
+      <p style="color: #E5E7EB; margin: 10px 0 0 0; font-size: 16px;">Reference: ${quoteId}</p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px 20px;">
+      <!-- Priority Alert -->
+      <div style="background-color: ${analysis.priority === 'premium' ? '#FEF3C7' : analysis.priority === 'urgent' ? '#FEE2E2' : '#F0FDF4'}; 
+                  border-left: 4px solid ${analysis.priority === 'premium' ? '#F59E0B' : analysis.priority === 'urgent' ? '#EF4444' : '#10B981'}; 
+                  padding: 15px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 5px 0; color: #1F2937; font-size: 16px;">Priority: ${analysis.priority.toUpperCase()}</h3>
+        <p style="margin: 0; color: #4B5563; font-size: 14px;">Estimated Value: £${analysis.estimatedValue.toLocaleString()}</p>
+      </div>
+
+      <!-- Customer Information -->
+      <h2 style="color: #2C3E50; margin: 0 0 15px 0; font-size: 20px;">Customer Information</h2>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Name:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${data.fullName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Email:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;"><a href="mailto:${data.email}" style="color: #1D4ED8;">${data.email}</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Phone:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;"><a href="tel:${data.phone}" style="color: #1D4ED8;">${data.phone}</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Address:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${data.installationAddress || 'Not provided'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB; font-weight: bold;">Entry Point:</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E5E7EB;">${data.entryPoint.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+        </tr>
+      </table>
+
+      ${data.additionalNotes ? `
+      <h3 style="color: #2C3E50; margin: 20px 0 10px 0;">Additional Notes</h3>
+      <div style="background-color: #F9FAFB; padding: 15px; border-radius: 6px; border-left: 4px solid #6B7280;">
+        <p style="margin: 0; color: #374151;">${data.additionalNotes}</p>
+      </div>
+      ` : ''}
+
+      <!-- Product-specific content -->
+      ${productContent}
+
+      <!-- Action Required -->
+      <div style="background-color: #EFF6FF; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #1E40AF; margin: 0 0 10px 0;">Action Required</h3>
+        <p style="margin: 0 0 10px 0; color: #1F2937;">Please review this quote request and respond within the estimated timeframe.</p>
+        <p style="margin: 0; color: #6B7280; font-size: 14px;"><strong>Response Time:</strong> ${getModalResponseTimeEstimate(analysis.priority)}</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #F9FAFB; padding: 20px; text-align: center; border-top: 1px solid #E5E7EB;">
+      <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 14px;">The Wall Shop Ltd</p>
+      <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 12px;">SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK</p>
+      <p style="margin: 0; color: #6B7280; font-size: 12px;">Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+function generateCustomerEmailHtml(data: QuoteModalData, analysis: QuoteModalAnalysis, productContent: string, quoteId: string): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Request Received - ${quoteId}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #F3F4F6;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF;">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%); padding: 30px 20px; text-align: center;">
+      <h1 style="color: #FFFFFF; margin: 0; font-size: 24px; font-weight: bold;">Quote Request Received</h1>
+      <p style="color: #E5E7EB; margin: 10px 0 0 0; font-size: 16px;">Reference: ${quoteId}</p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px 20px;">
+      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+        Dear ${data.fullName},
+      </p>
+      
+      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+        Thank you for your interest in our ${data.entryPoint.replace('-', ' ')} solutions. We have received your quote request and our team is already reviewing your requirements.
+      </p>
+
+      <!-- Product Configuration -->
+      ${productContent}
+
+      <!-- Next Steps -->
+      <div style="background-color: #EFF6FF; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #1E40AF; margin: 0 0 15px 0;">What Happens Next?</h3>
+        <ul style="margin: 0; padding-left: 20px; color: #374151;">
+          <li style="margin-bottom: 8px;">Our technical team will review your specifications</li>
+          <li style="margin-bottom: 8px;">We'll prepare a detailed proposal with pricing</li>
+          <li style="margin-bottom: 8px;">A specialist will contact you to discuss your project</li>
+          <li style="margin-bottom: 0;">We'll schedule a consultation if required</li>
+        </ul>
+      </div>
+
+      <!-- Response Time -->
+      <div style="background-color: #F0FDF4; padding: 15px; border-radius: 6px; border-left: 4px solid #10B981; margin: 20px 0;">
+        <p style="margin: 0; color: #065F46;"><strong>Expected Response:</strong> ${getModalResponseTimeEstimate(analysis.priority)}</p>
+      </div>
+
+      <!-- Contact Information -->
+      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+        If you have any immediate questions or need to make changes to your request, please don't hesitate to contact us:
+      </p>
+      
+      <div style="background-color: #F9FAFB; padding: 15px; border-radius: 6px;">
+        <p style="margin: 0 0 5px 0; color: #374151;"><strong>Phone:</strong> <a href="tel:+441417393377" style="color: #1D4ED8; text-decoration: none;">+44 141 739 3377</a></p>
+        <p style="margin: 0 0 5px 0; color: #374151;"><strong>Email:</strong> <a href="mailto:info@thewallshop.co.uk" style="color: #1D4ED8; text-decoration: none;">info@thewallshop.co.uk</a></p>
+        <p style="margin: 0; color: #374151;"><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM GMT</p>
+      </div>
+
+      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 20px 0 0 0;">
+        Best regards,<br>
+        <strong>The Wall Shop Team</strong>
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #F9FAFB; padding: 20px; text-align: center; border-top: 1px solid #E5E7EB;">
+      <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 14px;"><strong>The Wall Shop Ltd</strong></p>
+      <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 12px;">SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK</p>
+      <p style="margin: 0 0 20px 0; color: #6B7280; font-size: 12px;">Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk</p>
+      
+      <!-- Footer Disclaimer -->
+      <div style="border-top: 1px solid #E5E7EB; padding-top: 15px; margin-top: 15px;">
+        <p style="margin: 0; color: #9CA3AF; font-size: 11px; line-height: 1.4;">
+          This email and any files transmitted with it are confidential and intended solely for the use of the individuals or entities to whom they are addressed. If you have received this email in error, please return it to the sender by forwarding it to them and deleting it from your computer. Please note that any views or opinions presented in this email are solely those of the author and do not necessarily represent those of The Wall Shop Ltd. Finally, the recipient should check this email and any attachments for the presence of viruses. The Wall Shop Ltd accepts no liability for any loss or damage caused by any virus transmitted by this email.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/* ===============================
+   TEXT EMAIL GENERATORS
+   =============================== */
+
+function generateAdminEmailText(data: QuoteModalData, analysis: QuoteModalAnalysis, quoteId: string): string {
+  return `
+NEW QUOTE REQUEST - ${quoteId}
+Priority: ${analysis.priority.toUpperCase()}
+Estimated Value: £${analysis.estimatedValue.toLocaleString()}
+
+CUSTOMER INFORMATION:
+Name: ${data.fullName}
+Email: ${data.email}
+Phone: ${data.phone}
+Address: ${data.installationAddress || 'Not provided'}
+Entry Point: ${data.entryPoint.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+
+${data.additionalNotes ? `ADDITIONAL NOTES:\n${data.additionalNotes}\n\n` : ''}
+
+ACTION REQUIRED:
+Please review this quote request and respond within: ${getModalResponseTimeEstimate(analysis.priority)}
+
+---
+The Wall Shop Ltd
+SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK
+Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk
+  `;
+}
+
+function generateCustomerEmailText(data: QuoteModalData, analysis: QuoteModalAnalysis, quoteId: string): string {
+  return `
+QUOTE REQUEST RECEIVED - ${quoteId}
+
+Dear ${data.fullName},
+
+Thank you for your interest in our ${data.entryPoint.replace('-', ' ')} solutions. We have received your quote request and our team is already reviewing your requirements.
+
+WHAT HAPPENS NEXT?
+- Our technical team will review your specifications
+- We'll prepare a detailed proposal with pricing  
+- A specialist will contact you to discuss your project
+- We'll schedule a consultation if required
+
+EXPECTED RESPONSE: ${getModalResponseTimeEstimate(analysis.priority)}
+
+CONTACT US:
+Phone: +44 141 739 3377
+Email: info@thewallshop.co.uk
+Hours: Monday - Friday, 9:00 AM - 6:00 PM GMT
+
+Best regards,
+The Wall Shop Team
+
+---
+The Wall Shop Ltd
+SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK
+Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk
+
+This email and any files transmitted with it are confidential and intended solely for the use of the individuals or entities to whom they are addressed. If you have received this email in error, please return it to the sender by forwarding it to them and deleting it from your computer. Please note that any views or opinions presented in this email are solely those of the author and do not necessarily represent those of The Wall Shop Ltd. Finally, the recipient should check this email and any attachments for the presence of viruses. The Wall Shop Ltd accepts no liability for any loss or damage caused by any virus transmitted by this email.
+  `;
+}
+
+/* ===============================
+   EMAIL SENDING
+   =============================== */
+
 async function sendQuoteModalEmails(
   resend: Resend,
   data: QuoteModalData,
@@ -372,7 +699,7 @@ async function sendQuoteModalEmails(
 
   try {
     const [adminResult, customerResult] = await Promise.allSettled([
-      // Admin email with enhanced subject and headers
+      // Admin email
       resend.emails.send({
         from: "The Wall Shop Quotes <quotes@thewallshop.co.uk>",
         to: ["stephen@thewallshop.co.uk"],
@@ -385,7 +712,7 @@ async function sendQuoteModalEmails(
           "X-Priority": analysis.priority,
           "X-Customer-Email": data.email,
           "X-Estimated-Value": analysis.estimatedValue.toString(),
-          "X-Wall-Shop-System": "enhanced-v2"
+          "X-Wall-Shop-System": "route-specific-v1"
         },
         tags: [
           { name: "type", value: "quote-admin" },
@@ -393,17 +720,18 @@ async function sendQuoteModalEmails(
           { name: "entry-point", value: data.entryPoint }
         ]
       }),
-      // Customer email with enhanced subject and headers
+      // Customer email with CC
       resend.emails.send({
         from: "The Wall Shop <quotes@thewallshop.co.uk>",
         to: [data.email],
+        cc: [data.email], // CC the submitter to keep them in the loop
         subject: `Your Quote Request Received — ${quoteId} | The Wall Shop`,
         html: content.customerHtml,
         text: content.customerText,
         headers: {
           "X-Quote-ID": quoteId,
           "X-Entry-Point": data.entryPoint,
-          "X-Wall-Shop-System": "enhanced-v2"
+          "X-Wall-Shop-System": "route-specific-v1"
         },
         tags: [
           { name: "type", value: "quote-customer" },
@@ -440,7 +768,6 @@ async function sendQuoteModalEmails(
 
 /* =========================
    UTILITIES / VALIDATION
-   (Keeping existing functions but with enhanced error handling)
    ========================= */
 
 function getClientIP(req: VercelRequest): string {
@@ -475,28 +802,15 @@ async function parseRequestBody(req: VercelRequest): Promise<any> {
     try {
       return JSON.parse(req.body);
     } catch {
-      throw new Error("Invalid JSON format in request body");
+      throw new Error("Invalid JSON in request body");
     }
   }
   return req.body || {};
 }
 
-function sanitizeString(value: any): string {
-  if (typeof value !== "string") return "";
-  return value
-    .replace(/<[^>]*>/g, "")
-    .replace(/[<>'"&]/g, (m) => {
-      const map: Record<string, string> = {
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#x27;",
-        "&": "&amp;",
-      };
-      return map[m] || m;
-    })
-    .substring(0, 5000)
-    .trim();
+function sanitizeString(input: string): string {
+  if (typeof input !== "string") return "";
+  return input.trim().replace(/[<>]/g, "");
 }
 
 function isValidEmail(email: string): boolean {
@@ -615,5 +929,6 @@ function generateQuoteModalId(): string {
 }
 
 // Export types for external use
-export { ModalQuotePriority, WALL_SHOP_BRAND_CONFIG, WALL_SHOP_CTA_LINKS, EXTENDED_THEME_VARIANTS };
+export { ModalQuotePriority };
+
 
