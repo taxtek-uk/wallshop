@@ -1,21 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { ProductCategory, FormErrors, SmartWallsFormData } from '@/types/quote';
-
-// Extend QuoteFormData to include the new smartWalls structure
-interface QuoteFormData {
-  contact: {
-    fullName: string;
-    email: string;
-    phone: string;
-    installationAddress: string;
-    additionalNotes: string;
-  };
-  productCategory: ProductCategory;
-  smartWalls?: SmartWallsFormData;
-  smartDevices?: any;
-  wallPanels?: any;
-  carbonRockBoards?: any;
-}
+import { ProductCategory, FormErrors, SmartWallsFormData, QuoteFormData } from '@/types/quote';
 
 interface QuoteState {
   currentStep: number;
@@ -49,7 +33,7 @@ const initialState: QuoteState = {
       additionalNotes: '',
     },
     productCategory: 'smart-walls',
-    smartWalls: { // Initialize smartWalls data structure
+    smartWalls: { // Initialize smartWalls data structure with all required fields
       dimensions: {
         width: 0,
         height: 2.1,
@@ -83,6 +67,10 @@ const initialState: QuoteState = {
       speakers: false,
       lighting: false,
       additionalFeatures: [],
+      // Add the new optional fields here, initialized to undefined or default values
+      style: undefined, // Will be set by StepSmartWalls
+      skippedAccessories: false,
+      skippedSmartDevices: false,
     },
   },
   errors: {},
@@ -102,7 +90,6 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
           ...state.formData,
           productCategory: action.payload,
         },
-        // Smart Walls has Contact -> Config -> Review. Others remain Contact -> Config
         totalSteps: action.payload === 'smart-walls' ? 3 : 2,
       };
     
@@ -116,7 +103,6 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
       };
     
     case 'UPDATE_PRODUCT_DATA': {
-      // Map category to the correct camelCase form key
       const categoryKeyMap: Record<ProductCategory, keyof QuoteFormData> = {
         'smart-walls': 'smartWalls',
         'smart-devices': 'smartDevices',
@@ -163,6 +149,9 @@ interface QuoteContextType {
   setErrors: (errors: FormErrors) => void;
   clearErrors: () => void;
   validateCurrentStep: () => boolean;
+  // Expose formData and a specific update function for smartWalls
+  formData: QuoteFormData;
+  updateSmartWallsFormData: (data: Partial<SmartWallsFormData>) => void;
 }
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined);
@@ -200,11 +189,10 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     const errors: FormErrors = {};
     
     if (state.currentStep === 1) {
-      // Validate contact form
       const { contact } = state.formData;
       if (!contact.fullName.trim()) errors.fullName = 'Full name is required';
       if (!contact.email.trim()) errors.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)) {
+      else if (!/^\S+@\S+\.\S+$/.test(contact.email)) {
         errors.email = 'Please enter a valid email address';
       }
       if (!contact.phone.trim()) errors.phone = 'Phone number is required';
@@ -212,12 +200,10 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
         errors.phone = 'Please enter a valid phone number';
       }
     } else if (state.currentStep === 2 && state.formData.productCategory === 'smart-walls') {
-      // Validate Smart Walls dimensions
       const smartWalls = state.formData.smartWalls;
       if (!smartWalls?.dimensions?.width || smartWalls.dimensions.width <= 0) {
         errors.smartWalls_dimensions_width = 'Wall width is required and must be greater than 0';
       }
-      // Add more specific smart walls validation here if needed
     }
     
     if (Object.keys(errors).length > 0) {
@@ -227,6 +213,17 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     
     clearErrors();
     return true;
+  };
+
+  // Specific update function for smartWalls data
+  const updateSmartWallsFormData = (data: Partial<SmartWallsFormData>) => {
+    dispatch({
+      type: 'UPDATE_PRODUCT_DATA',
+      payload: {
+        category: 'smart-walls',
+        data: { ...state.formData.smartWalls, ...data },
+      },
+    });
   };
 
   const contextValue: QuoteContextType = {
@@ -239,6 +236,8 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     setErrors,
     clearErrors,
     validateCurrentStep,
+    formData: state.formData, // Expose formData directly
+    updateSmartWallsFormData, // Expose the specific update function
   };
 
   return (
@@ -255,3 +254,5 @@ export function useQuote() {
   }
   return context;
 }
+
+

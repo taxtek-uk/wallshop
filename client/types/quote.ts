@@ -12,72 +12,89 @@ export interface ContactFormData {
   projectType?: string;
   budget?: string;
 }
+
 export interface SmartWallsFormData {
   // Dimensional specifications
-  dimensions: {
-    width: number;
-    height: number;
-    depth: '120mm' | '150mm' | '180mm' | 'custom';
+  dimensions?: {
+    width?: number;
+    height?: number;
+    depth?: '120mm' | '150mm' | '180mm' | 'custom';
     customDepth?: number;
     calculatedMaxWidth?: number;
   };
   
-  // Style selection
-  selectedStyle: {
-    category: string;
-    categoryId: string;
-    finish: string;
-    finishId: string;
-    finishImage: string;
-    finishDescription: string;
+  // Legacy style selection (kept for compatibility across the app)
+  selectedStyle?: {
+    category?: string;
+    categoryId?: string;
+    finish?: string;
+    finishId?: string;
+    finishImage?: string;
+    finishDescription?: string;
+  };
+
+  // New optional style model used by StepSmartWalls (non-breaking)
+  style?: {
+    category?: string; // category id
+    categoryName?: string; // category display name
+    finish?: {
+      id: number;
+      name: string;
+      img: string;
+      desc: string;
+    };
   };
   
   // Accessories
-  accessories: {
-    tv: boolean;
-    fireplace: boolean;
-    soundbar: boolean;
-    shelving: boolean;
+  accessories?: {
+    tv?: boolean;
+    fireplace?: boolean;
+    soundbar?: boolean;
+    shelving?: boolean;
   };
   
-  // Smart devices (integrated from StepSmartDevices)
-  smartDevices: {
-    selectedDevices: Array<{
+  // Smart devices (original object shape with nested selectedDevices)
+  smartDevices?: {
+    selectedDevices?: Array<{
       name: string;
       category: string;
     }>;
-    controlPanels: boolean;
-    securitySensors: boolean;
-    homeAutomation: boolean;
+    controlPanels?: boolean;
+    securitySensors?: boolean;
+    homeAutomation?: boolean;
   };
   
   // Gaming system
-  gamingSystem: {
-    type: 'PlayStation' | 'Xbox' | 'Nintendo' | 'PC Setup' | 'Custom' | null;
+  gamingSystem?: {
+    type?: 'PlayStation' | 'Xbox' | 'Nintendo' | 'PC Setup' | 'Custom' | null;
     specifications?: string;
   };
   
+  // Explicit skip flags recorded by StepSmartWalls (optional to remain non-breaking)
+  skippedAccessories?: boolean;
+  skippedSmartDevices?: boolean;
+
   // Existing fields for backward compatibility
-  tvIntegration: boolean;
-  speakers: boolean;
-  lighting: boolean;
-  additionalFeatures: string[];
+  tvIntegration?: boolean;
+  speakers?: boolean;
+  lighting?: boolean;
+  additionalFeatures?: string[];
   projectDetails?: {
-    propertyType: 'residential' | 'commercial';
-    purpose: 'decorative' | 'functional' | 'both';
-    installation: 'supply-only' | 'supply-install';
+    propertyType?: 'residential' | 'commercial';
+    purpose?: 'decorative' | 'functional' | 'both';
+    installation?: 'supply-only' | 'supply-install';
   };
   wallSpecifications?: {
-    width: number;
-    height: number;
-    thickness: string;
-    layout: 'straight' | 'curved' | 'angled';
+    width?: number;
+    height?: number;
+    thickness?: string;
+    layout?: 'straight' | 'curved' | 'angled';
   };
   technicalNeeds?: {
-    soundproofing: boolean;
-    fireRating: boolean;
-    accessibility: boolean;
-    ecoMaterials: boolean;
+    soundproofing?: boolean;
+    fireRating?: boolean;
+    accessibility?: boolean;
+    ecoMaterials?: boolean;
   };
 }
 
@@ -112,10 +129,10 @@ export interface TextureCategory {
   img: string;
   accent: string;
   panels: Array<{
-  id: number;
-  name: string;
-  img: string;
-  desc: string;
+    id: number;
+    name: string;
+    img: string;
+    desc: string;
   }>;
 }
 
@@ -144,48 +161,47 @@ export interface SmartWallsEmailData {
   };
 }
 
-
 export interface SmartDevicesFormData {
-  controlPanels: boolean;
+  controlPanels?: boolean;
   panelModel?: string;
   panelRoom?: string;
   panelMountType?: string;
-  securitySensors: boolean;
+  securitySensors?: boolean;
   motionDetection?: boolean;
   smokeDetection?: boolean;
   securityFeatures?: string[];
-  homeAutomation: boolean;
+  homeAutomation?: boolean;
   automationFeatures?: string[];
   selectedDevices?: { name: string; category?: string }[];
 }
 
 export interface WallPanelsFormData {
-  panelType: 'fluted' | 'hd-printing' | 'textured' | 'smooth';
+  panelType?: 'fluted' | 'hd-printing' | 'textured' | 'smooth';
   flutedGrooveDepth?: string;
   flutedSpacing?: string;
   hdPrintingPattern?: string;
   textureType?: string;
-  finish: string;
-  dimensions: {
-    width: number;
-    height: number;
-    area: number;
+  finish?: string;
+  dimensions?: {
+    width?: number;
+    height?: number;
+    area?: number;
   };
-  installation: 'diy' | 'professional';
+  installation?: 'diy' | 'professional';
 }
 
 export interface CarbonRockBoardsFormData {
-  boardType: 'acoustic' | 'mirror' | 'standard';
+  boardType?: 'acoustic' | 'mirror' | 'standard';
   acousticNrcRating?: string;
   acousticFabricColor?: string;
   mirrorTint?: string;
-  thickness: string;
-  dimensions: {
-    width: number;
-    height: number;
-    area: number;
+  thickness?: string;
+  dimensions?: {
+    width?: number;
+    height?: number;
+    area?: number;
   };
-  installation: 'diy' | 'professional';
+  installation?: 'diy' | 'professional';
 }
 
 export interface QuoteFormData {
