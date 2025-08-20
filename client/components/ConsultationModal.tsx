@@ -107,10 +107,15 @@ const ConsultationModal: React.FC<ConsultationModalProps> = ({
         return undefined;
       case 'phone':
         if (!value.trim()) return 'Phone number is required';
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+
+        // Strip spaces, dashes, and brackets
         const cleanPhone = value.replace(/[\s\-\(\)]/g, '');
-        if (!phoneRegex.test(cleanPhone) || cleanPhone.length < 10) {
-          return 'Please enter a valid phone number (minimum 10 digits)';
+
+        // Accept either E.164 (+44…) OR UK-local (07…)
+        const phoneRegex = /^(?:\+[1-9]\d{9,14}|0\d{9,14})$/;
+
+        if (!phoneRegex.test(cleanPhone)) {
+          return 'Please enter a valid phone number (e.g., +44 20 1234 5678 or 07340530184)';
         }
         return undefined;
       case 'projectType':
