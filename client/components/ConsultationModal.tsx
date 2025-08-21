@@ -203,9 +203,6 @@ const ConsultationModal: React.FC<ConsultationModalProps> = ({
     setSubmitError(null);
 
     try {
-      // Import the sendConsultation function
-      const { sendConsultation } = await import('../../api/sendConsultation');
-      
       // Prepare the data
       const consultationData = {
         ...formData,
@@ -216,8 +213,17 @@ const ConsultationModal: React.FC<ConsultationModalProps> = ({
         userAgent: navigator.userAgent,
       };
 
-      // Send the consultation request
-      await sendConsultation(consultationData);
+      // Send the consultation request to serverless API
+      const res = await fetch('/api/sendConsultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(consultationData),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.message || 'Failed to submit consultation request. Please try again.');
+      }
 
       setSubmitSuccess(true);
       
