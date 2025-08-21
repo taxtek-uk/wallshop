@@ -58,12 +58,12 @@ export default function StepReviewSubmit() {
         <section className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl font-bold text-mocha-950 mb-4">Smart Walls</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Item label="Width" value={smartWalls.dimensions?.width ? `${smartWalls.dimensions.width}m` : ''} />
-            <Item label="Height" value={smartWalls.dimensions?.height ? `${smartWalls.dimensions.height}m` : ''} />
-            <Item label="Depth" value={smartWalls.dimensions?.depth === 'custom' ? `${smartWalls.dimensions.customDepth}mm (Custom)` : smartWalls.dimensions?.depth} />
-            <Item label="Calculated Max Width" value={smartWalls.dimensions?.calculatedMaxWidth ? `${smartWalls.dimensions.calculatedMaxWidth.toFixed(2)}m` : ''} />
-            <Item label="Selected Style" value={smartWalls.selectedStyle ? `${smartWalls.selectedStyle.category} - ${smartWalls.selectedStyle.finish}` : ''} />
-            <Item label="Accessories" value={Object.entries(smartWalls.accessories || {}).filter(([, value]) => value).map(([key]) => key.charAt(0).toUpperCase() + key.slice(1)).join(', ') || 'None'} />
+            <Item label="Width" value={smartWalls.dimensions?.widthMm ? `${(smartWalls.dimensions.widthMm / 1000).toFixed(1)}m` : smartWalls.legacyDimensions?.width ? `${smartWalls.legacyDimensions.width}m` : ''} />
+            <Item label="Height" value={smartWalls.dimensions?.heightMm ? `${(smartWalls.dimensions.heightMm / 1000).toFixed(1)}m` : smartWalls.legacyDimensions?.height ? `${smartWalls.legacyDimensions.height}m` : ''} />
+            <Item label="Depth" value={smartWalls.legacyDimensions?.depth === 'custom' ? `${smartWalls.legacyDimensions.customDepth}mm (Custom)` : smartWalls.legacyDimensions?.depth || ''} />
+            <Item label="Calculated Max Width" value={smartWalls.legacyDimensions?.calculatedMaxWidth ? `${smartWalls.legacyDimensions.calculatedMaxWidth.toFixed(2)}m` : ''} />
+            <Item label="Selected Style" value={smartWalls.selectedStyle?.category && smartWalls.selectedStyle?.styleId ? `${smartWalls.selectedStyle.category} - ${smartWalls.selectedStyle.styleId}` : smartWalls.legacySelectedStyle?.category && smartWalls.legacySelectedStyle?.finish ? `${smartWalls.legacySelectedStyle.category} - ${smartWalls.legacySelectedStyle.finish}` : ''} />
+            <Item label="Accessories" value={Object.entries(smartWalls.devices || {}).filter(([, value]) => value).map(([key]) => key.charAt(0).toUpperCase() + key.slice(1)).join(', ') || Object.entries(smartWalls.accessories || {}).filter(([, value]) => value).map(([key]) => key.charAt(0).toUpperCase() + key.slice(1)).join(', ') || 'None'} />
             <Item label="Smart Devices" value={(smartWalls.smartDevices?.selectedDevices || []).map(d => d.name).join(', ') || 'None'} />
             <Item label="Gaming System" value={smartWalls.gamingSystem?.type || 'None'} />
             {smartWalls.gamingSystem?.type === 'Custom' && (

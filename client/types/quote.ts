@@ -1,6 +1,43 @@
 // Types for the Quote Modal system
+
+// Strict union types as required
+export type QuoteStep = 'dimensions' | 'styles' | 'accessories' | 'devices' | 'gaming' | 'review';
+export type StyleCategory = 'wood' | 'solid' | 'stone' | 'cloth' | 'metal' | 'mirror';
+
+// Product categories (existing)
 export type ProductCategory = 'smart-walls' | 'smart-devices' | 'wall-panels' | 'carbon-rock-boards';
 
+// Wall dimensions in mm
+export interface WallDimensionsMm {
+  widthMm: number | null;
+  heightMm: number | null;
+}
+
+// Style selection
+export interface SelectedStyle {
+  category: StyleCategory | null;
+  styleId: string | null; // id/slug of finish
+}
+
+// Smart devices with explicit keys (no index signatures)
+export interface SmartDevices {
+  tv: boolean;
+  fireplace: boolean;
+  soundbar: boolean;
+  shelving: boolean;
+}
+
+// Quote context state interface
+export interface QuoteContextState {
+  currentStep: QuoteStep;
+  data: SmartWallsFormData;
+  setStep: (step: QuoteStep) => void;
+  updateDimensions: (patch: Partial<WallDimensionsMm>) => void;
+  updateStyle: (patch: Partial<SelectedStyle>) => void;
+  toggleDevice: (key: keyof SmartDevices) => void;
+}
+
+// Contact form data
 export interface ContactFormData {
   fullName: string;
   firstName?: string;
@@ -13,9 +50,15 @@ export interface ContactFormData {
   budget?: string;
 }
 
+// Smart walls form data aggregate
 export interface SmartWallsFormData {
-  // Dimensional specifications
-  dimensions?: {
+  // New strict dimensional specifications
+  dimensions: WallDimensionsMm;
+  selectedStyle: SelectedStyle;
+  devices: SmartDevices;
+  
+  // Legacy compatibility fields (kept for backward compatibility)
+  legacyDimensions?: {
     width?: number;
     height?: number;
     depth?: '120mm' | '150mm' | '180mm' | 'custom';
@@ -24,7 +67,7 @@ export interface SmartWallsFormData {
   };
   
   // Legacy style selection (kept for compatibility across the app)
-  selectedStyle?: {
+  legacySelectedStyle?: {
     category?: string;
     categoryId?: string;
     finish?: string;
@@ -45,7 +88,7 @@ export interface SmartWallsFormData {
     };
   };
   
-  // Accessories
+  // Legacy accessories (kept for compatibility)
   accessories?: {
     tv?: boolean;
     fireplace?: boolean;
