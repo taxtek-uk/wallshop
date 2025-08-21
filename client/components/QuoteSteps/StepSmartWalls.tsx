@@ -719,7 +719,7 @@ export default function StepSmartWalls() {
                 </div>
 
                 {/* Warnings */}
-                {dimensionalCalculation.warnings.length > 0 && (
+                {/* {dimensionalCalculation.warnings.length > 0 && (
                   <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertTriangle className="w-4 h-4 text-red-600" />
@@ -729,7 +729,7 @@ export default function StepSmartWalls() {
                       <p key={index} className="text-sm text-red-700">{warning}</p>
                     ))}
                   </div>
-                )}
+                )} */}
               </motion.div>
             )}
 

@@ -724,7 +724,7 @@ async function sendQuoteModalEmails(
       resend.emails.send({
         from: "The Wall Shop <quotes@thewallshop.co.uk>",
         to: [data.email],
-        cc: [data.email], // CC the submitter to keep them in the loop
+        // cc: [data.email], // CC the submitter to keep them in the loop
         subject: `Your Quote Request Received — ${quoteId} | The Wall Shop`,
         html: content.customerHtml,
         text: content.customerText,
