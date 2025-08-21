@@ -275,7 +275,11 @@ function validateConsultationData(data: any): ValidationResult {
     errors.phone = 'Phone number is required';
   } else {
     const cleanPhone = data.phone.replace(/[\s\-\(\)]/g, '');
-    if (!/^[\+]?[1-9][\d]{0,15}$/.test(cleanPhone) || cleanPhone.length < 10) {
+    // Accept either E.164 (+44...) OR local 0-prefixed (07...)
+    const e164 = /^\+[1-9]\d{9,14}$/; // + followed by 10-15 digits total, first non-zero
+    const local = /^0\d{9,14}$/;       // 0 followed by 9-14 digits (10-15 total)
+
+    if (!(e164.test(cleanPhone) || local.test(cleanPhone))) {
       errors.phone = 'Invalid phone number format';
     }
   }
