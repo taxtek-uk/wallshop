@@ -1,11 +1,24 @@
-/**
- * Consultation Request Handler
- * Handles form submission and email notifications for consultation requests
- * Email: stephen@thewallshop.co.uk
- */
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { Resend } from "resend";
 
-// Types for consultation data
+/* =========================
+   CORS / SECURITY / LIMITS
+   ========================= */
+const ALLOWED_ORIGINS = [
+  "https://thewallshop.co.uk",
+  "https://www.thewallshop.co.uk",
+  "https://staging.thewallshop.co.uk",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
 
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 2;
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+/* ===============
+   DOMAIN MODELS
+   =============== */
 export interface ConsultationData {
   fullName: string;
   email: string;
@@ -23,144 +36,431 @@ export interface ConsultationData {
   userAgent?: string;
 }
 
-export interface EmailTemplate {
-  to: string;
-  subject: string;
-  html: string;
-  text: string;
+interface ValidationResult {
+  isValid: boolean;
+  data?: ConsultationData;
+  errors?: Record<string, string>;
 }
 
-// Email configuration
-const EMAIL_CONFIG = {
-  recipientEmail: 'stephen@thewallshop.co.uk',
-  fromEmail: 'noreply@thewallshop.co.uk',
-  fromName: 'The Wall Shop - Consultation System',
-  replyToEmail: '', // Will be set to customer's email
-};
+interface EmailResults {
+  success: boolean;
+  error?: string;
+  consultationId: string;
+  emailIds?: {
+    admin?: string;
+    customer?: string;
+  };
+}
 
-/**
- * Validates consultation form data
- */
-export function validateConsultationData(data: Partial<ConsultationData>): {
-  isValid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
+/* ==============
+   MAIN HANDLER
+   ============== */
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS
+  const origin = String(req.headers.origin || "");
+  if (ALLOWED_ORIGINS.includes(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Authorization");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  
+  // Enhanced Security Headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Content-Security-Policy", "default-src 'none'; img-src data: https:; style-src 'unsafe-inline'");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+  if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res.status(405).json({
+      error: "Method Not Allowed",
+      message: "This endpoint only accepts POST requests for consultation submissions.",
+      allowedMethods: ["POST", "OPTIONS"],
+    });
+  }
+
+  try {
+    // Rate limit
+    const clientIP = getClientIP(req);
+    const rl = checkRateLimit(clientIP);
+    if (!rl.allowed) {
+      return res.status(429).json({
+        error: "Rate Limit Exceeded",
+        message: "Too many consultation submissions. Please wait before submitting another request.",
+        retryAfter: Math.ceil(rl.resetTime / 1000),
+        details: {
+          limit: RATE_LIMIT_MAX_REQUESTS,
+          window: RATE_LIMIT_WINDOW / 1000,
+          remaining: 0,
+          resetTime: new Date(rl.resetTime).toISOString(),
+        },
+      });
+    }
+
+    // Environment check
+    if (!process.env.RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY");
+      return res.status(500).json({
+        error: "Service Configuration Error",
+        message: "Consultation submission service is temporarily unavailable. Please try again later or contact us directly.",
+        contact: { phone: "+44 141 739 3377", email: "stephen@thewallshop.co.uk" },
+      });
+    }
+
+    // Parse and validate
+    const body = await parseRequestBody(req);
+    const validation = validateConsultationData(body);
+    if (!validation.isValid || !validation.data) {
+      return res.status(400).json({
+        error: "Consultation Validation Failed",
+        message: "Please review and correct the highlighted fields before resubmitting your consultation request.",
+        fields: validation.errors || {},
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const data = validation.data;
+    
+    // Generate consultation-specific email content
+    const consultationId = generateConsultationId();
+    const adminHtml = generateAdminConsultationEmailHtml(data, consultationId);
+    const adminText = generateAdminConsultationEmailText(data, consultationId);
+    const customerHtml = generateCustomerConsultationEmailHtml(data, consultationId);
+    const customerText = generateCustomerConsultationEmailText(data, consultationId);
+
+    // Resend
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    // Send emails
+    const emailResults = await sendConsultationEmails(resend, data, {
+      adminHtml,
+      adminText,
+      customerHtml,
+      customerText
+    }, consultationId);
+    
+    if (!emailResults.success) throw new Error(emailResults.error || "Failed to process consultation submission");
+
+    // SUCCESS response
+    return res.status(200).json({
+      success: true,
+      message: "Consultation request submitted successfully! Our team will contact you soon to discuss your project.",
+      referenceId: emailResults.consultationId,
+      consultationId: emailResults.consultationId,
+      details: {
+        consultationId: emailResults.consultationId,
+        submittedAt: new Date().toISOString(),
+        priority: getConsultationPriority(data.timeline),
+        estimatedResponse: getConsultationResponseTimeEstimate(data.timeline),
+        nextSteps: [
+          "Initial consultation review and project assessment",
+          "Contact via your preferred method within 24-48 hours",
+          "Detailed discussion of your requirements and vision",
+          "Custom proposal preparation with design concepts",
+        ],
+        contact: {
+          phone: "+44 141 739 3377",
+          email: "stephen@thewallshop.co.uk",
+          hours: "Monday - Friday, 9:00 AM - 6:00 PM GMT",
+          emergency: "stephen@thewallshop.co.uk",
+        },
+      },
+      tracking: {
+        emailIds: emailResults.emailIds,
+        referenceId: emailResults.consultationId,
+        trackingEnabled: true
+      },
+    });
+  } catch (error) {
+    console.error("Consultation Submission Error:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      userAgent: req.headers["user-agent"],
+      origin: req.headers.origin,
+      ip: getClientIP(req),
+    });
+
+    return res.status(500).json({
+      error: "Consultation Processing Error",
+      message:
+        "We're experiencing technical difficulties processing your consultation request. Please try again or contact us directly.",
+      details: {
+        timestamp: new Date().toISOString(),
+        supportContact: {
+          phone: "+44 141 739 3377",
+          email: "stephen@thewallshop.co.uk",
+          emergencyEmail: "stephen@thewallshop.co.uk",
+        },
+        alternativeOptions: [
+          "Call us directly for immediate assistance",
+          "Email your requirements to stephen@thewallshop.co.uk",
+          "Use our comprehensive consultation form on the website",
+          "Schedule a consultation via our contact page",
+        ],
+      },
+    });
+  }
+}
+
+/* ===============================
+   HELPER FUNCTIONS
+   =============================== */
+
+function getClientIP(req: VercelRequest): string {
+  return (
+    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+    (req.headers["x-real-ip"] as string) ||
+    req.connection?.remoteAddress ||
+    "unknown"
+  );
+}
+
+function checkRateLimit(clientIP: string): { allowed: boolean; resetTime: number } {
+  const now = Date.now();
+  const existing = rateLimitMap.get(clientIP);
+
+  if (!existing || now > existing.resetTime) {
+    rateLimitMap.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return { allowed: true, resetTime: now + RATE_LIMIT_WINDOW };
+  }
+
+  if (existing.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, resetTime: existing.resetTime };
+  }
+
+  existing.count++;
+  return { allowed: true, resetTime: existing.resetTime };
+}
+
+async function parseRequestBody(req: VercelRequest): Promise<any> {
+  if (req.body) return req.body;
+  
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk.toString()));
+    req.on("end", () => {
+      try {
+        resolve(JSON.parse(body));
+      } catch (error) {
+        reject(new Error("Invalid JSON in request body"));
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+function validateConsultationData(data: any): ValidationResult {
+  const errors: Record<string, string> = {};
 
   // Required fields validation
   if (!data.fullName?.trim()) {
-    errors.push('Full name is required');
+    errors.fullName = 'Full name is required';
   } else if (data.fullName.trim().length < 2) {
-    errors.push('Full name must be at least 2 characters');
+    errors.fullName = 'Full name must be at least 2 characters';
   } else if (!/^[a-zA-Z\s'-]+$/.test(data.fullName.trim())) {
-    errors.push('Full name contains invalid characters');
+    errors.fullName = 'Full name contains invalid characters';
   }
 
   if (!data.email?.trim()) {
-    errors.push('Email address is required');
+    errors.email = 'Email address is required';
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    errors.push('Invalid email address format');
+    errors.email = 'Invalid email address format';
   }
 
   if (!data.phone?.trim()) {
-    errors.push('Phone number is required');
+    errors.phone = 'Phone number is required';
   } else {
     const cleanPhone = data.phone.replace(/[\s\-\(\)]/g, '');
     if (!/^[\+]?[1-9][\d]{0,15}$/.test(cleanPhone) || cleanPhone.length < 10) {
-      errors.push('Invalid phone number format');
+      errors.phone = 'Invalid phone number format';
     }
   }
 
   if (!data.projectType) {
-    errors.push('Project type is required');
+    errors.projectType = 'Project type is required';
   }
 
   if (!data.budget) {
-    errors.push('Budget range is required');
+    errors.budget = 'Budget range is required';
   }
 
   if (!data.timeline) {
-    errors.push('Project timeline is required');
+    errors.timeline = 'Project timeline is required';
   }
 
-  return {
-    isValid: errors.length === 0,
-    errors
+  if (Object.keys(errors).length > 0) {
+    return { isValid: false, errors };
+  }
+
+  // Create validated data object
+  const validatedData: ConsultationData = {
+    fullName: data.fullName.trim(),
+    email: data.email.trim().toLowerCase(),
+    phone: data.phone.trim(),
+    company: data.company?.trim() || undefined,
+    projectType: data.projectType,
+    budget: data.budget,
+    timeline: data.timeline,
+    message: data.message?.trim() || undefined,
+    preferredContactMethod: data.preferredContactMethod || 'email',
+    hearAboutUs: data.hearAboutUs || undefined,
+    submittedAt: new Date().toISOString(),
+    source: data.source || 'Consultation Modal',
+    ipAddress: data.ipAddress,
+    userAgent: data.userAgent,
   };
+
+  return { isValid: true, data: validatedData };
 }
 
-/**
- * Formats consultation data for email
- */
-export function formatConsultationForEmail(data: ConsultationData): EmailTemplate {
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString('en-GB', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
+function generateConsultationId(): string {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  return `CONS-${timestamp}-${random}`.toUpperCase();
+}
+
+function getConsultationPriority(timeline: string): string {
+  if (timeline === 'asap') return 'URGENT';
+  if (timeline.includes('1-3')) return 'HIGH';
+  return 'STANDARD';
+}
+
+function getConsultationResponseTimeEstimate(timeline: string): string {
+  if (timeline === 'asap') return 'Within 4-8 hours';
+  if (timeline.includes('1-3')) return 'Within 24 hours';
+  return 'Within 48 hours';
+}
+
+async function sendConsultationEmails(
+  resend: Resend,
+  data: ConsultationData,
+  content: { adminHtml: string; adminText: string; customerHtml: string; customerText: string },
+  consultationId: string
+): Promise<EmailResults> {
+  try {
+    const emailIds: { admin?: string; customer?: string } = {};
+
+    // Send admin notification
+    const adminResult = await resend.emails.send({
+      from: "The Wall Shop Consultations <consultations@thewallshop.co.uk>",
+      to: ["stephen@thewallshop.co.uk"],
+      subject: `New Consultation Request - ${data.fullName} (${getProjectTypeDisplay(data.projectType)})`,
+      html: content.adminHtml,
+      text: content.adminText,
+      replyTo: data.email,
     });
-  };
 
-  const getProjectTypeDisplay = (type: string): string => {
-    const types: Record<string, string> = {
-      'smart-walls': 'Smart Interactive Walls',
-      'luxury-wallpapers': 'Premium Luxury Wallpapers',
-      'acoustic-panels': 'Acoustic Sound Panels',
-      'carbon-rock-boards': 'Carbon Rock Boards',
-      'digital-displays': 'Digital Display Solutions',
-      'full-renovation': 'Complete Wall Renovation',
-      'consultation-only': 'Design Consultation Only',
-      'other': 'Other (See message for details)'
+    if (adminResult.error) {
+      throw new Error(`Admin email failed: ${adminResult.error.message}`);
+    }
+    emailIds.admin = adminResult.data?.id;
+
+    // Send customer confirmation
+    const customerResult = await resend.emails.send({
+      from: "The Wall Shop <noreply@thewallshop.co.uk>",
+      to: [data.email],
+      subject: "Consultation Request Received - The Wall Shop",
+      html: content.customerHtml,
+      text: content.customerText,
+      replyTo: "stephen@thewallshop.co.uk",
+    });
+
+    if (customerResult.error) {
+      console.warn("Customer email failed:", customerResult.error);
+      // Don't fail the entire request if customer email fails
+    } else {
+      emailIds.customer = customerResult.data?.id;
+    }
+
+    return {
+      success: true,
+      consultationId,
+      emailIds,
     };
-    return types[type] || type;
-  };
-
-  const getBudgetDisplay = (budget: string): string => {
-    const budgets: Record<string, string> = {
-      'under-5k': 'Under £5,000',
-      '5k-15k': '£5,000 - £15,000',
-      '15k-30k': '£15,000 - £30,000',
-      '30k-50k': '£30,000 - £50,000',
-      '50k-100k': '£50,000 - £100,000',
-      'over-100k': 'Over £100,000',
-      'consultation-first': 'Consultation First'
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error",
+      consultationId,
     };
-    return budgets[budget] || budget;
+  }
+}
+
+/* ===============================
+   EMAIL CONTENT GENERATORS
+   =============================== */
+
+function getProjectTypeDisplay(type: string): string {
+  const types: Record<string, string> = {
+    'smart-walls': 'Smart Interactive Walls',
+    'luxury-wallpapers': 'Premium Luxury Wallpapers',
+    'acoustic-panels': 'Acoustic Sound Panels',
+    'carbon-rock-boards': 'Carbon Rock Boards',
+    'digital-displays': 'Digital Display Solutions',
+    'full-renovation': 'Complete Wall Renovation',
+    'consultation-only': 'Design Consultation Only',
+    'other': 'Other (See message for details)'
   };
+  return types[type] || type;
+}
 
-  const getTimelineDisplay = (timeline: string): string => {
-    const timelines: Record<string, string> = {
-      'asap': 'As Soon As Possible',
-      '1-3-months': '1-3 Months',
-      '3-6-months': '3-6 Months',
-      '6-12-months': '6-12 Months',
-      'over-12-months': 'Over 12 Months',
-      'flexible': 'Flexible Timeline',
-      'planning-phase': 'Still in Planning Phase'
-    };
-    return timelines[timeline] || timeline;
+function getBudgetDisplay(budget: string): string {
+  const budgets: Record<string, string> = {
+    'under-5k': 'Under £5,000',
+    '5k-15k': '£5,000 - £15,000',
+    '15k-30k': '£15,000 - £30,000',
+    '30k-50k': '£30,000 - £50,000',
+    '50k-100k': '£50,000 - £100,000',
+    'over-100k': 'Over £100,000',
+    'consultation-first': 'Consultation First'
   };
+  return budgets[budget] || budget;
+}
 
-  const getHearAboutUsDisplay = (source: string): string => {
-    const sources: Record<string, string> = {
-      'google-search': 'Google Search',
-      'social-media': 'Social Media',
-      'referral': 'Referral from Friend/Colleague',
-      'website': 'Company Website',
-      'trade-show': 'Trade Show/Exhibition',
-      'advertisement': 'Advertisement',
-      'other': 'Other'
-    };
-    return sources[source] || source;
+function getTimelineDisplay(timeline: string): string {
+  const timelines: Record<string, string> = {
+    'asap': 'As Soon As Possible',
+    '1-3-months': '1-3 Months',
+    '3-6-months': '3-6 Months',
+    '6-12-months': '6-12 Months',
+    'over-12-months': 'Over 12 Months',
+    'flexible': 'Flexible Timeline',
+    'planning-phase': 'Still in Planning Phase'
   };
+  return timelines[timeline] || timeline;
+}
 
-  const subject = `New Consultation Request - ${data.fullName} (${getProjectTypeDisplay(data.projectType)})`;
+function getHearAboutUsDisplay(source: string): string {
+  const sources: Record<string, string> = {
+    'google-search': 'Google Search',
+    'social-media': 'Social Media',
+    'referral': 'Referral from Friend/Colleague',
+    'website': 'Company Website',
+    'trade-show': 'Trade Show/Exhibition',
+    'advertisement': 'Advertisement',
+    'other': 'Other'
+  };
+  return sources[source] || source;
+}
 
-  const html = `
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleString('en-GB', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  });
+}
+
+function generateAdminConsultationEmailHtml(data: ConsultationData, consultationId: string): string {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,10 +529,7 @@ export function formatConsultationForEmail(data: ConsultationData): EmailTemplat
             color: #1e293b;
             font-size: 18px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
         }
-
         .info-item {
             margin-bottom: 12px;
             display: flex;
@@ -315,12 +612,6 @@ export function formatConsultationForEmail(data: ConsultationData): EmailTemplat
             background: #10b981;
             color: white;
         }
-        .btn-email:hover {
-            background: #2563eb;
-        }
-        .btn-phone:hover {
-            background: #059669;
-        }
         .metadata {
             background: #f8fafc;
             border-top: 1px solid #e2e8f0;
@@ -388,6 +679,7 @@ export function formatConsultationForEmail(data: ConsultationData): EmailTemplat
                             ${data.preferredContactMethod === 'email' ? 'Email' : 'Phone'}
                         </span>
                     </div>
+                </div>
                 
                 <div class="info-card">
                     <h3>Project Details</h3>
@@ -437,6 +729,7 @@ export function formatConsultationForEmail(data: ConsultationData): EmailTemplat
             <div class="metadata-grid">
                 <div><strong>Submitted:</strong> ${formatDate(data.submittedAt)}</div>
                 <div><strong>Source:</strong> ${data.source || 'Consultation Modal'}</div>
+                <div><strong>Reference:</strong> ${consultationId}</div>
                 ${data.ipAddress ? `<div><strong>IP Address:</strong> ${data.ipAddress}</div>` : ''}
                 ${data.userAgent ? `<div><strong>User Agent:</strong> ${data.userAgent.substring(0, 50)}...</div>` : ''}
             </div>
@@ -444,8 +737,10 @@ export function formatConsultationForEmail(data: ConsultationData): EmailTemplat
     </div>
 </body>
 </html>`;
+}
 
-  const text = `
+function generateAdminConsultationEmailText(data: ConsultationData, consultationId: string): string {
+  return `
 NEW CONSULTATION REQUEST - The Wall Shop
 
 CONTACT INFORMATION:
@@ -467,6 +762,7 @@ ${data.message}
 ` : ''}SUBMISSION DETAILS:
 - Submitted: ${formatDate(data.submittedAt)}
 - Source: ${data.source || 'Consultation Modal'}
+- Reference: ${consultationId}
 ${data.ipAddress ? `- IP Address: ${data.ipAddress}` : ''}
 
 QUICK ACTIONS:
@@ -475,160 +771,19 @@ QUICK ACTIONS:
 
 Priority Level: ${data.timeline === 'asap' ? 'URGENT' : data.timeline.includes('1-3') ? 'HIGH' : 'STANDARD'}
 `;
-
-  return {
-    to: EMAIL_CONFIG.recipientEmail,
-    subject,
-    html,
-    text
-  };
 }
 
-/**
- * Sends consultation data via email (Node.js/Server-side implementation)
- */
-export async function sendConsultationEmail(data: ConsultationData): Promise<void> {
-  const emailTemplate = formatConsultationForEmail(data);
-  
-  // For Node.js environments with nodemailer
-  if (typeof window === 'undefined') {
-    try {
-      // Dynamic import for server-side only
-      const nodemailer = (await import('nodemailer')).default;
-        if (!nodemailer) {
-            throw new Error('Nodemailer module not found');
-        }
-      
-      // Create transporter (configure with your email service)
-      const transporter = nodemailer.default.createTransporter({
-        // Gmail configuration (replace with your email service)
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER || EMAIL_CONFIG.fromEmail,
-          pass: process.env.EMAIL_PASS || 'your-app-password'
-        }
-      });
-
-      // Send email
-      await transporter.sendMail({
-        from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
-        to: EMAIL_CONFIG.recipientEmail,
-        replyTo: data.email,
-        subject: emailTemplate.subject,
-        text: emailTemplate.text,
-        html: emailTemplate.html
-      });
-
-      console.log('Consultation email sent successfully to:', EMAIL_CONFIG.recipientEmail);
-    } catch (error) {
-      console.error('Failed to send consultation email:', error);
-      throw new Error('Failed to send email notification');
-    }
-  }
-}
-
-/**
- * Saves consultation data to database/storage
- */
-export async function saveConsultationData(data: ConsultationData): Promise<void> {
-  try {
-    // In a real application, you would save to a database
-    // For now, we'll log the data and save to a JSON file
-    
-    const timestamp = new Date().toISOString();
-    const filename = `consultation_${timestamp.replace(/[:.]/g, '-')}.json`;
-    
-    const consultationRecord = {
-      id: `consultation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      ...data,
-      status: 'new',
-      createdAt: timestamp,
-      updatedAt: timestamp
-    };
-
-    // Log for debugging
-    console.log('Consultation data received:', consultationRecord);
-
-    // In a real application, replace this with database storage
-    // Example: await db.consultations.insert(consultationRecord);
-    
-    // For file-based storage (development/testing)
-    if (typeof window === 'undefined') {
-      const fs = await import('fs');
-      const path = await import('path');
-      
-      const dataDir = path.join(process.cwd(), 'data', 'consultations');
-      await fs.promises.mkdir(dataDir, { recursive: true });
-      
-      const filePath = path.join(dataDir, filename);
-      await fs.promises.writeFile(filePath, JSON.stringify(consultationRecord, null, 2));
-      
-      console.log('Consultation data saved to:', filePath);
-    }
-  } catch (error) {
-    console.error('Failed to save consultation data:', error);
-    throw new Error('Failed to save consultation data');
-  }
-}
-
-/**
- * Main function to handle consultation submission
- */
-export async function sendConsultation(data: ConsultationData): Promise<{
-  success: boolean;
-  message: string;
-  consultationId?: string;
-}> {
-  try {
-    // Validate the data
-    const validation = validateConsultationData(data);
-    if (!validation.isValid) {
-      return {
-        success: false,
-        message: `Validation failed: ${validation.errors.join(', ')}`
-      };
-    }
-
-    // Save consultation data
-    await saveConsultationData(data);
-
-    // Send email notification
-    await sendConsultationEmail(data);
-
-    // Send auto-response to customer (optional)
-    await sendCustomerConfirmation(data);
-
-    return {
-      success: true,
-      message: 'Consultation request submitted successfully',
-      consultationId: `consultation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    };
-  } catch (error) {
-    console.error('Error processing consultation:', error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : 'Failed to process consultation request'
-    };
-  }
-}
-
-/**
- * Sends confirmation email to customer
- */
-export async function sendCustomerConfirmation(data: ConsultationData): Promise<void> {
-  const confirmationTemplate = {
-    to: data.email,
-    subject: 'Thank you for your consultation request - The Wall Shop',
-    html: `
+function generateCustomerConsultationEmailHtml(data: ConsultationData, consultationId: string): string {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultation Request Confirmation</title>
+    <title>Consultation Request Received</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 600px;
@@ -648,17 +803,43 @@ export async function sendCustomerConfirmation(data: ConsultationData): Promise<
             padding: 30px;
             text-align: center;
         }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
         .content {
             padding: 30px;
         }
-        .confirmation-badge {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 25px;
-            display: inline-block;
-            font-weight: 600;
+        .summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
             margin-bottom: 20px;
+        }
+        .summary-card h3 {
+            margin: 0 0 15px 0;
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .summary-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .summary-label {
+            font-weight: 600;
+            color: #475569;
+        }
+        .summary-value {
+            color: #1e293b;
         }
         .next-steps {
             background: #f0f9ff;
@@ -667,144 +848,162 @@ export async function sendCustomerConfirmation(data: ConsultationData): Promise<
             padding: 20px;
             margin: 20px 0;
         }
+        .next-steps h3 {
+            margin: 0 0 15px 0;
+            color: #0369a1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #0c4a6e;
+        }
         .contact-info {
-            background: #f8fafc;
+            background: #f1f5f9;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
+            text-align: center;
+        }
+        .contact-info h3 {
+            margin: 0 0 15px 0;
+            color: #1e293b;
+        }
+        .contact-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>The Wall Shop</h1>
-            <p>Premium Wall Solutions & Design</p>
+            <h1>Consultation Request Received</h1>
+            <p>Thank you for your interest in The Wall Shop</p>
         </div>
         
         <div class="content">
-            <div class="confirmation-badge">
-                Request Received Successfully
+            <p>Dear ${data.fullName},</p>
+            
+            <p>Thank you for submitting your consultation request. We've received your inquiry about <strong>${getProjectTypeDisplay(data.projectType)}</strong> and are excited to help bring your vision to life.</p>
+            
+            <div class="summary-card">
+                <h3>Your Consultation Request Summary</h3>
+                <div class="summary-item">
+                    <span class="summary-label">Project Type:</span>
+                    <span class="summary-value">${getProjectTypeDisplay(data.projectType)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Budget Range:</span>
+                    <span class="summary-value">${getBudgetDisplay(data.budget)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Timeline:</span>
+                    <span class="summary-value">${getTimelineDisplay(data.timeline)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Preferred Contact:</span>
+                    <span class="summary-value">${data.preferredContactMethod === 'email' ? 'Email' : 'Phone'}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Reference ID:</span>
+                    <span class="summary-value">${consultationId}</span>
+                </div>
             </div>
             
-            <h2>Dear ${data.fullName},</h2>
-            
-            <p>Thank you for your interest in our services! We've received your consultation request for <strong>${data.projectType}</strong> and are excited to help bring your vision to life.</p>
-            
             <div class="next-steps">
-                <h3>What happens next?</h3>
+                <h3>What Happens Next?</h3>
                 <ul>
-                    <li><strong>Within 24 hours:</strong> Our team will review your requirements and contact you via your preferred method (${data.preferredContactMethod})</li>
-                    <li><strong>Initial consultation:</strong> We'll schedule a free consultation to discuss your project in detail</li>
-                    <li><strong>Custom proposal:</strong> Based on our discussion, we'll provide a tailored solution and quote</li>
+                    <li>Our team will review your consultation request within the next few hours</li>
+                    <li>We'll contact you via your preferred method (${data.preferredContactMethod}) within ${getConsultationResponseTimeEstimate(data.timeline)}</li>
+                    <li>We'll discuss your project requirements and vision in detail</li>
+                    <li>We'll prepare a custom proposal with design concepts and pricing</li>
                 </ul>
             </div>
             
-            <p>In the meantime, feel free to browse our portfolio and recent projects on our website. If you have any urgent questions, don't hesitate to reach out.</p>
+            <p>In the meantime, feel free to browse our portfolio and case studies on our website to get inspired by our previous projects.</p>
             
             <div class="contact-info">
-                <h3>Contact Information</h3>
-                <p><strong>Email:</strong> stephen@thewallshop.co.uk<br>
-                <strong>Phone:</strong> Available during consultation<br>
-                <strong>Website:</strong> www.thewallshop.co.uk</p>
+                <h3>Need to reach us sooner?</h3>
+                <p>If you have any urgent questions or need to modify your request, don't hesitate to contact us directly:</p>
+                <div class="contact-details">
+                    <div>
+                        <strong>Phone:</strong><br>
+                        <a href="tel:+441417393377" style="color: #3b82f6;">+44 141 739 3377</a>
+                    </div>
+                    <div>
+                        <strong>Email:</strong><br>
+                        <a href="mailto:stephen@thewallshop.co.uk" style="color: #3b82f6;">stephen@thewallshop.co.uk</a>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; font-size: 14px; color: #64748b;">
+                    Business Hours: Monday - Friday, 9:00 AM - 6:00 PM GMT
+                </p>
             </div>
             
-            <p>We look forward to working with you!</p>
+            <p>Thank you for choosing The Wall Shop. We look forward to working with you!</p>
             
             <p>Best regards,<br>
-            <strong>Stephen & The Wall Shop Team</strong></p>
+            <strong>The Wall Shop Team</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated confirmation email. Please save your reference ID: <strong>${consultationId}</strong></p>
+            <p>© ${new Date().getFullYear()} The Wall Shop. All rights reserved.</p>
         </div>
     </div>
 </body>
-</html>`,
-    text: `
+</html>`;
+}
+
+function generateCustomerConsultationEmailText(data: ConsultationData, consultationId: string): string {
+  return `
+CONSULTATION REQUEST RECEIVED - The Wall Shop
+
 Dear ${data.fullName},
 
-Thank you for your consultation request with The Wall Shop!
+Thank you for submitting your consultation request. We've received your inquiry about ${getProjectTypeDisplay(data.projectType)} and are excited to help bring your vision to life.
 
-We've received your request for ${data.projectType} and will contact you within 24 hours via ${data.preferredContactMethod}.
+YOUR CONSULTATION REQUEST SUMMARY:
+- Project Type: ${getProjectTypeDisplay(data.projectType)}
+- Budget Range: ${getBudgetDisplay(data.budget)}
+- Timeline: ${getTimelineDisplay(data.timeline)}
+- Preferred Contact: ${data.preferredContactMethod === 'email' ? 'Email' : 'Phone'}
+- Reference ID: ${consultationId}
 
-What happens next:
-1. Our team will review your requirements
-2. We'll schedule a free consultation
-3. We'll provide a custom proposal
+WHAT HAPPENS NEXT?
+1. Our team will review your consultation request within the next few hours
+2. We'll contact you via your preferred method (${data.preferredContactMethod}) within ${getConsultationResponseTimeEstimate(data.timeline)}
+3. We'll discuss your project requirements and vision in detail
+4. We'll prepare a custom proposal with design concepts and pricing
 
-Contact us: stephen@thewallshop.co.uk
+In the meantime, feel free to browse our portfolio and case studies on our website to get inspired by our previous projects.
+
+NEED TO REACH US SOONER?
+If you have any urgent questions or need to modify your request, don't hesitate to contact us directly:
+
+Phone: +44 141 739 3377
+Email: stephen@thewallshop.co.uk
+Business Hours: Monday - Friday, 9:00 AM - 6:00 PM GMT
+
+Thank you for choosing The Wall Shop. We look forward to working with you!
 
 Best regards,
-Stephen & The Wall Shop Team
-`
-  };
+The Wall Shop Team
 
-  // Send confirmation email using the same email service
-  if (typeof window === 'undefined') {
-    try {
-      const nodemailer = await import('nodemailer');
-      
-      const transporter = nodemailer.default.createTransporter({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER || EMAIL_CONFIG.fromEmail,
-          pass: process.env.EMAIL_PASS || 'your-app-password'
-        }
-      });
-
-      await transporter.sendMail({
-        from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
-        to: confirmationTemplate.to,
-        subject: confirmationTemplate.subject,
-        text: confirmationTemplate.text,
-        html: confirmationTemplate.html
-      });
-
-      console.log('Confirmation email sent to customer:', data.email);
-    } catch (error) {
-      console.error('Failed to send confirmation email:', error);
-      // Don't throw error for confirmation email failure
-    }
-  }
+---
+This is an automated confirmation email. Please save your reference ID: ${consultationId}
+© ${new Date().getFullYear()} The Wall Shop. All rights reserved.
+`;
 }
-
-/**
- * API endpoint handler for Next.js or Express
- */
-export async function handleConsultationAPI(req: any, res: any): Promise<void> {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  try {
-    const consultationData: ConsultationData = req.body;
-    
-    // Add server-side metadata
-    consultationData.ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
-    consultationData.userAgent = req.headers['user-agent'] || 'unknown';
-    
-    const result = await sendConsultation(consultationData);
-    
-    if (result.success) {
-      res.status(200).json(result);
-    } else {
-      res.status(400).json(result);
-    }
-  } catch (error) {
-    console.error('API error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-}
-
-// Export default for ES modules
-export default {
-  sendConsultation,
-  validateConsultationData,
-  formatConsultationForEmail,
-  sendConsultationEmail,
-  saveConsultationData,
-  sendCustomerConfirmation,
-  handleConsultationAPI
-};
-
