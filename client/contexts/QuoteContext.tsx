@@ -1,15 +1,21 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { 
-  ProductCategory, 
-  FormErrors, 
-  SmartWallsFormData, 
-  QuoteFormData,
-  QuoteStep,
-  QuoteContextState,
-  WallDimensionsMm,
-  SelectedStyle,
-  SmartDevices
-} from '@/types/quote';
+import { ProductCategory, FormErrors, SmartWallsFormData } from '@/types/quote';
+
+// Extend QuoteFormData to include the new smartWalls structure
+interface QuoteFormData {
+  contact: {
+    fullName: string;
+    email: string;
+    phone: string;
+    installationAddress: string;
+    additionalNotes: string;
+  };
+  productCategory: ProductCategory;
+  smartWalls?: SmartWallsFormData;
+  smartDevices?: any;
+  wallPanels?: any;
+  carbonRockBoards?: any;
+}
 
 interface QuoteState {
   currentStep: number;
@@ -18,9 +24,6 @@ interface QuoteState {
   errors: FormErrors;
   isSubmitting: boolean;
   isSubmitted: boolean;
-  // New strict state for SmartWalls
-  smartWallsStep: QuoteStep;
-  smartWallsData: SmartWallsFormData;
 }
 
 type QuoteAction =
@@ -32,70 +35,11 @@ type QuoteAction =
   | { type: 'CLEAR_ERRORS' }
   | { type: 'SET_SUBMITTING'; payload: boolean }
   | { type: 'SET_SUBMITTED'; payload: boolean }
-  | { type: 'RESET_FORM' }
-  // New actions for strict SmartWalls typing
-  | { type: 'SET_SMARTWALLS_STEP'; payload: QuoteStep }
-  | { type: 'UPDATE_DIMENSIONS'; payload: Partial<WallDimensionsMm> }
-  | { type: 'UPDATE_STYLE'; payload: Partial<SelectedStyle> }
-  | { type: 'TOGGLE_DEVICE'; payload: keyof SmartDevices };
-
-const initialSmartWallsData: SmartWallsFormData = {
-  dimensions: {
-    widthMm: null,
-    heightMm: null,
-  },
-  selectedStyle: {
-    category: null,
-    styleId: null,
-  },
-  devices: {
-    tv: false,
-    fireplace: false,
-    soundbar: false,
-    shelving: false,
-  },
-  // Legacy compatibility fields
-  legacyDimensions: {
-    width: 0,
-    height: 2.1,
-    depth: '180mm',
-    calculatedMaxWidth: 0,
-  },
-  legacySelectedStyle: {
-    category: '',
-    categoryId: '',
-    finish: '',
-    finishId: '',
-    finishImage: '',
-    finishDescription: '',
-  },
-  accessories: {
-    tv: false,
-    fireplace: false,
-    soundbar: false,
-    shelving: false,
-  },
-  smartDevices: {
-    selectedDevices: [],
-    controlPanels: false,
-    securitySensors: false,
-    homeAutomation: false,
-  },
-  gamingSystem: {
-    type: null,
-  },
-  tvIntegration: false,
-  speakers: false,
-  lighting: false,
-  additionalFeatures: [],
-  style: undefined,
-  skippedAccessories: false,
-  skippedSmartDevices: false,
-};
+  | { type: 'RESET_FORM' };
 
 const initialState: QuoteState = {
   currentStep: 1,
-  totalSteps: 3,
+  totalSteps: 3, // Will be updated based on product category
   formData: {
     contact: {
       fullName: '',
@@ -105,13 +49,45 @@ const initialState: QuoteState = {
       additionalNotes: '',
     },
     productCategory: 'smart-walls',
-    smartWalls: initialSmartWallsData,
+    smartWalls: { // Initialize smartWalls data structure
+      dimensions: {
+        width: 0,
+        height: 2.1,
+        depth: '180mm',
+        calculatedMaxWidth: 0,
+      },
+      selectedStyle: {
+        category: '',
+        categoryId: '',
+        finish: '',
+        finishId: '',
+        finishImage: '',
+        finishDescription: '',
+      },
+      accessories: {
+        tv: false,
+        fireplace: false,
+        soundbar: false,
+        shelving: false,
+      },
+      smartDevices: {
+        selectedDevices: [],
+        controlPanels: false,
+        securitySensors: false,
+        homeAutomation: false,
+      },
+      gamingSystem: {
+        type: null,
+      },
+      tvIntegration: false,
+      speakers: false,
+      lighting: false,
+      additionalFeatures: [],
+    },
   },
   errors: {},
   isSubmitting: false,
   isSubmitted: false,
-  smartWallsStep: 'dimensions',
-  smartWallsData: initialSmartWallsData,
 };
 
 function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
@@ -126,6 +102,7 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
           ...state.formData,
           productCategory: action.payload,
         },
+        // Smart Walls has Contact -> Config -> Review. Others remain Contact -> Config
         totalSteps: action.payload === 'smart-walls' ? 3 : 2,
       };
     
@@ -139,6 +116,7 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
       };
     
     case 'UPDATE_PRODUCT_DATA': {
+      // Map category to the correct camelCase form key
       const categoryKeyMap: Record<ProductCategory, keyof QuoteFormData> = {
         'smart-walls': 'smartWalls',
         'smart-devices': 'smartDevices',
@@ -169,40 +147,6 @@ function quoteReducer(state: QuoteState, action: QuoteAction): QuoteState {
     
     case 'RESET_FORM':
       return initialState;
-
-    // New strict SmartWalls actions
-    case 'SET_SMARTWALLS_STEP':
-      return { ...state, smartWallsStep: action.payload };
-
-    case 'UPDATE_DIMENSIONS':
-      return {
-        ...state,
-        smartWallsData: {
-          ...state.smartWallsData,
-          dimensions: { ...state.smartWallsData.dimensions, ...action.payload },
-        },
-      };
-
-    case 'UPDATE_STYLE':
-      return {
-        ...state,
-        smartWallsData: {
-          ...state.smartWallsData,
-          selectedStyle: { ...state.smartWallsData.selectedStyle, ...action.payload },
-        },
-      };
-
-    case 'TOGGLE_DEVICE':
-      return {
-        ...state,
-        smartWallsData: {
-          ...state.smartWallsData,
-          devices: {
-            ...state.smartWallsData.devices,
-            [action.payload]: !state.smartWallsData.devices[action.payload],
-          },
-        },
-      };
     
     default:
       return state;
@@ -219,11 +163,6 @@ interface QuoteContextType {
   setErrors: (errors: FormErrors) => void;
   clearErrors: () => void;
   validateCurrentStep: () => boolean;
-  // Expose formData and a specific update function for smartWalls
-  formData: QuoteFormData;
-  updateSmartWallsFormData: (data: Partial<SmartWallsFormData>) => void;
-  // New strict SmartWalls context API
-  smartWallsContext: QuoteContextState;
 }
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined);
@@ -261,10 +200,11 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     const errors: FormErrors = {};
     
     if (state.currentStep === 1) {
+      // Validate contact form
       const { contact } = state.formData;
       if (!contact.fullName.trim()) errors.fullName = 'Full name is required';
       if (!contact.email.trim()) errors.email = 'Email is required';
-      else if (!/^\S+@\S+\.\S+$/.test(contact.email)) {
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)) {
         errors.email = 'Please enter a valid email address';
       }
       if (!contact.phone.trim()) errors.phone = 'Phone number is required';
@@ -272,10 +212,12 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
         errors.phone = 'Please enter a valid phone number';
       }
     } else if (state.currentStep === 2 && state.formData.productCategory === 'smart-walls') {
+      // Validate Smart Walls dimensions
       const smartWalls = state.formData.smartWalls;
-      if (!smartWalls?.legacyDimensions?.width || smartWalls.legacyDimensions.width <= 0) {
+      if (!smartWalls?.dimensions?.width || smartWalls.dimensions.width <= 0) {
         errors.smartWalls_dimensions_width = 'Wall width is required and must be greater than 0';
       }
+      // Add more specific smart walls validation here if needed
     }
     
     if (Object.keys(errors).length > 0) {
@@ -285,35 +227,6 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     
     clearErrors();
     return true;
-  };
-
-  // Specific update function for smartWalls data
-  const updateSmartWallsFormData = (data: Partial<SmartWallsFormData>) => {
-    dispatch({
-      type: 'UPDATE_PRODUCT_DATA',
-      payload: {
-        category: 'smart-walls',
-        data: { ...state.formData.smartWalls, ...data },
-      },
-    });
-  };
-
-  // Strict SmartWalls context implementation
-  const smartWallsContext: QuoteContextState = {
-    currentStep: state.smartWallsStep,
-    data: state.smartWallsData,
-    setStep: (step: QuoteStep) => {
-      dispatch({ type: 'SET_SMARTWALLS_STEP', payload: step });
-    },
-    updateDimensions: (patch: Partial<WallDimensionsMm>) => {
-      dispatch({ type: 'UPDATE_DIMENSIONS', payload: patch });
-    },
-    updateStyle: (patch: Partial<SelectedStyle>) => {
-      dispatch({ type: 'UPDATE_STYLE', payload: patch });
-    },
-    toggleDevice: (key: keyof SmartDevices) => {
-      dispatch({ type: 'TOGGLE_DEVICE', payload: key });
-    },
   };
 
   const contextValue: QuoteContextType = {
@@ -326,9 +239,6 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     setErrors,
     clearErrors,
     validateCurrentStep,
-    formData: state.formData,
-    updateSmartWallsFormData,
-    smartWallsContext,
   };
 
   return (
@@ -345,13 +255,3 @@ export function useQuote() {
   }
   return context;
 }
-
-// New hook for strict SmartWalls context
-export function useSmartWallsQuote(): QuoteContextState {
-  const context = useContext(QuoteContext);
-  if (context === undefined) {
-    throw new Error('useSmartWallsQuote must be used within a QuoteProvider');
-  }
-  return context.smartWallsContext;
-}
-

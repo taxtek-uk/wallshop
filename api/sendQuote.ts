@@ -931,4 +931,3 @@ function generateQuoteModalId(): string {
 // Export types for external use
 export { ModalQuotePriority };
 
-

@@ -1,43 +1,6 @@
 // Types for the Quote Modal system
-
-// Strict union types as required
-export type QuoteStep = 'dimensions' | 'styles' | 'accessories' | 'devices' | 'gaming' | 'review';
-export type StyleCategory = 'wood' | 'solid' | 'stone' | 'cloth' | 'metal' | 'mirror';
-
-// Product categories (existing)
 export type ProductCategory = 'smart-walls' | 'smart-devices' | 'wall-panels' | 'carbon-rock-boards';
 
-// Wall dimensions in mm
-export interface WallDimensionsMm {
-  widthMm: number | null;
-  heightMm: number | null;
-}
-
-// Style selection
-export interface SelectedStyle {
-  category: StyleCategory | null;
-  styleId: string | null; // id/slug of finish
-}
-
-// Smart devices with explicit keys (no index signatures)
-export interface SmartDevices {
-  tv: boolean;
-  fireplace: boolean;
-  soundbar: boolean;
-  shelving: boolean;
-}
-
-// Quote context state interface
-export interface QuoteContextState {
-  currentStep: QuoteStep;
-  data: SmartWallsFormData;
-  setStep: (step: QuoteStep) => void;
-  updateDimensions: (patch: Partial<WallDimensionsMm>) => void;
-  updateStyle: (patch: Partial<SelectedStyle>) => void;
-  toggleDevice: (key: keyof SmartDevices) => void;
-}
-
-// Contact form data
 export interface ContactFormData {
   fullName: string;
   firstName?: string;
@@ -49,95 +12,72 @@ export interface ContactFormData {
   projectType?: string;
   budget?: string;
 }
-
-// Smart walls form data aggregate
 export interface SmartWallsFormData {
-  // New strict dimensional specifications
-  dimensions: WallDimensionsMm;
-  selectedStyle: SelectedStyle;
-  devices: SmartDevices;
-  
-  // Legacy compatibility fields (kept for backward compatibility)
-  legacyDimensions?: {
-    width?: number;
-    height?: number;
-    depth?: '120mm' | '150mm' | '180mm' | 'custom';
+  // Dimensional specifications
+  dimensions: {
+    width: number;
+    height: number;
+    depth: '120mm' | '150mm' | '180mm' | 'custom';
     customDepth?: number;
     calculatedMaxWidth?: number;
   };
   
-  // Legacy style selection (kept for compatibility across the app)
-  legacySelectedStyle?: {
-    category?: string;
-    categoryId?: string;
-    finish?: string;
-    finishId?: string;
-    finishImage?: string;
-    finishDescription?: string;
-  };
-
-  // New optional style model used by StepSmartWalls (non-breaking)
-  style?: {
-    category?: string; // category id
-    categoryName?: string; // category display name
-    finish?: {
-      id: number;
-      name: string;
-      img: string;
-      desc: string;
-    };
+  // Style selection
+  selectedStyle: {
+    category: string;
+    categoryId: string;
+    finish: string;
+    finishId: string;
+    finishImage: string;
+    finishDescription: string;
   };
   
-  // Legacy accessories (kept for compatibility)
-  accessories?: {
-    tv?: boolean;
-    fireplace?: boolean;
-    soundbar?: boolean;
-    shelving?: boolean;
+  // Accessories
+  accessories: {
+    tv: boolean;
+    fireplace: boolean;
+    soundbar: boolean;
+    shelving: boolean;
   };
   
-  // Smart devices (original object shape with nested selectedDevices)
-  smartDevices?: {
-    selectedDevices?: Array<{
+  // Smart devices (integrated from StepSmartDevices)
+  smartDevices: {
+    selectedDevices: Array<{
       name: string;
       category: string;
     }>;
-    controlPanels?: boolean;
-    securitySensors?: boolean;
-    homeAutomation?: boolean;
+    controlPanels: boolean;
+    securitySensors: boolean;
+    homeAutomation: boolean;
   };
   
   // Gaming system
-  gamingSystem?: {
-    type?: 'PlayStation' | 'Xbox' | 'Nintendo' | 'PC Setup' | 'Custom' | null;
+  gamingSystem: {
+    type: 'PlayStation' | 'Xbox' | 'Nintendo' | 'PC Setup' | 'Custom' | null;
     specifications?: string;
   };
   
-  // Explicit skip flags recorded by StepSmartWalls (optional to remain non-breaking)
-  skippedAccessories?: boolean;
-  skippedSmartDevices?: boolean;
-
   // Existing fields for backward compatibility
-  tvIntegration?: boolean;
-  speakers?: boolean;
-  lighting?: boolean;
-  additionalFeatures?: string[];
+  tvIntegration: boolean;
+  speakers: boolean;
+  lighting: boolean;
+  additionalFeatures: string[];
   projectDetails?: {
-    propertyType?: 'residential' | 'commercial';
-    purpose?: 'decorative' | 'functional' | 'both';
-    installation?: 'supply-only' | 'supply-install';
+    propertyType: 'residential' | 'commercial';
+    purpose: 'decorative' | 'functional' | 'both';
+    installation: 'supply-only' | 'supply-install';
   };
   wallSpecifications?: {
-    width?: number;
-    height?: number;
-    thickness?: string;
-    layout?: 'straight' | 'curved' | 'angled';
+    width: number;
+    height: number;
+    thickness: string;
+    layout: 'straight' | 'curved' | 'angled';
   };
   technicalNeeds?: {
-    soundproofing?: boolean;
-    fireRating?: boolean;
-    accessibility?: boolean;
-    ecoMaterials?: boolean;
+    soundproofing: boolean;
+    fireRating: boolean;
+    accessibility: boolean;
+    ecoMaterials: boolean;
   };
 }
 
@@ -172,10 +112,10 @@ export interface TextureCategory {
   img: string;
   accent: string;
   panels: Array<{
-    id: number;
-    name: string;
-    img: string;
-    desc: string;
+  id: number;
+  name: string;
+  img: string;
+  desc: string;
   }>;
 }
 
@@ -204,47 +144,48 @@ export interface SmartWallsEmailData {
   };
 }
 
+
 export interface SmartDevicesFormData {
-  controlPanels?: boolean;
+  controlPanels: boolean;
   panelModel?: string;
   panelRoom?: string;
   panelMountType?: string;
-  securitySensors?: boolean;
+  securitySensors: boolean;
   motionDetection?: boolean;
   smokeDetection?: boolean;
   securityFeatures?: string[];
-  homeAutomation?: boolean;
+  homeAutomation: boolean;
   automationFeatures?: string[];
   selectedDevices?: { name: string; category?: string }[];
 }
 
 export interface WallPanelsFormData {
-  panelType?: 'fluted' | 'hd-printing' | 'textured' | 'smooth';
+  panelType: 'fluted' | 'hd-printing' | 'textured' | 'smooth';
   flutedGrooveDepth?: string;
   flutedSpacing?: string;
   hdPrintingPattern?: string;
   textureType?: string;
-  finish?: string;
-  dimensions?: {
-    width?: number;
-    height?: number;
-    area?: number;
+  finish: string;
+  dimensions: {
+    width: number;
+    height: number;
+    area: number;
   };
-  installation?: 'diy' | 'professional';
+  installation: 'diy' | 'professional';
 }
 
 export interface CarbonRockBoardsFormData {
-  boardType?: 'acoustic' | 'mirror' | 'standard';
+  boardType: 'acoustic' | 'mirror' | 'standard';
   acousticNrcRating?: string;
   acousticFabricColor?: string;
   mirrorTint?: string;
-  thickness?: string;
-  dimensions?: {
-    width?: number;
-    height?: number;
-    area?: number;
+  thickness: string;
+  dimensions: {
+    width: number;
+    height: number;
+    area: number;
   };
-  installation?: 'diy' | 'professional';
+  installation: 'diy' | 'professional';
 }
 
 export interface QuoteFormData {

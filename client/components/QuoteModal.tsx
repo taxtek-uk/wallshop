@@ -7,7 +7,7 @@ import {
   AlertCircle, Sparkles
 } from 'lucide-react';
 import { useQuote } from '@/contexts/QuoteContext';
-import { ProductCategory, QuoteStep } from '@/types/quote';
+import { ProductCategory } from '@/types/quote';
 import Step1Contact from '@/components/QuoteSteps/Step1Contact';
 import StepSmartWalls from '@/components/QuoteSteps/StepSmartWalls';
 import StepSmartDevices from '@/components/QuoteSteps/StepSmartDevices';
@@ -47,14 +47,6 @@ export default function QuoteModal({
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState('');
-
-  // === SmartWalls local state with strict typing ===
-  const [smartWallsSection, setSmartWallsSection] = useState<QuoteStep>('dimensions');
-
-  // Strict typed setter for SmartWalls sections
-  const setSection = (section: QuoteStep) => {
-    setSmartWallsSection(section);
-  };
 
   // --- Tailwind-safe color map (avoid dynamic class names) ---
   const colorBgMap: Record<StepDef['colorKey'], string> = {
@@ -139,7 +131,7 @@ export default function QuoteModal({
       id: 'review',
       title: 'Review & Submit',
       description: 'Confirm your details before submission',
-      icon: FileText,
+      icon: FileText, // keep FileText icon from your original; it reads well here
       component: StepReviewSubmit,
       required: false,
       colorKey: 'emerald',
@@ -156,6 +148,7 @@ export default function QuoteModal({
         return [contact, crb, review];
       case 'home':
       default:
+        // IMPORTANT: include review in home flow
         return [contact, crb, sd, sw, wp, review];
     }
   })();
@@ -163,7 +156,6 @@ export default function QuoteModal({
   // Current step
   const currentStepData = steps[state.currentStep - 1] || steps[0];
   const StepComponent = currentStepData.component;
-  const isSmartWalls = currentStepData?.id === 'smart-walls';
 
   // Validation helper for steps
   const getStepValidation = (stepIndex: number) => {
@@ -184,77 +176,129 @@ export default function QuoteModal({
       }
       case 'smart-walls': {
         const sw = state.formData.smartWalls;
-        const hasDimensions = sw?.legacyDimensions?.width && sw.legacyDimensions.width > 0 && 
-                             sw?.legacyDimensions?.height && sw.legacyDimensions.height > 0;
-        const hasStyle = !!sw?.legacySelectedStyle?.finish;
+        const hasDimensions = sw?.dimensions?.width > 0 && sw?.dimensions?.height > 0;
+        const hasStyle = !!sw?.selectedStyle?.finish;
+        // Add more validation for smart walls if needed
         if (!hasDimensions || !hasStyle) {
           return { isValid: false, message: 'Dimensions and style are required' };
         }
         return { isValid: true, message: 'Complete' };
       }
       default:
-        return { isValid: true, message: 'Complete' };
+        return { isValid: true, message: 'Optional' };
     }
   };
 
-  // Progress calculation
+  // Overall progress (0 until contact is valid; last step shows 100%)
   const getOverallProgress = () => {
-    const completedSteps = steps.filter((_, index) => getStepValidation(index).isValid).length;
-    return Math.round((completedSteps / steps.length) * 100);
+    const totalSteps = steps.length;
+    if (totalSteps <= 1) return 0;
+
+    const contactValid = getStepValidation(0).isValid;
+    if (!contactValid) return 0;
+
+    // steps behind the current one; ensure last step = 100%
+    let completed = state.currentStep - 1;
+    if (state.currentStep === 1 && contactValid) completed = 1;
+    completed = Math.max(1, Math.min(completed, totalSteps - 1));
+    return (completed / (totalSteps - 1)) * 100;
   };
 
+  // Count of selected product groups
   const getSelectedProductsCount = () => {
     let count = 0;
-    if (state.formData.smartWalls && getStepValidation(steps.findIndex(s => s.id === 'smart-walls')).isValid) count++;
-    if (state.formData.smartDevices) count++;
-    if (state.formData.wallPanels) count++;
-    if (state.formData.carbonRockBoards) count++;
+    if (state.formData.carbonRockBoards && Object.keys(state.formData.carbonRockBoards).length > 0) count++;
+    if (state.formData.smartDevices && Object.keys(state.formData.smartDevices).length > 0) count++;
+    if (state.formData.smartWalls && state.formData.smartWalls.dimensions?.width > 0) count++; // Check for smartWalls data presence
+    if (state.formData.wallPanels && Object.keys(state.formData.wallPanels).length > 0) count++;
     return count;
   };
 
-  // Navigation handlers
+  // Navigation
   const handleNext = () => {
-    if (validateCurrentStep()) {
+    // Enforce contact validation before leaving step 1
+    if (state.currentStep === 1) {
+      const valid = validateCurrentStep();
+      if (!valid) return;
+    }
+    // Enforce smart-walls validation before leaving step 2 (if smart-walls is the product category)
+    if (state.currentStep === 2 && state.formData.productCategory === 'smart-walls') {
+      const valid = getStepValidation(1).isValid; // Validate the smart-walls step
+      if (!valid) return;
+    }
+    if (state.currentStep < steps.length) {
       nextStep();
     }
   };
 
   const handlePrevious = () => {
-    prevStep();
+    if (state.currentStep > 1) prevStep();
   };
 
-  // Submit handler
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape' && !isSubmitting) {
+        onClose();
+      } else if (e.key === 'ArrowLeft' && state.currentStep > 1) {
+        handlePrevious();
+      } else if (e.key === 'ArrowRight' && state.currentStep < steps.length) {
+        handleNext();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, state.currentStep, isSubmitting]);
+
+  // --- Real API submission (robust) ---
   const submitQuote = async () => {
-    const endpoint = '/api/quote';
+    const { formData } = state;
+
     const payload = {
-      contact: state.formData.contact,
-      productCategory: state.formData.productCategory,
-      smartWalls: state.formData.smartWalls,
-      smartDevices: state.formData.smartDevices,
-      wallPanels: state.formData.wallPanels,
-      carbonRockBoards: state.formData.carbonRockBoards,
-      timestamp: new Date().toISOString(),
+  fullName: formData.contact?.fullName || '',
+  email: formData.contact?.email || '',
+  phone: formData.contact?.phone || '',
+  installationAddress: formData.contact?.installationAddress || '',
+  additionalNotes: formData.contact?.additionalNotes || '',
+  productCategory: state.formData.productCategory || 'general',
+  entryPoint: resolvedEntryPoint,
+  smartWalls: formData.smartWalls || null,
+  smartDevices: formData.smartDevices || null,
+  wallPanels: formData.wallPanels || null,
+  carbonRockBoards: formData.carbonRockBoards || null,
+  clientMeta: {
+    urlPath: location.pathname,
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    submittedAt: new Date().toISOString(),
+  },
+
+
+  
     };
 
-    const res = await fetch(endpoint, {
+    
+    const res = await fetch('/api/sendQuote', { // Use dedicated Quote Modal endpoint
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
+    // Handle non-2xx with detailed text/JSON parse
     if (!res.ok) {
-      let errMsg = `HTTP ${res.status}`;
+      const text = await res.text();
+      let errMsg = `Submission failed (${res.status})`;
       try {
-        const text = await res.text();
         const json = JSON.parse(text);
         if (json?.message) errMsg = json.message;
         if (json?.fields) errMsg += ` — ${json.fields.join(', ')}`;
       } catch {
-        if (res.statusText) errMsg += ` — ${res.statusText}`;
+        if (text) errMsg += ` — ${text}`;
       }
       throw new Error(errMsg);
     }
 
+    // Handle possibly empty body gracefully
     const raw = await res.text();
     let data: any = {};
     if (raw) {
@@ -263,33 +307,35 @@ export default function QuoteModal({
     return data;
   };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setSubmitError(null);
+const handleSubmit = async () => {
+  setIsSubmitting(true);
+  setSubmitError(null);
 
-    try {
-      const result = await submitQuote();
-      setSubmitSuccess(true);
+  try {
+    const result = await submitQuote();
+    setSubmitSuccess(true);
 
-      const ref = result?.referenceId || result?.quoteId || '';
-      setSubmitMessage(
-        `Thanks! Your quote request has been sent.${ref ? ` Reference: ${ref}` : ''}`
-      );
+    const ref = result?.referenceId || result?.quoteId || '';
+    setSubmitMessage(
+      `Thanks! Your quote request has been sent.${ref ? ` Reference: ${ref}` : ''}`
+    );
 
-      dispatch({ type: 'RESET_FORM' });
-      dispatch({ type: 'SET_STEP', payload: 1 });
-      
-      setTimeout(() => {
-        try { onClose(); } catch {}
-      }, 1200);
+    // ✅ Immediately clear the wizard so the client can start a fresh quote
+    dispatch({ type: 'RESET_FORM' });                   // clears all fields & sets step to initial
+    dispatch({ type: 'SET_STEP', payload: 1 });         // ensure we're back to step 1
+    // Optional: close the modal after a short, friendly confirmation toast window
+    setTimeout(() => {
+      try { onClose(); } catch {}
+    }, 1200);
 
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to submit quote');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+    // ⛔️ Remove the page reload (was keeping UI on step 3 temporarily)
+    // setTimeout(() => { window.location.reload(); }, 10000);
+  } catch (error) {
+    setSubmitError(error instanceof Error ? error.message : 'Failed to submit quote');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   // Only allow submit when required steps valid AND on the last step
   const canSubmit = () => {
     const allRequiredOk = steps.every((step, index) => {
@@ -392,78 +438,81 @@ export default function QuoteModal({
 
               return (
                 <button
-                  key={step.id}
-                  onClick={() => {
-                    const targetStep = index + 1;
-                    if (targetStep > 1 && state.currentStep === 1) {
-                      const ok = validateCurrentStep();
-                      if (!ok) return;
-                    }
-                    if (
-                      targetStep > 2 &&
-                      state.currentStep === 2 &&
-                      state.formData.productCategory === "smart-walls"
-                    ) {
-                      const ok = getStepValidation(1).isValid;
-                      if (!ok) return;
-                    }
-                    dispatch({ type: "SET_STEP", payload: targetStep });
-                  }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap min-w-fit ${
-                    isActive
-                      ? "bg-leather-900 shadow-lg ring-2 ring-black/30 !text-white"
-                      : isCompleted
-                      ? "bg-green-100 text-green-800 hover:bg-green-200"
-                      : "bg-white text-stone-600 hover:bg-stone-100 border border-stone-200"
-                  }`}
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-controls={`step-${step.id}`}
-                  id={`tab-${step.id}`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    key={step.id}
+                    onClick={() => {
+                      const targetStep = index + 1;
+                      // Prevent jumping past contact without valid data
+                      if (targetStep > 1 && state.currentStep === 1) {
+                        const ok = validateCurrentStep();
+                        if (!ok) return;
+                      }
+                      // Prevent jumping past smart-walls without valid data if it's the current product category
+                      if (
+                        targetStep > 2 &&
+                        state.currentStep === 2 &&
+                        state.formData.productCategory === "smart-walls"
+                      ) {
+                        const ok = getStepValidation(1).isValid;
+                        if (!ok) return;
+                      }
+                      dispatch({ type: "SET_STEP", payload: targetStep });
+                    }}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap min-w-fit ${
                       isActive
-                        ? "bg-white/20"
+                        ? "bg-leather-900 shadow-lg ring-2 ring-black/30 !text-white"
                         : isCompleted
-                        ? "bg-green-600"
-                        : "bg-stone-200"
+                        ? "bg-green-100 text-green-800 hover:bg-green-200"
+                        : "bg-white text-stone-600 hover:bg-stone-100 border border-stone-200"
                     }`}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`step-${step.id}`}
+                    id={`tab-${step.id}`}
                   >
-                    {isCompleted ? (
-                      <Check className="w-3 h-3 text-white" />
-                    ) : (
-                      <IconComponent
-                        className={`w-3 h-3 ${isActive ? "text-white" : "text-stone-600"}`}
-                      />
-                    )}
-                  </div>
-
-                  <div className="text-left hidden sm:block">
                     <div
-                      className={`font-semibold ${
-                        isActive ? "!text-white" : "text-mocha-950"
-                      }`}
-                    >
-                      {step.title}
-                    </div>
-                    <div
-                      className={`text-xs ${
+                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
                         isActive
-                          ? "!text-white/80"
+                          ? "bg-white/20"
                           : isCompleted
-                          ? "text-green-700"
-                          : "text-stone-500"
+                          ? "bg-green-600"
+                          : "bg-stone-200"
                       }`}
                     >
-                      {isActive
-                        ? "Current Step"
-                        : isCompleted
-                        ? "Completed"
-                        : validation.message}
+                      {isCompleted ? (
+                        <Check className="w-3 h-3 text-white" />
+                      ) : (
+                        <IconComponent
+                          className={`w-3 h-3 ${isActive ? "text-white" : "text-stone-600"}`}
+                        />
+                      )}
                     </div>
-                  </div>
-                </button>
+
+                    <div className="text-left hidden sm:block">
+                      <div
+                        className={`font-semibold ${
+                          isActive ? "!text-white" : "text-mocha-950"
+                        }`}
+                      >
+                        {step.title}
+                      </div>
+                      <div
+                        className={`text-xs ${
+                          isActive
+                            ? "!text-white/80"
+                            : isCompleted
+                            ? "text-green-700"
+                            : "text-stone-500"
+                        }`}
+                      >
+                        {isActive
+                          ? "Current Step"
+                          : isCompleted
+                          ? "Completed"
+                          : validation.message}
+                      </div>
+                    </div>
+                  </button>
+
               );
             })}
           </div>
@@ -472,14 +521,7 @@ export default function QuoteModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-stone-50">
           <AnimatePresence mode="wait">
-            {isSmartWalls ? (
-              <StepSmartWalls
-                activeSection={smartWallsSection}
-                setActiveSection={setSection}
-              />
-            ) : (
-              <StepComponent key={state.currentStep} />
-            )}
+            <StepComponent key={state.currentStep} />
           </AnimatePresence>
         </div>
 
@@ -589,6 +631,24 @@ export default function QuoteModal({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Help Text */}
+          <div className="mt-4 text-xs text-stone-500 text-center">
+            <div className="flex items-center justify-center space-x-4">
+              <span className="flex items-center space-x-1">
+                <Shield className="w-3 h-3" />
+                <span>Secure & Confidential</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <Clock className="w-3 h-3" />
+                <span>24hr Response Time</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <Sparkles className="w-3 h-3" />
+                <span>No Obligation</span>
+              </span>
+            </div>
+          </div>
         </footer>
       </motion.div>
     </div>
