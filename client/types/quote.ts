@@ -186,6 +186,14 @@ export interface CarbonRockBoardsFormData {
     area: number;
   };
   installation: 'diy' | 'professional';
+  // New fields for board size selection
+  selectedBoardWidth?: string;
+  selectedBoardHeight?: string;
+  boardCalculation?: {
+    totalBoards: number;
+    coverage: number;
+    waste: number;
+  };
 }
 
 export interface QuoteFormData {
@@ -216,4 +224,3 @@ export interface StepProps {
   onChange: (field: string, value: any) => void;
   onValidate: () => boolean;
 }
-

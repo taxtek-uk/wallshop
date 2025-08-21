@@ -13,8 +13,6 @@ import { SmartWallsFormData, DimensionalCalculation, TextureCategory, SmartDevic
 
 // Using SmartWallsFormData from '@/types/quote' directly to avoid duplicate type definitions
 
-
-
 function calculateMaxWallDimensions(
   width: number, 
   height: number, 
@@ -266,115 +264,91 @@ const textureCategories: TextureCategory[] = [
       { id: 1, name: "Bronze Mirror", img: "/images/carbon-rock-boards/mirror/1.jpg", desc: "Warm bronze-tinted mirror with elegant shine" },
       { id: 2, name: "Copper Reflection", img: "/images/carbon-rock-boards/mirror/2.jpg", desc: "Vintage copper tone with smooth mirrored surface" },
       { id: 3, name: "Golden Glow", img: "/images/carbon-rock-boards/mirror/3.jpg", desc: "Champagne gold mirror finish with rich sheen" },
-      { id: 4, name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Matte brass reflection with subtle warmth" },
-      { id: 5, name: "Crystal Silver", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Sleek silver mirror with crisp reflectivity" },
-      { id: 6, name: "Titanium Gloss", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Cool titanium mirror with polished finish" }
+      { id: 4, name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Premium brass mirror with sophisticated appeal" },
+      { id: 5, name: "Silver Chrome", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Classic chrome mirror for modern spaces" },
+      { id: 6, name: "Titanium Shine", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Contemporary titanium mirror with subtle depth" }
     ]
   }
 ];
 
+// Gaming systems
+const gamingSystems = [
+  { value: 'PlayStation', label: 'PlayStation 5', description: 'Latest PlayStation console with 4K gaming' },
+  { value: 'Xbox', label: 'Xbox Series X', description: 'Microsoft\'s flagship gaming console' },
+  { value: 'Nintendo', label: 'Nintendo Switch', description: 'Versatile handheld and docked gaming' },
+  { value: 'PC Setup', label: 'PC Gaming Setup', description: 'Custom PC gaming configuration' },
+  { value: 'Custom', label: 'Custom Gaming System', description: 'Specify your custom requirements' }
+];
+
 export default function StepSmartWalls() {
   const { state, updateProductData } = useQuote();
-  const smartWallsData: SmartWallsFormData = {
-    tvIntegration: false,
-    speakers: false,
-    lighting: false,
-    additionalFeatures: [],
-    dimensions: {
-      width: 0,
-      height: 2.1, // Fixed height as specified
-      depth: '180mm',
-      calculatedMaxWidth: 0
-    },
-    selectedStyle: {
-      category: '',
-      categoryId: '',
-      finish: '',
-      finishId: '',
-      finishImage: '',
-      finishDescription: '',
-    },
-    accessories: {
-      tv: false,
-      fireplace: false,
-      soundbar: false,
-      shelving: false
-    },
-    smartDevices: {
-      selectedDevices: [],
-      controlPanels: false,
-      securitySensors: false,
-      homeAutomation: false
-    },
-    gamingSystem: {
-      type: null
-    },
-    ...(state.formData.smartWalls || {}),
-  };
+  const smartWallsData = (state.formData.smartWalls || {
+    dimensions: { width: 0, height: 2.1, depth: '180mm', calculatedMaxWidth: 0 },
+    selectedStyle: { category: '', categoryId: '', finish: '', finishId: '', finishImage: '', finishDescription: '' },
+    accessories: { tv: false, fireplace: false, soundbar: false, shelving: false },
+    smartDevices: { selectedDevices: [], controlPanels: false, securitySensors: false, homeAutomation: false },
+    gamingSystem: { type: null },
+    tvIntegration: false, speakers: false, lighting: false, additionalFeatures: []
+  }) as SmartWallsFormData;
 
-  // State management
-  const [activeSection, setActiveSection] = useState<string>('dimensions');
-  const [selectedStyleCategory, setSelectedStyleCategory] = useState<TextureCategory | null>(null);
-  const [selectedFinish, setSelectedFinish] = useState<TextureCategory['panels'][number] | null>(null);
+  // State for multi-step flow with tabs
+  const [activeSection, setActiveSection] = useState<'dimensions' | 'style' | 'accessories' | 'devices' | 'gaming'>('dimensions');
   const [isStyleDetailView, setIsStyleDetailView] = useState(false);
+  const [selectedStyleCategory, setSelectedStyleCategory] = useState<TextureCategory | null>(null);
+  const [selectedFinish, setSelectedFinish] = useState<any>(null);
   const [deviceSearchTerm, setDeviceSearchTerm] = useState('');
-  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState<string>('all');
+  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState('all');
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState<'accessories' | 'devices' | null>(null);
 
-  // Dimensional calculation
+  // Validation states
+  const [dimensionErrors, setDimensionErrors] = useState<{width?: string; height?: string}>({});
+
   const dimensionalCalculation = useMemo(() => {
-    if (!smartWallsData.dimensions?.width) {
-      return { maxWidth: 0, modules: [], warnings: [], isValid: true };
+    if (smartWallsData.dimensions?.width > 0) {
+      return calculateMaxWallDimensions(
+        smartWallsData.dimensions.width,
+        smartWallsData.dimensions.height || 2.1,
+        smartWallsData.dimensions.depth || '180mm',
+        smartWallsData.accessories?.tv || false
+      );
     }
-    
-    return calculateMaxWallDimensions(
-      smartWallsData.dimensions.width,
-      smartWallsData.dimensions.height,
-      smartWallsData.dimensions.depth,
-      smartWallsData.accessories?.tv || false
-    );
-  }, [
-    smartWallsData.dimensions?.width,
-    smartWallsData.dimensions?.height,
-    smartWallsData.dimensions?.depth,
-    smartWallsData.accessories?.tv
-  ]);
+    return { maxWidth: 0, modules: [], warnings: [], isValid: false };
+  }, [smartWallsData.dimensions, smartWallsData.accessories?.tv]);
 
-  // Update calculated max width when calculation changes
-  useEffect(() => {
-    if (dimensionalCalculation.maxWidth !== smartWallsData.dimensions?.calculatedMaxWidth) {
-      handleDimensionsChange('calculatedMaxWidth', dimensionalCalculation.maxWidth);
-    }
-  }, [dimensionalCalculation.maxWidth]);
-
-  // Event handlers
   const handleFieldChange = (field: keyof SmartWallsFormData, value: any) => {
     const updatedData = { ...smartWallsData, [field]: value };
     updateProductData('smart-walls', updatedData);
   };
 
-  const handleDimensionsChange = (field: keyof NonNullable<SmartWallsFormData['dimensions']>, value: any) => {
-    const current = smartWallsData.dimensions || { width: 0, height: 2.1, depth: '180mm' };
-    handleFieldChange('dimensions', { ...current, [field]: value });
-  };
-
-  const handleAccessoryToggle = (accessory: keyof NonNullable<SmartWallsFormData['accessories']>) => {
-    const current = smartWallsData.accessories || { tv: false, fireplace: false, soundbar: false, shelving: false };
-    handleFieldChange('accessories', { ...current, [accessory]: !current[accessory] });
-  };
-
-  const handleDeviceToggle = (deviceName: string, deviceCategory: string) => {
-    const current = smartWallsData.smartDevices?.selectedDevices || [];
-    const exists = current.find(d => d.name === deviceName);
-    const updated = exists 
-      ? current.filter(d => d.name !== deviceName)
-      : [...current, { name: deviceName, category: deviceCategory }];
+  const handleDimensionsChange = (field: string, value: any) => {
+    const newDimensions = { ...smartWallsData.dimensions, [field]: value };
     
-    const smartDevices = smartWallsData.smartDevices || { selectedDevices: [], controlPanels: false, securitySensors: false, homeAutomation: false };
-    handleFieldChange('smartDevices', { ...smartDevices, selectedDevices: updated });
-  };
-
-  const handleGamingSystemSelect = (type: SmartWallsFormData['gamingSystem']['type']) => {
-    handleFieldChange('gamingSystem', { ...smartWallsData.gamingSystem, type });
+    // Validation
+    const errors: {width?: string; height?: string} = {};
+    
+    if (field === 'width') {
+      const widthMm = value * 1000;
+      if (value < 1 || widthMm < 1000) {
+        errors.width = 'Width must be at least 1000mm (1.0m)';
+      } else if (widthMm > 6000) {
+        errors.width = 'Our standard system supports up to 6.0 metres. For larger walls, please consider a custom quotation by our representative.';
+      }
+    }
+    
+    if (field === 'height') {
+      const heightMm = value * 1000;
+      if (value < 2.2 || heightMm < 2200) {
+        errors.height = 'Height must be at least 2200mm (2.2m)';
+      } else if (heightMm > 4000) {
+        errors.height = 'Height cannot exceed 4000mm (4.0m)';
+      }
+    }
+    
+    setDimensionErrors(errors);
+    
+    // Update dimensions even if there are errors (for real-time feedback)
+    newDimensions.calculatedMaxWidth = dimensionalCalculation.maxWidth;
+    handleFieldChange('dimensions', newDimensions);
   };
 
   const handleStyleCategoryClick = (category: TextureCategory) => {
@@ -382,40 +356,122 @@ export default function StepSmartWalls() {
     setIsStyleDetailView(true);
   };
 
-  const handleFinishSelect = (finish: TextureCategory['panels'][number]) => {
+  const handleFinishSelect = (finish: any) => {
     setSelectedFinish(finish);
-    handleFieldChange('selectedStyle', {
+    const selectedStyle = {
       category: selectedStyleCategory?.name || '',
       categoryId: selectedStyleCategory?.id || '',
       finish: finish.name,
-      finishId: String(finish.id),
+      finishId: finish.id.toString(),
       finishImage: finish.img,
       finishDescription: finish.desc
-    });
+    };
+    handleFieldChange('selectedStyle', selectedStyle);
+    
+    // Auto-scroll to bottom and reveal next button
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 300);
   };
 
-  // Filtered devices for search
+  const handleAccessoryToggle = (accessory: keyof NonNullable<SmartWallsFormData['accessories']>) => {
+    const newAccessories = {
+      ...smartWallsData.accessories,
+      [accessory]: !smartWallsData.accessories?.[accessory]
+    };
+    handleFieldChange('accessories', newAccessories);
+  };
+
+  const handleDeviceToggle = (device: SmartDevice) => {
+    const currentDevices = smartWallsData.smartDevices?.selectedDevices || [];
+    const isSelected = currentDevices.some(d => d.name === device.name);
+    
+    let newDevices;
+    if (isSelected) {
+      newDevices = currentDevices.filter(d => d.name !== device.name);
+    } else {
+      newDevices = [...currentDevices, { name: device.name, category: device.category }];
+    }
+    
+    const newSmartDevices = {
+      ...smartWallsData.smartDevices,
+      selectedDevices: newDevices
+    };
+    handleFieldChange('smartDevices', newSmartDevices);
+  };
+
+  const handleGamingSystemSelect = (system: string) => {
+    const newGamingSystem = { ...smartWallsData.gamingSystem, type: system as any };
+    handleFieldChange('gamingSystem', newGamingSystem);
+  };
+
+  // Check if dimensions are valid
+  const isDimensionsValid = () => {
+    const width = smartWallsData.dimensions?.width || 0;
+    const height = smartWallsData.dimensions?.height || 0;
+    const widthMm = width * 1000;
+    const heightMm = height * 1000;
+    
+    return widthMm >= 1000 && widthMm <= 6000 && heightMm >= 2200 && heightMm <= 4000 && Object.keys(dimensionErrors).length === 0;
+  };
+
+  // Check if style is selected
+  const isStyleSelected = () => {
+    return smartWallsData.selectedStyle?.finish && smartWallsData.selectedStyle?.category;
+  };
+
+  // Check if accessories are selected
+  const hasAccessoriesSelected = () => {
+    const accessories = smartWallsData.accessories;
+    return accessories?.tv || accessories?.fireplace || accessories?.soundbar || accessories?.shelving;
+  };
+
+  // Check if smart devices are selected
+  const hasSmartDevicesSelected = () => {
+    return (smartWallsData.smartDevices?.selectedDevices?.length || 0) > 0;
+  };
+
+  // Filter devices
   const filteredDevices = deviceCatalog.filter(device => {
     const matchesSearch = device.name.toLowerCase().includes(deviceSearchTerm.toLowerCase()) ||
-                         device.description.toLowerCase().includes(deviceSearchTerm.toLowerCase());
+                         device.category.toLowerCase().includes(deviceSearchTerm.toLowerCase());
     const matchesCategory = selectedDeviceCategory === 'all' || device.category === selectedDeviceCategory;
     return matchesSearch && matchesCategory;
   });
 
   const deviceCategories = ['all', ...Array.from(new Set(deviceCatalog.map(d => d.category)))];
 
-  // Count selected features for header display
-  const getSelectedFeaturesCount = () => {
-    let count = 0;
-    if (smartWallsData.dimensions?.width > 0) count++;
-    if (smartWallsData.selectedStyle) count++;
-    if (smartWallsData.accessories) {
-      count += Object.values(smartWallsData.accessories).filter(Boolean).length;
+  const handleNextSection = (from: string, to: string) => {
+    if (from === 'accessories' && !hasAccessoriesSelected()) {
+      setShowConfirmationPopup('accessories');
+      return;
     }
-    if (smartWallsData.smartDevices?.selectedDevices?.length > 0) count++;
-    if (smartWallsData.gamingSystem?.type) count++;
-    return count;
+    if (from === 'devices' && !hasSmartDevicesSelected()) {
+      setShowConfirmationPopup('devices');
+      return;
+    }
+    setActiveSection(to as any);
   };
+
+  const handleConfirmationResponse = (confirmed: boolean, type: 'accessories' | 'devices') => {
+    setShowConfirmationPopup(null);
+    if (confirmed) {
+      if (type === 'accessories') {
+        setActiveSection('devices');
+      } else if (type === 'devices') {
+        setActiveSection('gaming');
+      }
+    }
+  };
+
+  // Tab navigation data
+  const tabs = [
+    { id: 'dimensions', label: 'Dimensions', icon: Ruler, completed: isDimensionsValid() },
+    { id: 'style', label: 'Style', icon: Palette, completed: isStyleSelected() },
+    { id: 'accessories', label: 'Accessories', icon: Plus, completed: hasAccessoriesSelected() },
+    { id: 'devices', label: 'Smart Devices', icon: Zap, completed: hasSmartDevicesSelected() },
+    { id: 'gaming', label: 'Gaming', icon: Gamepad2, completed: !!smartWallsData.gamingSystem?.type }
+  ];
 
   return (
     <motion.div
@@ -424,75 +480,104 @@ export default function StepSmartWalls() {
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
       className="space-y-8"
-      data-seo-title="Smart Walls Configuration"
-      data-seo-desc="Configure your premium smart wall solution with integrated technology and luxury finishes"
     >
-      {/* Header Section */}
-      <header className="text-center space-y-4">
+      {/* Confirmation Popup */}
+      <AnimatePresence>
+        {showConfirmationPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl"
+            >
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                  <AlertTriangle className="w-8 h-8 text-yellow-600" />
+                </div>
+                <h3 className="text-xl font-bold text-mocha-950">
+                  {showConfirmationPopup === 'accessories' 
+                    ? "Are you sure you don't want to integrate any accessory into your smart wall?"
+                    : "Are you sure you don't want to integrate any Smart Device into your smart wall?"
+                  }
+                </h3>
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => handleConfirmationResponse(false, showConfirmationPopup)}
+                    className="flex-1 px-6 py-3 bg-stone-200 hover:bg-stone-300 rounded-xl font-semibold text-mocha-950 transition-colors"
+                  >
+                    Go Back
+                  </button>
+                  <button
+                    onClick={() => handleConfirmationResponse(true, showConfirmationPopup)}
+                    className="flex-1 px-6 py-3 bg-leather-600 hover:bg-leather-700 rounded-xl font-semibold text-white transition-colors"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Header */}
+      <div className="text-center space-y-4">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-leather-600 to-leather-700 rounded-2xl shadow-lg"
         >
-          <Grid className="w-8 h-8 text-white" />
+          <Zap className="w-8 h-8 text-white" />
         </motion.div>
         
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-mocha-950 tracking-tight">
-            Smart Walls Configuration
-          </h1>
+          <h1 className="text-3xl font-bold text-mocha-950 tracking-tight">Smart Walls Configuration</h1>
           <p className="text-lg text-stone-600 max-w-3xl mx-auto leading-relaxed">
-            Design your <span className="font-semibold text-mocha-950">intelligent wall solution</span> with 
-            integrated technology, premium finishes, and smart home devices.
+            Configure your premium smart wall system with integrated technology and custom finishes.
           </p>
         </div>
-        
-        {getSelectedFeaturesCount() > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-leather-100 text-leather-800 rounded-full text-sm font-medium"
-          >
-            <CheckCircle className="w-4 h-4" />
-            {getSelectedFeaturesCount()} feature{getSelectedFeaturesCount() !== 1 ? 's' : ''} configured
-          </motion.div>
-        )}
-      </header>
+      </div>
 
-      {/* Section Navigation */}
-      <nav className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+      {/* Tab Navigation */}
+      <div className="bg-white border border-stone-200 rounded-2xl p-2 shadow-sm">
         <div className="flex flex-wrap gap-2">
-          {[
-            { id: 'dimensions', label: 'Dimensions', icon: Ruler },
-            { id: 'style', label: 'Style Selection', icon: Palette },
-            { id: 'accessories', label: 'Accessories', icon: Plus },
-            { id: 'devices', label: 'Smart Devices', icon: Zap },
-            { id: 'gaming', label: 'Gaming System', icon: Gamepad2 }
-          ].map(section => {
-            const IconComponent = section.icon;
-            const isActive = activeSection === section.id;
+          {tabs.map((tab, index) => {
+            const IconComponent = tab.icon;
+            const isActive = activeSection === tab.id;
+            const isAccessible = index === 0 || tabs[index - 1].completed;
             
             return (
               <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                key={tab.id}
+                onClick={() => isAccessible ? setActiveSection(tab.id as any) : null}
+                disabled={!isAccessible}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
                   isActive
                     ? 'bg-leather-600 text-white shadow-md'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-                }`}
+                    : isAccessible
+                    ? 'bg-stone-100 text-mocha-950 hover:bg-stone-200'
+                    : 'bg-stone-50 text-stone-400 cursor-not-allowed'
+                } ${tab.completed && !isActive ? 'ring-2 ring-green-200' : ''}`}
               >
                 <IconComponent className="w-4 h-4" />
-                {section.label}
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.completed && !isActive && (
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                )}
               </button>
             );
           })}
         </div>
-      </nav>
+      </div>
 
-
-      {/* Dimensions Section */}
+      {/* Wall Dimensions Section */}
       {activeSection === 'dimensions' && (
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -511,8 +596,6 @@ export default function StepSmartWalls() {
             </div>
           </div>
 
-        
-
           <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
             {/* Dimension Inputs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -523,26 +606,45 @@ export default function StepSmartWalls() {
                 <input
                   type="number"
                   step="0.1"
-                  min="0.1"
+                  min="1.0"
                   max="10"
                   value={smartWallsData.dimensions?.width || ''}
                   onChange={(e) => handleDimensionsChange('width', parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 ${
+                    dimensionErrors.width ? 'border-red-300 bg-red-50' : 'border-stone-300'
+                  }`}
                   placeholder="e.g., 3.5"
                 />
+                {dimensionErrors.width && (
+                  <p className="text-sm text-red-600 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    {dimensionErrors.width}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-mocha-950">
-                  Height (meters)
+                  Height (meters) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
+                  step="0.1"
+                  min="2.2"
+                  max="4.0"
                   value={smartWallsData.dimensions?.height || 2.1}
-                  disabled
-                  className="w-full px-4 py-3 border-2 border-stone-200 rounded-xl bg-stone-50 text-stone-600"
+                  onChange={(e) => handleDimensionsChange('height', parseFloat(e.target.value) || 2.1)}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 ${
+                    dimensionErrors.height ? 'border-red-300 bg-red-50' : 'border-stone-300'
+                  }`}
+                  placeholder="e.g., 2.4"
                 />
-                <p className="text-xs text-stone-500">Fixed at 2.1m for smart walls</p>
+                {dimensionErrors.height && (
+                  <p className="text-sm text-red-600 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    {dimensionErrors.height}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -585,7 +687,7 @@ export default function StepSmartWalls() {
             )}
 
             {/* Calculation Results */}
-            {smartWallsData.dimensions?.width > 0 && (
+            {smartWallsData.dimensions?.width > 0 && isDimensionsValid() && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -630,6 +732,23 @@ export default function StepSmartWalls() {
                 )}
               </motion.div>
             )}
+
+            {/* Next Button */}
+            {isDimensionsValid() && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-end"
+              >
+                <button
+                  onClick={() => setActiveSection('style')}
+                  className="px-8 py-3 bg-leather-600 hover:bg-leather-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2"
+                >
+                  Next: Choose Style
+                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                </button>
+              </motion.div>
+            )}
           </div>
         </motion.section>
       )}
@@ -648,93 +767,94 @@ export default function StepSmartWalls() {
             <h2 className="text-xl font-bold text-mocha-950">Style Selection</h2>
           </div>
 
-          {!isStyleDetailView ? (
-            // Category Selection
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {textureCategories.map((category) => {
-                const IconComponent = category.icon;
-                return (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => handleStyleCategoryClick(category)}
-                    className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br ${category.color} border-stone-200 hover:border-stone-300`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className={`w-12 h-12 bg-${category.accent} rounded-xl flex items-center justify-center mb-4 shadow-md`}>
-                      <IconComponent className="w-6 h-6 text-leather-600" />
+          {/* Display all styles/finishes with category headings in one screen */}
+          <div className="space-y-8">
+            {textureCategories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <div key={category.id} className="space-y-4">
+                  <div className="flex items-center gap-3 pb-2 border-b border-stone-200">
+                    <div className={`w-8 h-8 bg-${category.accent} rounded-lg flex items-center justify-center`}>
+                      <IconComponent className="w-4 h-4 text-leather-600" />
                     </div>
-                    
-                    <h3 className="font-bold text-mocha-950 text-lg mb-2">{category.name}</h3>
-                    <p className="text-stone-600 text-sm leading-relaxed mb-4">{category.desc}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-stone-500">{category.panels.length} options</span>
-                      <ArrowLeft className="w-4 h-4 text-stone-400 rotate-180 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          ) : (
-            // Finish Selection within Category
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setIsStyleDetailView(false)}
-                  className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Categories
-                </button>
-                <h3 className="text-xl font-bold text-mocha-950">{selectedStyleCategory?.name}</h3>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {selectedStyleCategory?.panels.map((finish) => {
-                  const isSelected = selectedFinish?.id === finish.id;
-                  return (
-                    <motion.button
-                      key={finish.id}
-                      onClick={() => handleFinishSelect(finish)}
-                      className={`group relative p-4 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-                        isSelected
-                          ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
-                          : 'bg-white border-stone-200 hover:border-stone-300'
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {isSelected && (
-                        <div className="absolute top-3 right-3">
-                          <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="w-full h-24 bg-stone-200 rounded-lg mb-3 overflow-hidden">
-                        <img 
-                          src={finish.img} 
-                          alt={finish.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                    <h3 className="text-lg font-bold text-mocha-950">{category.name}</h3>
+                    <span className="text-sm text-stone-500">({category.panels.length} options)</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {category.panels.map((finish) => {
+                      const isSelected = smartWallsData.selectedStyle?.finishId === finish.id.toString() && 
+                                        smartWallsData.selectedStyle?.categoryId === category.id;
+                      return (
+                        <motion.button
+                          key={`${category.id}-${finish.id}`}
+                          onClick={() => {
+                            const selectedStyle = {
+                              category: category.name,
+                              categoryId: category.id,
+                              finish: finish.name,
+                              finishId: finish.id.toString(),
+                              finishImage: finish.img,
+                              finishDescription: finish.desc
+                            };
+                            handleFieldChange('selectedStyle', selectedStyle);
                           }}
-                        />
-                      </div>
-                      
-                      <h4 className="font-bold text-mocha-950 text-sm mb-1">{finish.name}</h4>
-                      <p className="text-xs text-stone-600 leading-relaxed">{finish.desc}</p>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
+                          className={`group relative p-3 rounded-xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                            isSelected
+                              ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                              : 'bg-white border-stone-200 hover:border-stone-300'
+                          }`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 z-10">
+                              <div className="w-5 h-5 bg-leather-600 rounded-full flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="w-full h-20 bg-stone-200 rounded-lg mb-2 overflow-hidden">
+                            <img 
+                              src={finish.img} 
+                              alt={finish.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                          
+                          <h4 className="font-semibold text-mocha-950 text-xs mb-1">{finish.name}</h4>
+                          <p className="text-xs text-stone-600 leading-tight line-clamp-2">{finish.desc}</p>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Next Button */}
+          {isStyleSelected() && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-end pt-6"
+            >
+              <button
+                onClick={() => setActiveSection('accessories')}
+                className="px-8 py-3 bg-leather-600 hover:bg-leather-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2"
+              >
+                Next: Choose Accessories
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+              </button>
+            </motion.div>
           )}
         </motion.section>
       )}
-
 
       {/* Accessories Section */}
       {activeSection === 'accessories' && (
@@ -793,7 +913,7 @@ export default function StepSmartWalls() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {accessory.popular && (
+                  {accessory.popular && !isSelected && (
                     <div className="absolute top-3 right-3">
                       <span className="px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
                         Popular
@@ -820,6 +940,17 @@ export default function StepSmartWalls() {
                 </motion.button>
               );
             })}
+          </div>
+
+          {/* Next Button */}
+          <div className="flex justify-end pt-6">
+            <button
+              onClick={() => handleNextSection('accessories', 'devices')}
+              className="px-8 py-3 bg-leather-600 hover:bg-leather-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2"
+            >
+              Next: Choose Smart Device
+              <ArrowLeft className="w-4 h-4 rotate-180" />
+            </button>
           </div>
         </motion.section>
       )}
@@ -851,13 +982,12 @@ export default function StepSmartWalls() {
                   className="w-full pl-10 pr-4 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200"
                 />
               </div>
-              
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 <select
                   value={selectedDeviceCategory}
                   onChange={(e) => setSelectedDeviceCategory(e.target.value)}
-                  className="pl-10 pr-8 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 appearance-none bg-white min-w-[160px]"
+                  className="pl-10 pr-8 py-3 border-2 border-stone-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 bg-white"
                 >
                   {deviceCategories.map(category => (
                     <option key={category} value={category}>
@@ -865,91 +995,92 @@ export default function StepSmartWalls() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
-            </div>
-            
-            <div className="mt-4 flex items-center justify-between text-sm text-stone-600">
-              <span>Showing {filteredDevices.length} of {deviceCatalog.length} devices</span>
-              <span>{smartWallsData.smartDevices?.selectedDevices?.length || 0} selected</span>
             </div>
           </div>
 
-          {/* Device Catalog */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <AnimatePresence mode="popLayout">
-              {filteredDevices.map((device, index) => {
-                const IconComponent = device.icon;
-                const isSelected = smartWallsData.smartDevices?.selectedDevices?.some(d => d.name === device.name) || false;
-                
-                return (
-                  <motion.button
-                    key={device.name}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => handleDeviceToggle(device.name, device.category)}
-                    className={`group relative p-5 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
-                        : 'bg-white border-stone-200 hover:border-stone-300'
-                    }`}
-                  >
-                    {device.popular && (
-                      <div className="absolute top-3 right-3">
-                        <span className="px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
-                          Popular
-                        </span>
-                      </div>
-                    )}
-
-                    {isSelected && (
-                      <div className="absolute top-3 right-3">
-                        <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
-                      isSelected ? 'bg-leather-600 shadow-md' : 'bg-leather-100 group-hover:bg-leather-200'
-                    }`}>
-                      <IconComponent className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-leather-600'}`} />
+          {/* Device Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDevices.map((device) => {
+              const IconComponent = device.icon;
+              const isSelected = smartWallsData.smartDevices?.selectedDevices?.some(d => d.name === device.name) || false;
+              
+              return (
+                <motion.button
+                  key={device.name}
+                  onClick={() => handleDeviceToggle(device)}
+                  className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    isSelected
+                      ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
+                      : 'bg-white border-stone-200 hover:border-stone-300'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {device.popular && !isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                        Popular
+                      </span>
                     </div>
+                  )}
 
-                    <div className="space-y-3">
-                      <div className="space-y-1">
-                        <h3 className="font-bold text-mocha-950 text-sm leading-tight">
-                          {device.name}
-                        </h3>
-                        <p className="text-xs text-stone-600 leading-relaxed">
-                          {device.description}
-                        </p>
+                  {isSelected && (
+                    <div className="absolute top-3 right-3">
+                      <div className="w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="px-2 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">
-                          {device.category}
-                        </span>
-                      </div>
-
-                      {device.features && (
-                        <div className="space-y-1">
-                          {device.features.slice(0, 2).map((feature, idx) => (
-                            <div key={idx} className="flex items-center gap-1">
-                              <div className="w-1 h-1 bg-stone-400 rounded-full"></div>
-                              <span className="text-xs text-stone-500">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
-                  </motion.button>
-                );
-              })}
-            </AnimatePresence>
+                  )}
+
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${
+                    isSelected ? 'bg-leather-600 shadow-md' : 'bg-leather-100 group-hover:bg-leather-200'
+                  }`}>
+                    <IconComponent className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-leather-600'}`} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-mocha-950 text-lg">{device.name}</h3>
+                    <p className="text-xs text-leather-600 font-medium">{device.category}</p>
+                    <p className="text-stone-600 text-sm leading-relaxed">{device.description}</p>
+                    
+                    <div className="space-y-1">
+                      {device.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-stone-700">
+                          <CheckCircle className="w-3 h-3 text-green-600 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Next Buttons */}
+          <div className="flex justify-end gap-4 pt-6">
+            {hasSmartDevicesSelected() && (
+              <>
+                <button
+                  onClick={() => setActiveSection('gaming')}
+                  className="px-6 py-3 bg-leather-600 hover:bg-leather-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2"
+                >
+                  Next: Choose Gaming System
+                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                </button>
+               
+              </>
+            )}
+            {!hasSmartDevicesSelected() && (
+              <button
+                onClick={() => handleNextSection('devices', 'gaming')}
+                className="px-8 py-3 bg-leather-600 hover:bg-leather-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2"
+              >
+                Continue
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+              </button>
+            )}
           </div>
         </motion.section>
       )}
@@ -969,19 +1100,13 @@ export default function StepSmartWalls() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {([
-              { type: 'PlayStation', label: 'PlayStation 5', description: 'Sony PlayStation 5 integration with optimized display settings' },
-              { type: 'Xbox', label: 'Xbox Series X/S', description: 'Microsoft Xbox Series X/S with 4K gaming support' },
-              { type: 'Nintendo', label: 'Nintendo Switch', description: 'Nintendo Switch with docking station integration' },
-              { type: 'PC Setup', label: 'Gaming PC', description: 'Custom gaming PC setup with high-performance specifications' },
-              { type: 'Custom', label: 'Custom Setup', description: 'Specify your own gaming system requirements' }
-            ] satisfies Array<{ type: SmartWallsFormData['gamingSystem']['type']; label: string; description: string }>).map((system) => {
-              const isSelected = smartWallsData.gamingSystem?.type === system.type;
+            {gamingSystems.map((system) => {
+              const isSelected = smartWallsData.gamingSystem?.type === system.value;
               
               return (
                 <motion.button
-                  key={system.type}
-                  onClick={() => handleGamingSystemSelect(system.type)}
+                  key={system.value}
+                  onClick={() => handleGamingSystemSelect(system.value)}
                   className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
                     isSelected
                       ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
@@ -1030,9 +1155,19 @@ export default function StepSmartWalls() {
               />
             </motion.div>
           )}
+
+          {/* Next Button */}
+          {smartWallsData.gamingSystem?.type && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-end pt-6"
+            >
+               
+            </motion.div>
+          )}
         </motion.section>
       )}
     </motion.div>
   );
 }
-
