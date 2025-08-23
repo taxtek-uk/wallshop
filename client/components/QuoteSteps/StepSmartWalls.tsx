@@ -4,7 +4,7 @@ import {
   Tv, Volume2, Lightbulb, Plus, Check, Zap, Shield, Info, 
   ChevronDown, Settings, Ruler, Home, Building, MapPin, Grid,
   Wrench, CheckCircle, Monitor, Speaker, Palette, ArrowLeft,
-  Mountain, Layers, Square, Eye, Calculator,
+  Mountain, Layers, Square, Eye, Calculator, SlidersVertical,
   Tablet, Lock, Camera, Thermometer, Search, Filter,
   Wifi, Router, Smartphone, Gamepad2, AlertTriangle
 } from 'lucide-react';
@@ -79,6 +79,14 @@ const deviceCatalog: SmartDevice[] = [
     icon: Tablet,
     features: ['7" Display', 'Enhanced Processing', 'Multi-Zone Control']
   },
+  {
+  name: 'Xiaofang Magic Cube',
+  category: 'Remote Control',
+  description: 'Universal Wi-Fi IR blaster that replaces traditional remotes for TVs, ACs, fans, and more.',
+  icon: SlidersVertical,
+  features: ['Infrared Control', 'Smartphone App', 'Voice Assistant Compatible', 'Supports 8000+ Devices'],
+  popular: false
+},
   { 
     name: 'Smart Lock V5 Face', 
     category: 'Security', 
