@@ -484,11 +484,9 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                 required
                               >
                                 <option value="">Select Width</option>
+                                <option value="1000">1000mm</option>
                                 <option value="1220">1220mm</option>
-                                <option value="1200">1200mm</option>
-                                <option value="915">915mm</option>
-                                <option value="600">600mm</option>
-                              </select>
+                                </select>
                             </div>
                             <div className="space-y-2">
                               <label className="block text-sm font-medium text-gray-700">Board Height (mm) *</label>
@@ -500,10 +498,10 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                 required
                               >
                                 <option value="">Select Height</option>
-                                <option value="2440">2440mm</option>
+                                <option value="3000">3000mm</option>
+                                <option value="2800">2800mm</option>
+                                <option value="2600">2600mm</option>
                                 <option value="2400">2400mm</option>
-                                <option value="1830">1830mm</option>
-                                <option value="1220">1220mm</option>
                               </select>
                             </div>
                           </div>
