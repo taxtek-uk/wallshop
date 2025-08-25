@@ -36,16 +36,9 @@ const NAV_ITEMS: NavItem[] = [
       { name: 'Fittings', to: '/wall-panels/aluminum-fittings' },
       { name: 'HD Printing', to: '/wall-panels/wpc-hd-printing' },
       { name: 'SPC Background', to: '/wall-panels/spc-background' },
-      { name: 'UHD Continuous', to: '/wall-panels/uhd-continuous', children: [
-          { name: 'Gilding', to: '/wall-panels/uhd-continuous/gilding' },
-          { name: 'White', to: '/wall-panels/uhd-continuous/white' },
-          { name: 'Grey', to: '/wall-panels/uhd-continuous/grey' },
-          { name: 'Black', to: '/wall-panels/uhd-continuous/black' },
-        ]
-      },
+      { name: 'UHD Continuous', to: '/wall-panels/uhd-continuous' },
       { name: 'Waterproof', to: '/wall-panels/spc-waterproof' },
-      { name: 'Stone Crystal', to: '/wall-panels/spc-stone-crystal' },
-      { name: 'Plastic Wood', to: '/wall-panels/plastic-wood' },
+  
   ]},
   { name: 'Carbon Rock', to: '/carbon-rock-boards' },
   

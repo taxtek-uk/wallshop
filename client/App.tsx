@@ -52,8 +52,7 @@ const WPCHDPrintingWallPanel = lazy(() => import("./pages/WPCHDPrintingWallPanel
 const SPCBackgroundWall = lazy(() => import("./pages/SPCBackgroundWall"));
 const UHDContinuousPattern = lazy(() => import("./pages/UHDContinuousPattern"));
 const SPCWaterproofWallPanel = lazy(() => import("./pages/SPCWaterproofWallPanel"));
-const SPCStoneCrystalFlooring = lazy(() => import("./pages/SPCStoneCrystalFlooring"));
-const PlasticWoodFlooring = lazy(() => import("./pages/PlasticWoodFlooring"));
+ 
 const WoodGrainWallPanels = lazy(() => import("./pages/WoodGrainWallPanels"));
 const ClothPatternWallPanels = lazy(() => import("./pages/ClothPatternWallPanels"));
 
@@ -134,8 +133,7 @@ const App = () => (
             <Route path="/wall-panels/spc-background" element={<SPCBackgroundWall />} />
             <Route path="/wall-panels/uhd-continuous" element={<UHDContinuousPattern />} />
             <Route path="/wall-panels/spc-waterproof" element={<SPCWaterproofWallPanel />} />
-            <Route path="/wall-panels/spc-stone-crystal" element={<SPCStoneCrystalFlooring />} />
-            <Route path="/wall-panels/plastic-wood" element={<PlasticWoodFlooring />} />
+ 
           
             {/* Catch-all for 404 */}
             <Route path="*" element={<NotFound />} />

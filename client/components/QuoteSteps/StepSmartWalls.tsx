@@ -4,11 +4,12 @@ import {
   Tv, Volume2, Lightbulb, Plus, Check, Zap, Shield, Info, 
   ChevronDown, Settings, Ruler, Home, Building, MapPin, Grid,
   Wrench, CheckCircle, Monitor, Speaker, Palette, ArrowLeft,
-  Mountain, Layers, Square, Eye, Calculator, SlidersVertical,
+  Mountain, Layers, Square, Gem, TreePine, Eye, Calculator, SlidersVertical,
   Tablet, Lock, Camera, Thermometer, Search, Filter,
   Wifi, Router, Smartphone, Gamepad2, AlertTriangle
 } from 'lucide-react';
 import { useQuote } from '@/contexts/QuoteContext';
+import TextureSection from '@/components/TextureSection';
 import { SmartWallsFormData, DimensionalCalculation, TextureCategory, SmartDevice } from '@/types/quote';
 
 // Using SmartWallsFormData from '@/types/quote' directly to avoid duplicate type definitions
@@ -124,123 +125,77 @@ const deviceCatalog: SmartDevice[] = [
   }
 ];
 
-// Texture categories (condensed for space)
-const textureCategories: TextureCategory[] = [
+ 
+// Texture categories with stock numbers
+export const textureCategories = [
+  {
+    id: 'fabric',
+    name: "Cloth Pattern Series",
+    desc: "Soft textile pattern with acoustic value.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/cloth.jpg",
+    color: "from-rose-100 to-pink-100",
+    accent: "rose-600",
+    panels: [
+      { id: "T6301", name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls", stock: 10 },
+      { id: "S6029", name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls", stock: 10 },
+      { id: "T6102", name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/5.jpg", desc: "Silver Mesh texture for contemporary interior walls", stock: 10 },
+      { id: "T6306", name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/11.jpg", desc: "Alabaster Cotton texture for contemporary interior walls", stock: 10 },
+      { id: "S6020", name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/6.jpg", desc: "Soft Gauze texture for contemporary interior walls", stock: 10 }
+    ]
+  },
   {
     id: 'wood',
     name: "Wood Grain Series",
     desc: "Warm wood aesthetics with durable surface.",
-    icon: Layers,
+    icon: TreePine,
     img: "/images/carbon-rock-boards/wood.jpg",
     color: "from-amber-100 to-orange-100",
     accent: "amber-600",
     panels: [
-      { id: 1, name: "Natural Oak", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Classic oak texture with soft grain pattern" },
-      { id: 2, name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations" },
-      { id: 3, name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast" },
-      { id: 4, name: "Golden Maple", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm maple hue with straight grain" },
-      { id: 5, name: "Weathered Cedar", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Textured cedar look with aged character" },
-      { id: 6, name: "Rustic Pine", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Light pine tone with visible knots and streaks" },
-      { id: 7, name: "Charcoal Oak", img: "/images/carbon-rock-boards/wood/7.jpg", desc: "Deep grey oak with modern finish" },
-      { id: 8, name: "Amber Teak", img: "/images/carbon-rock-boards/wood/8.jpg", desc: "Teak-inspired golden tones and natural flow" },
-      { id: 9, name: "Espresso Birch", img: "/images/carbon-rock-boards/wood/9.jpg", desc: "Bold espresso hue on tight birch grains" },
-      { id: 10, name: "Sunbleached Timber", img: "/images/carbon-rock-boards/wood/10.jpg", desc: "Light grey-brown tone like weathered wood" },
-      { id: 11, name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical rosewood" },
-      { id: 12, name: "Whitewashed Oak", img: "/images/carbon-rock-boards/wood/12.jpg", desc: "Pale oak with a whitewashed soft grain" },
-      { id: 13, name: "Hazel Beech", img: "/images/carbon-rock-boards/wood/13.jpg", desc: "Light beech finish with smooth texture" },
-      { id: 14, name: "Dark Walnut", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep tones" },
-      { id: 15, name: "Bamboo Slate", img: "/images/carbon-rock-boards/wood/15.jpg", desc: "Neutral bamboo-inspired texture in muted finish" },
-      { id: 16, name: "Ash Greywood", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone" },
-      { id: 17, name: "Ivory Elm", img: "/images/carbon-rock-boards/wood/17.jpg", desc: "Smooth ivory tone with linear elm grain" },
-      { id: 18, name: "Toasted Mahogany", img: "/images/carbon-rock-boards/wood/18.jpg", desc: "Dark toasted tone with rich mahogany grain" },
-      { id: 19, name: "Copperwood", img: "/images/carbon-rock-boards/wood/19.jpg", desc: "Copper-tinged finish with clean grain lines" },
-      { id: 20, name: "Chestnut Brown", img: "/images/carbon-rock-boards/wood/20.jpg", desc: "Balanced brown chestnut-inspired finish" }
+      { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
+      { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
+      { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
+      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical rosewood", stock: 10 },
+      { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
+      { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
     ]
   },
   {
     id: 'solid',
     name: "Solid Color Series",
     desc: "Industrial elegance with raw, minimalist tones.",
-    icon: Palette,
+    icon: Square,
     img: "/images/carbon-rock-boards/wpc.jpg",
     color: "from-slate-100 to-gray-100",
     accent: "slate-600",
     panels: [
-      { id: 1, name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism" },
-      { id: 2, name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look" },
-      { id: 3, name: "Muted Graphite", img: "/images/carbon-rock-boards/solid/3.jpg", desc: "Balanced dark silver tone for sleek walls" },
-      { id: 4, name: "Jet Black", img: "/images/carbon-rock-boards/solid/4.jpg", desc: "Deep black ideal for bold modern interiors" },
-      { id: 5, name: "Rose Brick", img: "/images/carbon-rock-boards/solid/5.jpg", desc: "Warm reddish tone inspired by natural clay" },
-      { id: 6, name: "Burnt Orange", img: "/images/carbon-rock-boards/solid/6.jpg", desc: "Bright terracotta with energetic character" },
-      { id: 7, name: "Sky Blue", img: "/images/carbon-rock-boards/solid/7.jpg", desc: "A cool pastel blue evoking calm environments" },
-      { id: 8, name: "Frost White", img: "/images/carbon-rock-boards/solid/8.jpg", desc: "Pure white with a crisp clean finish" },
-      { id: 9, name: "Stone Clay", img: "/images/carbon-rock-boards/solid/9.jpg", desc: "Earthy stone shade with balanced neutrality" },
-      { id: 10, name: "Slate Blue", img: "/images/carbon-rock-boards/solid/10.jpg", desc: "Dark blue-grey with a sophisticated edge" },
-      { id: 11, name: "Ivory", img: "/images/carbon-rock-boards/solid/11.jpg", desc: "Soft ivory tone perfect for elegant settings" },
-      { id: 12, name: "Desert Sand", img: "/images/carbon-rock-boards/solid/12.jpg", desc: "Warm tan reminiscent of natural sands" },
-      { id: 13, name: "Steel Grey", img: "/images/carbon-rock-boards/solid/13.jpg", desc: "Robust mid-grey with urban vibes" },
-      { id: 14, name: "Charcoal Navy", img: "/images/carbon-rock-boards/solid/14.jpg", desc: "Deep navy blend with a charcoal base" },
-      { id: 15, name: "Obsidian", img: "/images/carbon-rock-boards/solid/15.jpg", desc: "Matte black with premium depth and richness" },
-      { id: 16, name: "Fog Silver", img: "/images/carbon-rock-boards/solid/16.jpg", desc: "Light grey with misty undertones" },
-      { id: 17, name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/17.jpg", desc: "Soft pearl-beige tone for warm ambience" },
-      { id: 18, name: "Lavender Smoke", img: "/images/carbon-rock-boards/solid/18.jpg", desc: "Cool tone with leather-grey transitions" },
-      { id: 19, name: "Silken Stone", img: "/images/carbon-rock-boards/solid/19.jpg", desc: "Light sandy grey with smooth finish" },
-      { id: 20, name: "Deep leather", img: "/images/carbon-rock-boards/solid/20.jpg", desc: "Bold leather hue ideal for rich feature walls" }
+      { id: "T8201", name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism", stock: 10 },
+      { id: "T8026", name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look", stock: 10 },
+      { id: "T8107", name: "Slate Blue", img: "/images/carbon-rock-boards/solid/10.jpg", desc: "Dark blue-grey with a sophisticated edge", stock: 10 },
+      { id: "T8039", name: "Ivory", img: "/images/carbon-rock-boards/solid/11.jpg", desc: "Soft ivory tone perfect for elegant settings", stock: 10 },
+      { id: "T8103", name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/17.jpg", desc: "Soft pearl-beige tone for warm ambience", stock: 10 },
+      { id: "T8036", name: "Desert Sand", img: "/images/carbon-rock-boards/solid/12.jpg", desc: "Warm tan reminiscent of natural sands", stock: 10 },
+      { id: "T8008", name: "Obsidian", img: "/images/carbon-rock-boards/solid/15.jpg", desc: "Matte black with premium depth and richness", stock: 10 }
     ]
   },
   {
     id: 'stone',
     name: "Stone Grain Series",
     desc: "Classic stone surface with timeless elegance.",
-    icon: Mountain,
+    icon: Gem,
     img: "/images/carbon-rock-boards/stone.jpg",
     color: "from-stone-100 to-slate-100",
     accent: "stone-600",
     panels: [
-      { id: 1, name: "T3006", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture T3006" },
-      { id: 2, name: "T3012", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture T3012" },
-      { id: 3, name: "T3017", img: "/images/carbon-rock-boards/stone/3.jpg", desc: "Stone texture T3017" },
-      { id: 4, name: "T3018", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture T3018" },
-      { id: 5, name: "T3019", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture T3019" },
-      { id: 6, name: "T3023", img: "/images/carbon-rock-boards/stone/6.jpg", desc: "Stone texture T3023" },
-      { id: 7, name: "T3024", img: "/images/carbon-rock-boards/stone/7.jpg", desc: "Stone texture T3024" },
-      { id: 8, name: "T3025", img: "/images/carbon-rock-boards/stone/8.jpg", desc: "Stone texture T3025" },
-      { id: 9, name: "T3201", img: "/images/carbon-rock-boards/stone/9.jpg", desc: "Stone texture T3201" },
-      { id: 10, name: "T3202", img: "/images/carbon-rock-boards/stone/10.jpg", desc: "Stone texture T3202" },
-      { id: 11, name: "T3203", img: "/images/carbon-rock-boards/stone/11.jpg", desc: "Stone texture T3203" },
-      { id: 12, name: "T3204", img: "/images/carbon-rock-boards/stone/12.jpg", desc: "Stone texture T3204" },
-      { id: 13, name: "T3205", img: "/images/carbon-rock-boards/stone/13.jpg", desc: "Stone texture T3205" },
-      { id: 14, name: "T3206", img: "/images/carbon-rock-boards/stone/14.jpg", desc: "Stone texture T3206" },
-      { id: 15, name: "T3207", img: "/images/carbon-rock-boards/stone/15.jpg", desc: "Stone texture T3207" },
-      { id: 16, name: "S239-2", img: "/images/carbon-rock-boards/stone/16.jpg", desc: "Stone texture S239-2" },
-      { id: 17, name: "Z7030", img: "/images/carbon-rock-boards/stone/17.jpg", desc: "Stone texture Z7030" },
-      { id: 18, name: "S240", img: "/images/carbon-rock-boards/stone/18.jpg", desc: "Stone texture S240" },
-      { id: 19, name: "S3004", img: "/images/carbon-rock-boards/stone/19.jpg", desc: "Stone texture S3004" }
-    ]
-  },
-  {
-    id: 'fabric',
-    name: "Cloth Pattern Series",
-    desc: "Soft textile pattern with acoustic value, premium quality.",
-    icon: Palette,
-    img: "/images/carbon-rock-boards/cloth.jpg",
-    color: "from-neutral-100 to-stone-100",
-    accent: "neutral-600",
-    panels: [
-      { id: 1, name: "Linen Weave", img: "/images/carbon-rock-boards/fabric/1.jpg", desc: "Linen Weave texture for contemporary interior walls" },
-      { id: 2, name: "Denim Texture", img: "/images/carbon-rock-boards/fabric/2.jpg", desc: "Denim Texture texture for contemporary interior walls" },
-      { id: 3, name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls" },
-      { id: 4, name: "Ivory Cotton", img: "/images/carbon-rock-boards/fabric/4.jpg", desc: "Ivory Cotton texture for contemporary interior walls" },
-      { id: 5, name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/5.jpg", desc: "Silver Mesh texture for contemporary interior walls" },
-      { id: 6, name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/6.jpg", desc: "Soft Gauze texture for contemporary interior walls" },
-      { id: 7, name: "Contrast Linen Panel", img: "/images/carbon-rock-boards/fabric/7.jpg", desc: "Contrast Linen Panel texture for contemporary interior walls" },
-      { id: 8, name: "Beige Canvas", img: "/images/carbon-rock-boards/fabric/8.jpg", desc: "Beige Canvas texture for contemporary interior walls" },
-      { id: 9, name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls" },
-      { id: 10, name: "Crosshatch Blend", img: "/images/carbon-rock-boards/fabric/10.jpg", desc: "Crosshatch Blend texture for contemporary interior walls" },
-      { id: 11, name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/11.jpg", desc: "Alabaster Cotton texture for contemporary interior walls" },
-      { id: 12, name: "Khaki Hemp", img: "/images/carbon-rock-boards/fabric/12.jpg", desc: "Khaki Hemp texture for contemporary interior walls" },
-      { id: 13, name: "Pebble Mesh", img: "/images/carbon-rock-boards/fabric/13.jpg", desc: "Pebble Mesh texture for contemporary interior walls" },
-      { id: 14, name: "Cream Wool", img: "/images/carbon-rock-boards/fabric/14.jpg", desc: "Cream Wool texture for contemporary interior walls" },
+      { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 0 },
+      { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture Black & Blue", stock: 0 },
+      { id: "S240", name: "S240", img: "/images/carbon-rock-boards/stone/3.jpg", desc: "Stone texture S240", stock: 0 },
+      { id: "T3205", name: "Mid Grey & Dark Grey", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & Dark Grey", stock: 0 },
+      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Mid Grey & White", stock: 0 },
+      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/6.jpg", desc: "Stone texture Dark Grey & Black", stock: 0 },
+      { id: "T3207", name: "T3207", img: "/images/carbon-rock-boards/stone/7.jpg", desc: "Stone texture T3207", stock: 0 },
+      { id: "T3024", name: "Dark Grey & White", img: "/images/carbon-rock-boards/stone/8.jpg", desc: "Stone texture Dark Grey & White", stock: 0 }
     ]
   },
   {
@@ -252,12 +207,12 @@ const textureCategories: TextureCategory[] = [
     color: "from-amber-100 to-yellow-100",
     accent: "amber-600",
     panels: [
-      { id: 1, name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/1.jpg", desc: "Elegant bronze with a brushed satin finish" },
-      { id: 2, name: "Antique Copper", img: "/images/carbon-rock-boards/metal/2.jpg", desc: "Warm copper tone with vintage character" },
-      { id: 3, name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/3.jpg", desc: "Subtle golden shimmer with soft elegance" },
-      { id: 4, name: "Urban Brass", img: "/images/carbon-rock-boards/metal/4.jpg", desc: "Contemporary brass with matte warmth" },
-      { id: 5, name: "Mirror Silver", img: "/images/carbon-rock-boards/metal/5.jpg", desc: "Sleek silver chrome for high reflectivity" },
-      { id: 6, name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/6.jpg", desc: "Modern titanium finish with silky texture" }
+      { id: "M1001", name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/1.jpg", desc: "Elegant bronze with a brushed satin finish", stock: 10 },
+      { id: "M1002", name: "Antique Copper", img: "/images/carbon-rock-boards/metal/2.jpg", desc: "Warm copper tone with vintage character", stock: 10 },
+      { id: "M1003", name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/3.jpg", desc: "Subtle golden shimmer with soft elegance", stock: 10 },
+      { id: "M1004", name: "Urban Brass", img: "/images/carbon-rock-boards/metal/4.jpg", desc: "Contemporary brass with matte warmth", stock: 10 },
+      { id: "M1005", name: "Mirror Silver", img: "/images/carbon-rock-boards/metal/5.jpg", desc: "Sleek silver chrome for high reflectivity", stock: 10 },
+      { id: "M1006", name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/6.jpg", desc: "Modern titanium finish with silky texture", stock: 10 }
     ]
   },
   {
@@ -266,18 +221,20 @@ const textureCategories: TextureCategory[] = [
     desc: "Reflective brilliance with a sleek, high-gloss finish.",
     icon: Square,
     img: "/images/carbon-rock-boards/mirror.jpg",
-    color: "from-blue-100 to-leather-100",
-    accent: "blue-600",
+    color: "from-leather-100 to-leather-100",
+    accent: "stone-600",
     panels: [
-      { id: 1, name: "Bronze Mirror", img: "/images/carbon-rock-boards/mirror/1.jpg", desc: "Warm bronze-tinted mirror with elegant shine" },
-      { id: 2, name: "Copper Reflection", img: "/images/carbon-rock-boards/mirror/2.jpg", desc: "Vintage copper tone with smooth mirrored surface" },
-      { id: 3, name: "Golden Glow", img: "/images/carbon-rock-boards/mirror/3.jpg", desc: "Champagne gold mirror finish with rich sheen" },
-      { id: 4, name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Premium brass mirror with sophisticated appeal" },
-      { id: 5, name: "Silver Chrome", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Classic chrome mirror for modern spaces" },
-      { id: 6, name: "Titanium Shine", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Contemporary titanium mirror with subtle depth" }
+      { id: "MR2001", name: "Bronze Mirror", img: "/images/carbon-rock-boards/mirror/1.jpg", desc: "Warm bronze-tinted mirror with elegant shine", stock: 10 },
+      { id: "MR2002", name: "Copper Reflection", img: "/images/carbon-rock-boards/mirror/2.jpg", desc: "Vintage copper tone with smooth mirrored surface", stock: 10 },
+      { id: "MR2003", name: "Golden Glow", img: "/images/carbon-rock-boards/mirror/3.jpg", desc: "Champagne gold mirror finish with rich sheen", stock: 10 },
+      { id: "MR2004", name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Matte brass reflection with subtle warmth", stock: 10 },
+      { id: "MR2005", name: "Crystal Silver", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Sleek silver mirror with crisp reflectivity", stock: 10 },
+      { id: "MR2006", name: "Titanium Gloss", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Cool titanium mirror with polished finish", stock: 10 }
     ]
   }
 ];
+
+
 
 // Gaming systems
 const gamingSystems = [
@@ -291,14 +248,14 @@ const gamingSystems = [
 export default function StepSmartWalls() {
   const { state, updateProductData } = useQuote();
   const smartWallsData = (state.formData.smartWalls || {
-    dimensions: { width: 0, height: 2.1, depth: '180mm', calculatedMaxWidth: 0 },
+    dimensions: { width: 0, height: "", depth: "180mm", calculatedMaxWidth: 0 },
     selectedStyle: { category: '', categoryId: '', finish: '', finishId: '', finishImage: '', finishDescription: '' },
     accessories: { tv: false, fireplace: false, soundbar: false, shelving: false },
     smartDevices: { selectedDevices: [], controlPanels: false, securitySensors: false, homeAutomation: false },
     gamingSystem: { type: null },
     tvIntegration: false, speakers: false, lighting: false, additionalFeatures: []
   }) as SmartWallsFormData;
-
+  
   // State for multi-step flow with tabs
   const [activeSection, setActiveSection] = useState<'dimensions' | 'style' | 'accessories' | 'devices' | 'gaming'>('dimensions');
   const [isStyleDetailView, setIsStyleDetailView] = useState(false);
@@ -315,7 +272,7 @@ export default function StepSmartWalls() {
     if (smartWallsData.dimensions?.width > 0) {
       return calculateMaxWallDimensions(
         smartWallsData.dimensions.width,
-        smartWallsData.dimensions.height || 2.1,
+        smartWallsData.dimensions.height,
         smartWallsData.dimensions.depth || '180mm',
         smartWallsData.accessories?.tv || false
       );
@@ -640,10 +597,15 @@ export default function StepSmartWalls() {
                   step="0.1"
                   min="2.2"
                   max="4.0"
-                  value={smartWallsData.dimensions?.height || 2.1}
-                  onChange={(e) => handleDimensionsChange('height', parseFloat(e.target.value) || 2.1)}
+                  value={smartWallsData.dimensions?.height ?? ""}
+                  onChange={(e) =>
+                    handleDimensionsChange(
+                      "height",
+                      e.target.value === "" ? null : parseFloat(e.target.value)
+                    )
+                  }
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-leather-200 focus:border-leather-600 transition-all duration-200 ${
-                    dimensionErrors.height ? 'border-red-300 bg-red-50' : 'border-stone-300'
+                    dimensionErrors.height ? "border-red-300 bg-red-50" : "border-stone-300"
                   }`}
                   placeholder="e.g., 2.4"
                 />
@@ -654,6 +616,7 @@ export default function StepSmartWalls() {
                   </p>
                 )}
               </div>
+
 
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-mocha-950">
@@ -776,74 +739,111 @@ export default function StepSmartWalls() {
           </div>
 
           {/* Display all styles/finishes with category headings in one screen */}
-          <div className="space-y-8">
-            {textureCategories.map((category) => {
-              const IconComponent = category.icon;
-              return (
-                <div key={category.id} className="space-y-4">
-                  <div className="flex items-center gap-3 pb-2 border-b border-stone-200">
-                    <div className={`w-8 h-8 bg-${category.accent} rounded-lg flex items-center justify-center`}>
-                      <IconComponent className="w-4 h-4 text-leather-600" />
-                    </div>
-                    <h3 className="text-lg font-bold text-mocha-950">{category.name}</h3>
-                    <span className="text-sm text-stone-500">({category.panels.length} options)</span>
+        <div className="space-y-8">
+          {textureCategories.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <div key={category.id} className="space-y-4">
+                {/* Category Header */}
+                <div className="flex items-center gap-3 pb-2 border-b border-stone-200">
+                  <div
+                    className={`w-8 h-8 bg-${category.accent} rounded-lg flex items-center justify-center`}
+                  >
+                    <IconComponent className="w-4 h-4 text-leather-600" />
                   </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {category.panels.map((finish) => {
-                      const isSelected = smartWallsData.selectedStyle?.finishId === finish.id.toString() && 
-                                        smartWallsData.selectedStyle?.categoryId === category.id;
-                      return (
-                        <motion.button
-                          key={`${category.id}-${finish.id}`}
-                          onClick={() => {
-                            const selectedStyle = {
-                              category: category.name,
-                              categoryId: category.id,
-                              finish: finish.name,
-                              finishId: finish.id.toString(),
-                              finishImage: finish.img,
-                              finishDescription: finish.desc
-                            };
-                            handleFieldChange('selectedStyle', selectedStyle);
-                          }}
-                          className={`group relative p-3 rounded-xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-                            isSelected
-                              ? 'bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200'
-                              : 'bg-white border-stone-200 hover:border-stone-300'
-                          }`}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          {isSelected && (
-                            <div className="absolute top-2 right-2 z-10">
-                              <div className="w-5 h-5 bg-leather-600 rounded-full flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                              </div>
-                            </div>
-                          )}
+                  <h3 className="text-lg font-bold text-mocha-950">
+                    {category.name}
+                  </h3>
+                  <span className="text-sm text-stone-500">
+                    ({category.panels.length} options)
+                  </span>
+                </div>
 
-                          <div className="w-full h-20 bg-stone-200 rounded-lg mb-2 overflow-hidden">
-                            <img 
-                              src={finish.img} 
+                {/* Panel Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {category.panels.map((finish) => {
+                    const isSelected =
+                      smartWallsData.selectedStyle?.finishId === finish.id.toString() &&
+                      smartWallsData.selectedStyle?.categoryId === category.id;
+                    return (
+                      <motion.button
+                        key={`${category.id}-${finish.id}`}
+                        onClick={() => {
+                          const selectedStyle = {
+                            category: category.name,
+                            categoryId: category.id,
+                            finish: finish.name,
+                            finishId: finish.id.toString(),
+                            finishImage: finish.img,
+                            finishDescription: finish.desc,
+                            stock: finish.stock || 0,
+                          };
+                          handleFieldChange("selectedStyle", selectedStyle);
+                        }}
+                        className={`group relative p-3 rounded-xl border-2 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                          isSelected
+                            ? "bg-gradient-to-br from-leather-50 to-leather-100 border-leather-300 ring-2 ring-leather-200"
+                            : "bg-white border-stone-200 hover:border-stone-300"
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {/* Selected Checkmark */}
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <div className="w-5 h-5 bg-leather-600 rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Image */}
+                        <div className="w-full h-20 bg-stone-200 rounded-lg mb-2 overflow-hidden flex items-center justify-center">
+                          {finish.img ? (
+                            <img
+                              src={finish.img.startsWith("/") ? finish.img : `/textures/${finish.img}`}
                               alt={finish.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.style.display = "none";
                               }}
                             />
-                          </div>
-                          
-                          <h4 className="font-semibold text-mocha-950 text-xs mb-1">{finish.name}</h4>
-                          <p className="text-xs text-stone-600 leading-tight line-clamp-2">{finish.desc}</p>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+                          ) : (
+                            <span className="text-xs text-stone-500">No Image</span>
+                          )}
+                        </div>
+
+                        {/* Name categoryId: category.id*/}
+                        <h5 className="text-xs text-stone-600 leading-tight line-clamp-2 mb-1">
+                          {finish.id}
+                        </h5>
+
+                        <h4 className="font-semibold text-mocha-950 text-xs mb-1">
+                          {finish.name}
+                        </h4>
+
+                        {/* Description */}
+                        {finish.desc && (
+                          <p className="text-xs text-stone-600 leading-tight line-clamp-2">
+                            {finish.desc}
+                          </p>
+                        )}
+
+                        {/* Stock */}
+                        {finish.stock !== undefined && (
+                          <p className="text-xs mt-1 font-medium text-green-700">
+                            In Stock: {finish.stock}
+                          </p>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
+        </div>
+
 
           {/* Next Button */}
           {isStyleSelected() && (
