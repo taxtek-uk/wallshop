@@ -5,15 +5,15 @@ import { X, CheckCircle, AlertCircle, Loader2, Layers, Square, Gem, TreePine} fr
 
 
 
-export const textureCategories = [
+const textureCategories = [
   {
     id: 'fabric',
     name: "Cloth Pattern Series",
     desc: "Soft textile pattern with acoustic value.",
     icon: Layers,
     img: "/images/carbon-rock-boards/cloth.jpg",
-    color: "from-rose-100 to-pink-100",
-    accent: "rose-600",
+    color: "from-leather-100 to-mocha-100",
+    accent: "leather-600",
     panels: [
       { id: "T6301", name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls", stock: 10 },
       { id: "S6029", name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls", stock: 10 },
@@ -34,7 +34,7 @@ export const textureCategories = [
       { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
       { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
       { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
-      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical rosewood", stock: 10 },
+      { id: "T9012", name: "leatherwood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
       { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
       { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
     ]
@@ -300,12 +300,12 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-gradient-to-br from-rose-500 via-pink-600 to-rose-700 px-6 py-4 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/90 via-pink-600/90 to-rose-700/90"></div>
+          <div className="bg-gradient-to-br from-leather-500 via-mocha-600 to-leather-700 px-6 py-4 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-leather-500/90 via-mocha-600/90 to-leather-700/90"></div>
             <div className="relative z-10 flex items-center justify-between">
               <div>
                 <h1 className="text-xl font-semibold">Carbon Rock Boards Quote</h1>
-                <p className="text-rose-100 text-sm opacity-90">Get your personalized quotation</p>
+                <p className="text-leather-100 text-sm opacity-90">Get your personalized quotation</p>
               </div>
               <button 
                 onClick={handleClose} 
@@ -342,7 +342,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                 </div>
                 <button
                   onClick={handleClose}
-                  className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="bg-gradient-to-r from-leather-500 to-mocha-600 hover:from-leather-600 hover:to-mocha-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Close
                 </button>
@@ -361,7 +361,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                 <div className="flex gap-3 justify-center">
                   <button
                     onClick={() => setSubmissionState('idle')}
-                    className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200"
+                    className="bg-gradient-to-r from-leather-500 to-mocha-600 hover:from-leather-600 hover:to-mocha-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200"
                   >
                     Try Again
                   </button>
@@ -381,14 +381,14 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     <div key={i} className="flex items-center">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
                         i <= step 
-                          ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg' 
+                          ? 'bg-gradient-to-r from-leather-500 to-mocha-600 text-white shadow-lg' 
                           : 'bg-gray-200 text-gray-500'
                       }`}>
                         {i}
                       </div>
                       {i < 6 && (
                         <div className={`w-8 h-0.5 mx-2 transition-all duration-200 ${
-                          i < step ? 'bg-gradient-to-r from-rose-500 to-pink-600' : 'bg-gray-200'
+                          i < step ? 'bg-gradient-to-r from-leather-500 to-mocha-600' : 'bg-gray-200'
                         }`} />
                       )}
                     </div>
@@ -420,7 +420,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               placeholder="3.5" 
                               step="0.1" 
                               min="0.1"
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -434,7 +434,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               placeholder="2.4" 
                               step="0.1" 
                               min="0.1"
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -465,16 +465,12 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               name="thickness" 
                               value={formData.thickness} 
                               onChange={handleChange} 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required
                             >
                               <option value="">Select Thickness</option>
-                              <option value="6">6mm</option>
+                              <option value="6">5mm</option>
                               <option value="8">8mm</option>
-                              <option value="10">10mm</option>
-                              <option value="12">12mm</option>
-                              <option value="15">15mm</option>
-                              <option value="18">18mm</option>
                             </select>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -484,7 +480,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                 name="boardWidth" 
                                 value={formData.boardWidth} 
                                 onChange={handleChange} 
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                                 required
                               >
                                 <option value="">Select Width</option>
@@ -500,7 +496,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                 name="boardHeight" 
                                 value={formData.boardHeight} 
                                 onChange={handleChange} 
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                                 required
                               >
                                 <option value="">Select Height</option>
@@ -550,7 +546,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               name="style" 
                               value={formData.style} 
                               onChange={handleChange} 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required
                             >
                               <option value="">Select Style</option>
@@ -571,7 +567,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                   <div key={panel.id} className="flex flex-col items-center space-y-2">
                                      <motion.div
                                       onClick={() => handleFinishSelect(panel.id)}
-                                      className={`relative aspect-square w-full cursor-pointer transition-all duration-200 transform hover:scale-105 overflow-hidden rounded-full ${formData.finish === panel.id ? 'ring-4 ring-offset-2 ring-rose-500' : 'ring-1 ring-gray-200'}`}
+                                      className={`relative aspect-square w-full cursor-pointer transition-all duration-200 transform hover:scale-105 overflow-hidden rounded-full ${formData.finish === panel.id ? 'ring-4 ring-offset-2 ring-leather-500' : 'ring-1 ring-gray-200'}`}
                                       whileTap={{ scale: 0.95 }}
                                       >
                                       <img 
@@ -580,7 +576,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                         className="w-full h-full object-cover rounded-full" 
                                       />
                                       {formData.finish === panel.id && (
-                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-rose-600 rounded-full flex items-center justify-center text-white">
+                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center text-white">
                                           <CheckCircle size={16} />
                                         </div>
                                       )}
@@ -615,7 +611,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               name="installation" 
                               value="professional" 
                               onChange={handleChange}
-                              className="mt-1 text-rose-600 focus:ring-rose-500"
+                              className="mt-1 text-leather-600 focus:ring-leather-500"
                             />
                             <div>
                               <div className="font-medium text-gray-800">Professional Installation</div>
@@ -628,7 +624,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               name="installation" 
                               value="diy" 
                               onChange={handleChange}
-                              className="mt-1 text-rose-600 focus:ring-rose-500"
+                              className="mt-1 text-leather-600 focus:ring-leather-500"
                             />
                             <div>
                               <div className="font-medium text-gray-800">DIY Installation Kit</div>
@@ -654,7 +650,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               value={formData.name} 
                               onChange={handleChange} 
                               placeholder="John Smith" 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -666,7 +662,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               value={formData.email} 
                               onChange={handleChange} 
                               placeholder="john@example.com" 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -678,7 +674,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               value={formData.phone} 
                               onChange={handleChange} 
                               placeholder="+44 7123 456789" 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -690,7 +686,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               value={formData.company} 
                               onChange={handleChange} 
                               placeholder="Your Company Ltd" 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                             />
                           </div>
                           <div className="space-y-2 md:col-span-2">
@@ -701,7 +697,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               value={formData.location} 
                               onChange={handleChange} 
                               placeholder="London, UK" 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -752,7 +748,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                         <button 
                           type="submit" 
                           disabled={submissionState === 'submitting'}
-                          className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto shadow-lg hover:shadow-xl"
+                          className="bg-gradient-to-r from-leather-500 to-mocha-600 hover:from-leather-600 hover:to-mocha-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto shadow-lg hover:shadow-xl"
                         >
                           {submissionState === 'submitting' ? (
                             <>
@@ -785,7 +781,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                       type="button" 
                       onClick={nextStep} 
                       disabled={!validateStep(step)}
-                      className="px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="px-6 py-3 bg-gradient-to-r from-leather-500 to-mocha-600 hover:from-leather-600 hover:to-mocha-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       Next
                     </button>
