@@ -403,7 +403,7 @@ function generateCrbQuoteEmailTemplate(data: CrbQuoteData): string {
       <!-- Project Location -->
       <div class="highlight-box" style="background:#fef6f6; padding:20px; border-left:5px solid #f43f5e; border-radius:6px; margin:25px 0;">
         <h4 style="margin:0 0 6px; font-size:16px; color:#222;">Project Location</h4>
-        <p style="margin:0; font-size:16px; font-weight:500;">${data.location}</p>
+        <p style="margin:0; font-size:16px; color:#222; font-weight:500;">${data.location}</p>
       </div>
 
       <!-- Customer Info -->
