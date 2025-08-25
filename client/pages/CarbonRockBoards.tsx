@@ -186,7 +186,7 @@ const CarbonRockBoards = () => {
       {/* Left Content */}
       <div>
         <span className="inline-block bg-gradient-to-br from-[#b69777] to-[#907252] text-white px-4 py-2 rounded-full text-sm font-semibold shadow mb-6">
-          🔥 Carbon Rock Boards
+          Carbon Rock Boards
         </span>
         <h1 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight text-white drop-shadow">
           Next-Gen Decorative Wall Panels
@@ -204,13 +204,7 @@ const CarbonRockBoards = () => {
             >
               Get Free Quote <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-2 border-white text-white hover:bg-white hover:text-[#b69777] px-8 py-4 text-lg font-bold"
-          >
-            Request Free Sample
-          </Button>
+        
         </div>
       </div>
 
@@ -348,7 +342,7 @@ const CarbonRockBoards = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] text-white">
+      {/* <section className="py-20 bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] text-white">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="text-4xl lg:text-5xl font-extrabold mb-6 drop-shadow-lg">
             Get a Quote or Free Sample
@@ -372,10 +366,10 @@ const CarbonRockBoards = () => {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
-      <AIChatWidget />
+      
        <CrbQuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
