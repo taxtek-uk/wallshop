@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => ({
   root: 'client', // index.html now in /client
   build: {
     outDir: '../dist/spa', // Output folder relative to root
+    emptyOutDir: true, // ✅ force Vite to clean even outside root
     rollupOptions: {
       output: {
         manualChunks: {
@@ -61,10 +62,15 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
-        pure_funcs:
-          mode === 'production'
-            ? ['console.log', 'console.info']
-            : []
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
+        // Extra compression passes for smaller bundles
+        passes: 2,
+        pure_getters: true,
+        module: true,
+        toplevel: true
+      },
+      mangle: {
+        toplevel: true
       }
     },
     sourcemap: mode === 'development'
@@ -83,7 +89,15 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './client'),
-      '@shared': path.resolve(__dirname, './shared')
+      '@shared': path.resolve(__dirname, './shared'),
+      ...(mode === 'production'
+        ? {
+            react: 'preact/compat',
+            'react-dom/test-utils': 'preact/test-utils',
+            'react-dom': 'preact/compat',
+            'react/jsx-runtime': 'preact/jsx-runtime'
+          }
+        : {})
     }
   },
   optimizeDeps: {

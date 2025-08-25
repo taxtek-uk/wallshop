@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import TextureSection from "@/components/TextureSection"
 import Footer from "@/components/Footer";
-import QuoteModal from "@/components/QuoteModal";
+import CrbQuoteModal from "@/components/CrbQuoteModal";
 import { Button } from "@/components/ui/button";
 import {
   Shield,
@@ -21,6 +21,8 @@ import {
   Warehouse,
   ChevronRight,
 } from "lucide-react";
+
+
 
 // AI Chatbot widget (basic floating bubble, triggers chat on click)
 const AIChatWidget = () => (
@@ -374,7 +376,7 @@ const CarbonRockBoards = () => {
 
       <Footer />
       <AIChatWidget />
-      <QuoteModal
+       <CrbQuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
         productCategory="carbon-rock-boards"

@@ -2,13 +2,15 @@ import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { QuoteProvider } from "@/contexts/QuoteContext";
+
+// Lazy-load Sonner toaster to keep it out of initial bundle
+const SonnerToaster = lazy(() => import("@/components/ui/sonner").then(m => ({ default: m.Toaster })));
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -80,7 +82,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Suspense fallback={null}>
+        <SonnerToaster />
+      </Suspense>
       <BrowserRouter>
         <HelmetProvider>
           <QuoteProvider>
