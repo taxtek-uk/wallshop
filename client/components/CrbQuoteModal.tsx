@@ -227,8 +227,10 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
         body: JSON.stringify(formData),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to submit quote request');
+        throw new Error(result.error || 'Failed to submit quote request');
       }
 
       setSubmissionState('success');
@@ -298,12 +300,12 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-leather-600 to-leather-700 px-6 py-4 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-leather-600/90 to-leather-700/90"></div>
+          <div className="bg-gradient-to-br from-rose-500 via-pink-600 to-rose-700 px-6 py-4 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/90 via-pink-600/90 to-rose-700/90"></div>
             <div className="relative z-10 flex items-center justify-between">
               <div>
                 <h1 className="text-xl font-semibold">Carbon Rock Boards Quote</h1>
-                <p className="text-leather-100 text-sm opacity-90">Get your personalized quotation</p>
+                <p className="text-rose-100 text-sm opacity-90">Get your personalized quotation</p>
               </div>
               <button 
                 onClick={handleClose} 
@@ -329,13 +331,18 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                 >
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </motion.div>
-                <h2 className="text-2xl font-semibold text-leather-800 mb-2">Quote Request Submitted!</h2>
-                <p className="text-leather-600 mb-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Quote Request Submitted!</h2>
+                <p className="text-gray-600 mb-4">
                   Thank you for your interest. Our team will review your requirements and contact you within 24 hours with a detailed quotation.
                 </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p className="text-blue-800 text-sm">
+                    📧 A copy of your request has been sent to your email address for your records.
+                  </p>
+                </div>
                 <button
                   onClick={handleClose}
-                  className="btn-luxury-earthy px-6 py-3 rounded-lg font-medium transition-all duration-200"
+                  className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Close
                 </button>
@@ -349,18 +356,18 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertCircle className="w-8 h-8 text-red-600" />
                 </div>
-                <h2 className="text-2xl font-semibold text-leather-800 mb-2">Submission Failed</h2>
-                <p className="text-leather-600 mb-6">{errorMessage}</p>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Submission Failed</h2>
+                <p className="text-gray-600 mb-6">{errorMessage}</p>
                 <div className="flex gap-3 justify-center">
                   <button
                     onClick={() => setSubmissionState('idle')}
-                    className="btn-luxury-earthy px-6 py-3 rounded-lg font-medium transition-all duration-200"
+                    className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200"
                   >
                     Try Again
                   </button>
                   <button
                     onClick={handleClose}
-                    className="px-6 py-3 border border-leather-300 text-leather-700 rounded-lg font-medium hover:bg-leather-50 transition-all duration-200"
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200"
                   >
                     Close
                   </button>
@@ -368,21 +375,26 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Progress Indicator */}
-                <div className="flex items-center justify-between text-sm text-leather-600 mb-8">
-                  <span className="font-medium">Step {step} of 6</span>
-                  <div className="flex-1 mx-4 bg-leather-100 rounded-full h-2 overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-gradient-to-r from-leather-600 to-leather-700 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(step / 6) * 100}%` }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </div>
-                  <span className="text-xs text-leather-500">{Math.round((step / 6) * 100)}%</span>
+                {/* Progress indicator */}
+                <div className="flex items-center justify-between mb-8">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="flex items-center">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
+                        i <= step 
+                          ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg' 
+                          : 'bg-gray-200 text-gray-500'
+                      }`}>
+                        {i}
+                      </div>
+                      {i < 6 && (
+                        <div className={`w-8 h-0.5 mx-2 transition-all duration-200 ${
+                          i < step ? 'bg-gradient-to-r from-rose-500 to-pink-600' : 'bg-gray-200'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
                 </div>
 
-                {/* Step Content */}
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step}
@@ -394,48 +406,47 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 1 && (
                       <div className="space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Project Dimensions</h2>
-                          <p className="text-leather-600 text-sm mb-6">Enter the dimensions of your wall area</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Project Dimensions</h2>
+                          <p className="text-gray-600 text-sm mb-6">Enter the dimensions of your wall or project area</p>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Width (meters)</label>
+                            <label className="block text-sm font-medium text-gray-700">Width (meters) *</label>
                             <input 
                               type="number" 
                               name="width" 
                               value={formData.width} 
                               onChange={handleChange} 
-                              placeholder="e.g., 3.5" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
-                              required 
-                              step="0.1"
+                              placeholder="3.5" 
+                              step="0.1" 
                               min="0.1"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              required 
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Height (meters)</label>
+                            <label className="block text-sm font-medium text-gray-700">Height (meters) *</label>
                             <input 
                               type="number" 
                               name="height" 
                               value={formData.height} 
                               onChange={handleChange} 
-                              placeholder="e.g., 2.4" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
-                              required 
-                              step="0.1"
+                              placeholder="2.4" 
+                              step="0.1" 
                               min="0.1"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
+                              required 
                             />
                           </div>
                         </div>
-                        {formData.totalArea > 0 && (
+                        {formData.width && formData.height && (
                           <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-leather-50 border border-leather-200 rounded-lg p-4"
+                            className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center"
                           >
-                            <p className="text-leather-700 font-medium">
-                              Total Area: <span className="text-leather-800">{formData.totalArea.toFixed(2)} m²</span>
-                            </p>
+                            <p className="text-gray-600 text-sm">Total Area</p>
+                            <p className="text-2xl font-semibold text-gray-800">{formData.totalArea.toFixed(2)} m²</p>
                           </motion.div>
                         )}
                       </div>
@@ -444,73 +455,79 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 2 && (
                       <div className="space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Board Specifications</h2>
-                          <p className="text-leather-600 text-sm mb-6">Choose your preferred board dimensions and thickness</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Board Specifications</h2>
+                          <p className="text-gray-600 text-sm mb-6">Choose your board thickness and dimensions</p>
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Thickness</label>
+                            <label className="block text-sm font-medium text-gray-700">Thickness *</label>
                             <select 
                               name="thickness" 
                               value={formData.thickness} 
                               onChange={handleChange} 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required
                             >
                               <option value="">Select Thickness</option>
-                              <option value="5">5mm - Standard</option>
-                              <option value="8">8mm - Premium</option>
+                              <option value="6">6mm</option>
+                              <option value="8">8mm</option>
+                              <option value="10">10mm</option>
+                              <option value="12">12mm</option>
+                              <option value="15">15mm</option>
+                              <option value="18">18mm</option>
                             </select>
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="block text-sm font-medium text-leather-700">Board Width</label>
+                              <label className="block text-sm font-medium text-gray-700">Board Width (mm) *</label>
                               <select 
                                 name="boardWidth" 
                                 value={formData.boardWidth} 
                                 onChange={handleChange} 
-                                className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                                 required
                               >
                                 <option value="">Select Width</option>
-                                <option value="1000">1000mm</option>
                                 <option value="1220">1220mm</option>
+                                <option value="1200">1200mm</option>
+                                <option value="915">915mm</option>
+                                <option value="600">600mm</option>
                               </select>
                             </div>
                             <div className="space-y-2">
-                              <label className="block text-sm font-medium text-leather-700">Board Height</label>
+                              <label className="block text-sm font-medium text-gray-700">Board Height (mm) *</label>
                               <select 
                                 name="boardHeight" 
                                 value={formData.boardHeight} 
                                 onChange={handleChange} 
-                                className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                                 required
                               >
                                 <option value="">Select Height</option>
+                                <option value="2440">2440mm</option>
                                 <option value="2400">2400mm</option>
-                                <option value="2600">2600mm</option>
-                                <option value="2800">2800mm</option>
-                                <option value="3000">3000mm</option>
+                                <option value="1830">1830mm</option>
+                                <option value="1220">1220mm</option>
                               </select>
                             </div>
                           </div>
-                          {formData.totalBoards > 0 && (
+                          {formData.totalArea && formData.boardWidth && formData.boardHeight && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="bg-leather-50 border border-leather-200 rounded-lg p-4 space-y-2"
+                              className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2"
                             >
                               <div className="grid grid-cols-3 gap-4 text-sm">
                                 <div className="text-center">
-                                  <p className="text-leather-600">Boards Needed</p>
-                                  <p className="text-xl font-semibold text-leather-800">{formData.totalBoards}</p>
+                                  <p className="text-gray-600">Boards Needed</p>
+                                  <p className="text-xl font-semibold text-gray-800">{formData.totalBoards}</p>
                                 </div>
                                 <div className="text-center">
-                                  <p className="text-leather-600">Efficiency</p>
+                                  <p className="text-gray-600">Efficiency</p>
                                   <p className="text-xl font-semibold text-green-600">{formData.efficiency}%</p>
                                 </div>
                                 <div className="text-center">
-                                  <p className="text-leather-600">Waste</p>
+                                  <p className="text-gray-600">Waste</p>
                                   <p className="text-xl font-semibold text-orange-600">{formData.waste}%</p>
                                 </div>
                               </div>
@@ -523,17 +540,17 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 3 && (
                       <div className="space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Style & Finish</h2>
-                          <p className="text-leather-600 text-sm mb-6">Choose your preferred style and finish</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Style & Finish</h2>
+                          <p className="text-gray-600 text-sm mb-6">Choose your preferred style and finish</p>
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Style Category</label>
+                            <label className="block text-sm font-medium text-gray-700">Style Category</label>
                             <select 
                               name="style" 
                               value={formData.style} 
                               onChange={handleChange} 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required
                             >
                               <option value="">Select Style</option>
@@ -548,13 +565,13 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                               animate={{ opacity: 1, y: 0 }}
                               className="space-y-4"
                             >
-                              <label className="block text-sm font-medium text-leather-700">Select Finish</label>
+                              <label className="block text-sm font-medium text-gray-700">Select Finish</label>
                               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                                 {selectedCategory.panels.map(panel => (
                                   <div key={panel.id} className="flex flex-col items-center space-y-2">
                                      <motion.div
                                       onClick={() => handleFinishSelect(panel.id)}
-                                      className={`relative aspect-square w-full cursor-pointer transition-all duration-200 transform hover:scale-105 overflow-hidden rounded-full ${formData.finish === panel.id ? 'ring-4 ring-offset-2 ring-leather-500' : 'ring-1 ring-leather-200'}`}
+                                      className={`relative aspect-square w-full cursor-pointer transition-all duration-200 transform hover:scale-105 overflow-hidden rounded-full ${formData.finish === panel.id ? 'ring-4 ring-offset-2 ring-rose-500' : 'ring-1 ring-gray-200'}`}
                                       whileTap={{ scale: 0.95 }}
                                       >
                                       <img 
@@ -563,7 +580,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                         className="w-full h-full object-cover rounded-full" 
                                       />
                                       {formData.finish === panel.id && (
-                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-leather-600 rounded-full flex items-center justify-center text-white">
+                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-rose-600 rounded-full flex items-center justify-center text-white">
                                           <CheckCircle size={16} />
                                         </div>
                                       )}
@@ -572,7 +589,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                                     {/* ✅ Name and Finish ID under image */}
                                     <div className="text-center">
                                       <p className="text-xs text-gray-500 mt-2">{panel.id}</p>
-                                      <p className="text-sm font-medium text-leather-800">{panel.name}</p>
+                                      <p className="text-sm font-medium text-gray-800">{panel.name}</p>
                                      
                                     </div>
                                   </div>
@@ -588,34 +605,34 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 4 && (
                       <div className="space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Installation Preference</h2>
-                          <p className="text-leather-600 text-sm mb-6">How would you like to install your boards?</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Installation Preference</h2>
+                          <p className="text-gray-600 text-sm mb-6">How would you like to install your boards?</p>
                         </div>
                         <div className="space-y-3">
-                          <label className="flex items-start gap-3 p-4 border border-leather-200 rounded-lg cursor-pointer hover:bg-leather-50 transition-all duration-200">
+                          <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
                             <input 
                               type="radio" 
                               name="installation" 
                               value="professional" 
                               onChange={handleChange}
-                              className="mt-1 text-leather-600 focus:ring-leather-500"
+                              className="mt-1 text-rose-600 focus:ring-rose-500"
                             />
                             <div>
-                              <div className="font-medium text-leather-800">Professional Installation</div>
-                              <div className="text-sm text-leather-600">Our certified installers will handle everything (Recommended)</div>
+                              <div className="font-medium text-gray-800">Professional Installation</div>
+                              <div className="text-sm text-gray-600">Our certified installers will handle everything (Recommended)</div>
                             </div>
                           </label>
-                          <label className="flex items-start gap-3 p-4 border border-leather-200 rounded-lg cursor-pointer hover:bg-leather-50 transition-all duration-200">
+                          <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200">
                             <input 
                               type="radio" 
                               name="installation" 
                               value="diy" 
                               onChange={handleChange}
-                              className="mt-1 text-leather-600 focus:ring-leather-500"
+                              className="mt-1 text-rose-600 focus:ring-rose-500"
                             />
                             <div>
-                              <div className="font-medium text-leather-800">DIY Installation Kit</div>
-                              <div className="text-sm text-leather-600">Includes detailed instructions and all necessary hardware</div>
+                              <div className="font-medium text-gray-800">DIY Installation Kit</div>
+                              <div className="text-sm text-gray-600">Includes detailed instructions and all necessary hardware</div>
                             </div>
                           </label>
                         </div>
@@ -625,66 +642,66 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 5 && (
                       <div className="space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Contact Information</h2>
-                          <p className="text-leather-600 text-sm mb-6">We'll use this information to send your quotation</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Contact Information</h2>
+                          <p className="text-gray-600 text-sm mb-6">We'll use this information to send your quotation</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Full Name *</label>
+                            <label className="block text-sm font-medium text-gray-700">Full Name *</label>
                             <input 
                               type="text" 
                               name="name" 
                               value={formData.name} 
                               onChange={handleChange} 
                               placeholder="John Smith" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Email Address *</label>
+                            <label className="block text-sm font-medium text-gray-700">Email Address *</label>
                             <input 
                               type="email" 
                               name="email" 
                               value={formData.email} 
                               onChange={handleChange} 
                               placeholder="john@example.com" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Phone Number *</label>
+                            <label className="block text-sm font-medium text-gray-700">Phone Number *</label>
                             <input 
                               type="tel" 
                               name="phone" 
                               value={formData.phone} 
                               onChange={handleChange} 
                               placeholder="+44 7123 456789" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-sm font-medium text-leather-700">Company (Optional)</label>
+                            <label className="block text-sm font-medium text-gray-700">Company (Optional)</label>
                             <input 
                               type="text" 
                               name="company" 
                               value={formData.company} 
                               onChange={handleChange} 
                               placeholder="Your Company Ltd" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                             />
                           </div>
                           <div className="space-y-2 md:col-span-2">
-                            <label className="block text-sm font-medium text-leather-700">Project Location *</label>
+                            <label className="block text-sm font-medium text-gray-700">Project Location *</label>
                             <input 
                               type="text" 
                               name="location" 
                               value={formData.location} 
                               onChange={handleChange} 
                               placeholder="London, UK" 
-                              className="w-full px-4 py-3 border border-leather-200 rounded-lg focus:ring-2 focus:ring-leather-500 focus:border-transparent transition-all duration-200 bg-white"
+                              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 bg-white"
                               required 
                             />
                           </div>
@@ -695,39 +712,39 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                     {step === 6 && (
                       <div className="text-center space-y-6">
                         <div>
-                          <h2 className="text-2xl font-semibold mb-2 text-leather-800">Review & Submit</h2>
-                          <p className="text-leather-600 text-sm mb-6">Please review your information before submitting</p>
+                          <h2 className="text-2xl font-semibold mb-2 text-gray-800">Review & Submit</h2>
+                          <p className="text-gray-600 text-sm mb-6">Please review your information before submitting</p>
                         </div>
                         
-                        <div className="bg-leather-50 border border-leather-200 rounded-lg p-6 text-left space-y-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-left space-y-4">
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-leather-600">Dimensions:</span>
-                              <span className="ml-2 font-medium text-leather-800">{formData.width}m × {formData.height}m</span>
+                              <span className="text-gray-600">Dimensions:</span>
+                              <span className="ml-2 font-medium text-gray-800">{formData.width}m × {formData.height}m</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Total Area:</span>
-                              <span className="ml-2 font-medium text-leather-800">{formData.totalArea.toFixed(2)} m²</span>
+                              <span className="text-gray-600">Total Area:</span>
+                              <span className="ml-2 font-medium text-gray-800">{formData.totalArea.toFixed(2)} m²</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Thickness:</span>
-                              <span className="ml-2 font-medium text-leather-800">{formData.thickness}mm</span>
+                              <span className="text-gray-600">Thickness:</span>
+                              <span className="ml-2 font-medium text-gray-800">{formData.thickness}mm</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Board Size:</span>
-                              <span className="ml-2 font-medium text-leather-800">{formData.boardWidth}×{formData.boardHeight}mm</span>
+                              <span className="text-gray-600">Board Size:</span>
+                              <span className="ml-2 font-medium text-gray-800">{formData.boardWidth}×{formData.boardHeight}mm</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Style:</span>
-                              <span className="ml-2 font-medium text-leather-800">{selectedCategory?.name}</span>
+                              <span className="text-gray-600">Style:</span>
+                              <span className="ml-2 font-medium text-gray-800">{selectedCategory?.name}</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Finish:</span>
-                              <span className="ml-2 font-medium text-leather-800">{selectedCategory?.panels.find(p => p.id === formData.finish)?.name}</span>
+                              <span className="text-gray-600">Finish:</span>
+                              <span className="ml-2 font-medium text-gray-800">{selectedCategory?.panels.find(p => p.id === formData.finish)?.name}</span>
                             </div>
                             <div>
-                              <span className="text-leather-600">Installation:</span>
-                              <span className="ml-2 font-medium text-leather-800">{formData.installation === 'professional' ? 'Professional' : 'DIY Kit'}</span>
+                              <span className="text-gray-600">Installation:</span>
+                              <span className="ml-2 font-medium text-gray-800">{formData.installation === 'professional' ? 'Professional' : 'DIY Kit'}</span>
                             </div>
                           </div>
                         </div>
@@ -735,7 +752,7 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                         <button 
                           type="submit" 
                           disabled={submissionState === 'submitting'}
-                          className="btn-luxury-earthy px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
+                          className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto shadow-lg hover:shadow-xl"
                         >
                           {submissionState === 'submitting' ? (
                             <>
@@ -752,12 +769,12 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                 </AnimatePresence>
 
                 {/* Navigation */}
-                <div className="flex justify-between pt-6 border-t border-leather-100">
+                <div className="flex justify-between pt-6 border-t border-gray-100">
                   {step > 1 ? (
                     <button 
                       type="button" 
                       onClick={prevStep} 
-                      className="px-6 py-3 border border-leather-300 text-leather-700 rounded-lg font-medium hover:bg-leather-50 transition-all duration-200"
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200"
                     >
                       Back
                     </button>
@@ -768,9 +785,9 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
                       type="button" 
                       onClick={nextStep} 
                       disabled={!validateStep(step)}
-                      className="px-6 py-3 bg-leather-700 text-white rounded-lg font-medium hover:bg-leather-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      className="px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
-                      Next Step
+                      Next
                     </button>
                   )}
                 </div>
@@ -782,4 +799,3 @@ export default function CrbQuoteModal({ isOpen, onClose, productCategory }: CrbQ
     </AnimatePresence>
   );
 }
-

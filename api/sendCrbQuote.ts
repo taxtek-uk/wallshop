@@ -155,7 +155,7 @@ function generateCrbQuoteEmailTemplate(data: CrbQuoteData): string {
             color: #2c3e50;
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0;
             background-color: #f8f9fa;
         }
         .container {
@@ -163,22 +163,39 @@ function generateCrbQuoteEmailTemplate(data: CrbQuoteData): string {
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
+            margin: 20px;
         }
         .header {
-            background: linear-gradient(135deg, #865d36, #93785b);
+            background: linear-gradient(135deg, #f43f5e 0%, #be185d 50%, #831843 100%);
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.9) 0%, rgba(190, 24, 93, 0.9) 50%, rgba(131, 24, 67, 0.9) 100%);
+        }
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         .header h1 {
             margin: 0;
             font-size: 28px;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         .header p {
             margin: 10px 0 0 0;
-            opacity: 0.9;
+            opacity: 0.95;
             font-size: 16px;
+            font-weight: 400;
         }
         .content {
             padding: 30px;
@@ -188,77 +205,110 @@ function generateCrbQuoteEmailTemplate(data: CrbQuoteData): string {
             padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
-            border-left: 4px solid #865d36;
+            border-left: 4px solid #f43f5e;
         }
         .section h3 {
             margin: 0 0 15px 0;
-            color: #865d36;
+            color: #831843;
             font-size: 18px;
             font-weight: 600;
         }
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 15px;
         }
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
+        .detail-table td {
+            padding: 12px 15px;
             border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
         }
-        .detail-label {
+        .detail-table td:first-child {
             font-weight: 500;
             color: #6c757d;
+            width: 40%;
         }
-        .detail-value {
+        .detail-table td:last-child {
             font-weight: 600;
             color: #2c3e50;
         }
         .highlight-box {
-            background: linear-gradient(135deg, #865d36, #93785b);
+            background: linear-gradient(135deg, #f43f5e 0%, #be185d 50%, #831843 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
             text-align: center;
-            margin: 20px 0;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
         }
         .highlight-box h4 {
             margin: 0 0 10px 0;
             font-size: 20px;
+            font-weight: 600;
         }
         .contact-info {
             background: #2c3e50;
             color: white;
-            padding: 25px;
+            padding: 30px;
             text-align: center;
         }
         .contact-info h4 {
-            margin: 0 0 15px 0;
-            font-size: 18px;
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            font-weight: 600;
         }
         .contact-details {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 15px;
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .contact-row {
+            display: table-row;
         }
         .contact-item {
+            display: table-cell;
             text-align: center;
+            padding: 10px;
+            vertical-align: top;
         }
         .contact-item strong {
             display: block;
-            margin-bottom: 5px;
-            color: #93785b;
+            margin-bottom: 8px;
+            color: #f43f5e;
+            font-weight: 600;
+        }
+        .company-signature {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #495057;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .disclaimer {
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.4;
+            border-top: 1px solid #dee2e6;
         }
         @media (max-width: 600px) {
-            .detail-grid {
-                grid-template-columns: 1fr;
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header, .content, .contact-info {
+                padding: 20px;
             }
             .contact-details {
-                flex-direction: column;
-                gap: 10px;
+                display: block;
+            }
+            .contact-item {
+                display: block;
+                margin-bottom: 15px;
+            }
+            .detail-table td {
+                padding: 8px 10px;
             }
         }
     </style>
@@ -266,133 +316,150 @@ function generateCrbQuoteEmailTemplate(data: CrbQuoteData): string {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Carbon Rock Boards Quote Request</h1>
-            <p>Professional Wall Solutions by The Wall Shop</p>
+            <div class="header-content">
+                <h1>Carbon Rock Boards Quote Request</h1>
+                <p>Professional Wall Solutions by The Wall Shop</p>
+            </div>
         </div>
         
         <div class="content">
-            <p>Dear Stephen,</p>
-            <p>We have received a new Carbon Rock Boards quote request. Please find the details below:</p>
+            <p>Dear Team,</p>
+            <p>We have received a new Carbon Rock Boards quote request. Please find the complete details below:</p>
             
             <div class="section">
                 <h3>Project Dimensions</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <span class="detail-label">Width:</span>
-                        <span class="detail-value">${data.width}m</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Height:</span>
-                        <span class="detail-value">${data.height}m</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Total Area:</span>
-                        <span class="detail-value">${data.totalArea.toFixed(2)} m²</span>
-                    </div>
-                </div>
+                <table class="detail-table">
+                    <tr>
+                        <td>Width:</td>
+                        <td>${data.width}m</td>
+                    </tr>
+                    <tr>
+                        <td>Height:</td>
+                        <td>${data.height}m</td>
+                    </tr>
+                    <tr>
+                        <td>Total Area:</td>
+                        <td><strong>${data.totalArea.toFixed(2)} m²</strong></td>
+                    </tr>
+                </table>
             </div>
             
             <div class="section">
-                <h3>📋 Board Specifications</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <span class="detail-label">Thickness:</span>
-                        <span class="detail-value">${data.thickness}mm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Board Size:</span>
-                        <span class="detail-value">${data.boardWidth} × ${data.boardHeight}mm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Boards Needed:</span>
-                        <span class="detail-value">${data.totalBoards}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Efficiency:</span>
-                        <span class="detail-value">${data.efficiency}%</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Waste:</span>
-                        <span class="detail-value">${data.waste}%</span>
-                    </div>
-                </div>
+                <h3>Board Specifications</h3>
+                <table class="detail-table">
+                    <tr>
+                        <td>Thickness:</td>
+                        <td>${data.thickness}mm</td>
+                    </tr>
+                    <tr>
+                        <td>Board Dimensions:</td>
+                        <td>${data.boardWidth} × ${data.boardHeight}mm</td>
+                    </tr>
+                    <tr>
+                        <td>Total Boards Required:</td>
+                        <td><strong>${data.totalBoards} boards</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Material Efficiency:</td>
+                        <td>${data.efficiency}%</td>
+                    </tr>
+                    <tr>
+                        <td>Estimated Waste:</td>
+                        <td>${data.waste}%</td>
+                    </tr>
+                </table>
             </div>
             
             <div class="section">
-                <h3>Style & Finish</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <span class="detail-label">Style Category:</span>
-                        <span class="detail-value">${data.style}</span>
-                    </div>
+                <h3>Style & Finish Selection</h3>
+                <table class="detail-table">
+                    <tr>
+                        <td>Style Category:</td>
+                        <td><strong>${data.style}</strong></td>
+                    </tr>
                     ${data.finish ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Specific Finish:</span>
-                        <span class="detail-value">${data.finish}</span>
-                    </div>
+                    <tr>
+                        <td>Specific Finish:</td>
+                        <td><strong>${data.finish}</strong></td>
+                    </tr>
                     ` : ''}
-                </div>
+                </table>
             </div>
             
             <div class="section">
-                <h3>🔧 Installation</h3>
-                <div class="detail-item">
-                    <span class="detail-label">Preference:</span>
-                    <span class="detail-value">${data.installation === 'professional' ? 'Professional Installation' : 'DIY Installation Kit'}</span>
-                </div>
+                <h3>Installation Requirements</h3>
+                <table class="detail-table">
+                    <tr>
+                        <td>Installation Preference:</td>
+                        <td><strong>${data.installation === 'professional' ? 'Professional Installation Required' : 'DIY Installation Kit'}</strong></td>
+                    </tr>
+                </table>
             </div>
             
             <div class="highlight-box">
                 <h4>📍 Project Location</h4>
-                <p style="margin: 0; font-size: 18px;">${data.location}</p>
+                <p style="margin: 0; font-size: 18px; font-weight: 500;">${data.location}</p>
             </div>
             
             <div class="section">
                 <h3>👤 Customer Information</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <span class="detail-label">Name:</span>
-                        <span class="detail-value">${data.name}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Email:</span>
-                        <span class="detail-value">${data.email}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Phone:</span>
-                        <span class="detail-value">${data.phone}</span>
-                    </div>
+                <table class="detail-table">
+                    <tr>
+                        <td>Full Name:</td>
+                        <td><strong>${data.name}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Email Address:</td>
+                        <td><a href="mailto:${data.email}" style="color: #f43f5e; text-decoration: none;">${data.email}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Phone Number:</td>
+                        <td><a href="tel:${data.phone}" style="color: #f43f5e; text-decoration: none;">${data.phone}</a></td>
+                    </tr>
                     ${data.company ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Company:</span>
-                        <span class="detail-value">${data.company}</span>
-                    </div>
+                    <tr>
+                        <td>Company:</td>
+                        <td><strong>${data.company}</strong></td>
+                    </tr>
                     ` : ''}
-                </div>
+                </table>
             </div>
             
-            <p style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #17a2b8;">
-                <strong>Submitted:</strong> ${currentDate}<br>
-                <strong>Response Time:</strong> We aim to respond within 24 hours with a detailed quotation.
+            <p style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #e8f4f8, #f0f9ff); border-radius: 8px; border-left: 4px solid #17a2b8;">
+                <strong>Submission Date:</strong> ${currentDate}<br>
+                <strong>Response Commitment:</strong> We aim to respond within 24 hours with a detailed quotation and next steps.
             </p>
         </div>
         
         <div class="contact-info">
-            <h4>The Wall Shop Contact Information</h4>
+            <h4>Contact Information</h4>
             <div class="contact-details">
-                <div class="contact-item">
-                    <strong>Phone</strong>
-                    +44 141 739 3377
-                </div>
-                <div class="contact-item">
-                    <strong>Email</strong>
-                    stephen@thewallshop.co.uk
-                </div>
-                <div class="contact-item">
-                    <strong>Website</strong>
-                    thewallshop.co.uk
+                <div class="contact-row">
+                    <div class="contact-item">
+                        <strong>Phone</strong>
+                        +44 141 739 3377
+                    </div>
+                    <div class="contact-item">
+                        <strong>Email</strong>
+                        info@thewallshop.co.uk
+                    </div>
+                    <div class="contact-item">
+                        <strong>Business Hours</strong>
+                        Monday - Friday<br>9:00 AM - 6:00 PM GMT
+                    </div>
                 </div>
             </div>
+            
+            <div class="company-signature">
+                <strong>Best regards,</strong><br>
+                <strong>The Wall Shop Team</strong><br>
+                SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK<br>
+                Phone: +44 141 739 3377 | Email: info@thewallshop.co.uk
+            </div>
+        </div>
+        
+        <div class="disclaimer">
+            <strong>CONFIDENTIALITY NOTICE:</strong> This email and any attachments are confidential and may be legally privileged. If you are not the intended recipient, please notify the sender immediately and delete this email. Any unauthorized use, disclosure, or distribution is strictly prohibited. The Wall Shop Ltd accepts no liability for any damage caused by any virus transmitted by this email.
         </div>
     </div>
 </body>
@@ -458,12 +525,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Generate email content
     const emailHtml = generateCrbQuoteEmailTemplate(data);
 
-    // Send email to stephen@thewallshop.co.uk with CC to client
+    // Send email to info@thewallshop.co.uk with CC to client
     const emailResult = await resend.emails.send({
       from: 'quotes@thewallshop.co.uk',
-      to: ['stephen@thewallshop.co.uk'],
+      to: ['info@thewallshop.co.uk'],
       cc: [data.email],
-      subject: 'New Carbon Rock Boards Quote Request',
+      subject: `New Carbon Rock Boards Quote Request - ${data.name}`,
       html: emailHtml,
       replyTo: data.email,
     });
@@ -476,7 +543,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Success response
     return res.status(200).json({
       success: true,
-      message: 'Quote request submitted successfully',
+      message: 'Quote request submitted successfully. You will receive a copy of your request via email.',
       emailId: emailResult.data?.id
     });
 
@@ -489,4 +556,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 }
-
