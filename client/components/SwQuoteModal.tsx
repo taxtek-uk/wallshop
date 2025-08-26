@@ -25,7 +25,17 @@ import {
   ChevronRight,
   CheckCircle2,
   AlertTriangle,
-  X, Layers, TreePine, Square, Gem
+  X, 
+  Layers, 
+  TreePine, 
+  Square, 
+  Gem,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 
 /** -----------------------------------------------------------
@@ -38,11 +48,12 @@ type Step =
   | "gaming"
   | "devices"
   | "styles"
+  | "contact"
   | "summary";
 
 type ModuleWidth = 400 | 600 | 800 | 1000 | 1100 | 1200;
 
-type AccessoryKey = "tv" | "fireplace" | "soundbar" | "shelving";
+type AccessoryKey = "tv" | "fireplace" | "soundbar";
 type GamingMode = "single" | "dual";
 
 type GamingOptionKey =
@@ -70,10 +81,6 @@ type DeviceKey =
   | "smartHanger"
   | "skyDomeLight";
 
-
-
-
-
 type StyleCategory = "fabric" | "wood" | "solid" | "stone" | "metallic" | "mirror";
 
 type Finish = {
@@ -82,6 +89,15 @@ type Finish = {
   img: string;
   desc?: string;
   stock?: number;
+};
+
+type ContactInfo = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  message: string;
+  consent: boolean;
 };
 
 type SwQuoteState = {
@@ -117,11 +133,19 @@ type SwQuoteState = {
   styleCategory: StyleCategory | null;
   finish: Finish | null;
 
+  // Contact Information
+  contact: ContactInfo;
+
   // UX ephemeral
   skipConfirm: {
     accessories: boolean; // should we show confirm?
     devices: boolean; // should we show confirm?
   };
+
+  // Submission state
+  isSubmitting: boolean;
+  submitSuccess: boolean;
+  submitError: string | null;
 };
 
 /** -----------------------------------------------------------
@@ -332,7 +356,6 @@ const textureCategories = [
   }
 ];
 
-
 /** -----------------------------------------------------------
  * Helpers
  * --------------------------------------------------------- */
@@ -345,6 +368,16 @@ const mmFrom = (val: string, unit: Unit) => {
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 const numberFormat = (n: number) => new Intl.NumberFormat("en-GB").format(n);
+
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+};
 
 const genAISeo = (state: SwQuoteState) => {
   const keys: string[] = [];
@@ -450,53 +483,55 @@ const injectSEO = (state: SwQuoteState) => {
 };
 
 /** -----------------------------------------------------------
- * Component
+ * Main Component
  * --------------------------------------------------------- */
 export default function SwQuoteModal({
   isOpen,
   onClose,
-  onSubmit, // optional callback to receive payload
+  onSubmit,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (payload: any) => void;
 }) {
   const [step, setStep] = useState<Step>("dimensions");
-
   const [state, setState] = useState<SwQuoteState>({
     widthInput: "",
     widthUnit: "mm",
-    heightInput: String(DEFAULT_HEIGHT),
+    heightInput: "",
     heightUnit: "mm",
-    moduleWidth: 1000,
-
+    moduleWidth: 800,
     widthMm: 0,
-    heightMm: DEFAULT_HEIGHT,
-
+    heightMm: 0,
     accessories: { tv: false, fireplace: false, soundbar: false, shelvingQty: 0 },
-
     gaming: { mode: null, options: {} },
-
     devices: {},
-
     styleCategory: null,
     finish: null,
-
+    contact: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      message: "",
+      consent: false,
+    },
     skipConfirm: { accessories: false, devices: false },
+    isSubmitting: false,
+    submitSuccess: false,
+    submitError: null,
   });
 
-  // Normalize to mm on change
+  // Derive normalized dimensions
   useEffect(() => {
-    setState((prev) => ({
-      ...prev,
-      widthMm: mmFrom(prev.widthInput, prev.widthUnit),
-      heightMm: clamp(mmFrom(prev.heightInput, prev.heightUnit), HEIGHT_MIN, HEIGHT_MAX),
-    }));
-  }, [state.widthInput, state.widthUnit, state.heightInput, state.heightUnit]); // eslint-disable-line
+    const widthMm = mmFrom(state.widthInput, state.widthUnit);
+    const heightMm = mmFrom(state.heightInput, state.heightUnit);
+    const clampedHeight = clamp(heightMm, HEIGHT_MIN, HEIGHT_MAX);
+    setState((p) => ({ ...p, widthMm, heightMm: clampedHeight }));
+  }, [state.widthInput, state.widthUnit, state.heightInput, state.heightUnit]);
 
-  const usableWidth = useMemo(() => Math.max(0, state.widthMm - WIDTH_CLEARANCE), [state.widthMm]);
+  const usableWidth = Math.max(0, state.widthMm - WIDTH_CLEARANCE);
   const slotCount = useMemo(() => {
-    if (!state.moduleWidth || usableWidth <= 0) return 0;
     return Math.floor(usableWidth / state.moduleWidth);
   }, [usableWidth, state.moduleWidth]);
 
@@ -516,6 +551,13 @@ export default function SwQuoteModal({
 
   const dualScreenBlocked =
     state.gaming.mode === "dual" && state.widthMm > 0 && state.widthMm < DUAL_SCREEN_MIN_WIDTH;
+
+  const canNextContact = 
+    state.contact.name.trim() !== "" &&
+    validateEmail(state.contact.email) &&
+    validatePhone(state.contact.phone) &&
+    state.contact.address.trim() !== "" &&
+    state.contact.consent;
 
   // Inject SEO/JSON-LD as state evolves
   useEffect(() => {
@@ -551,6 +593,11 @@ export default function SwQuoteModal({
     }
     if (step === "styles") {
       if (!state.finish) return;
+      setStep("contact");
+      return;
+    }
+    if (step === "contact") {
+      if (!canNextContact) return;
       setStep("summary");
       return;
     }
@@ -561,10 +608,13 @@ export default function SwQuoteModal({
     else if (step === "gaming") setStep("accessories");
     else if (step === "devices") setStep("gaming");
     else if (step === "styles") setStep("devices");
-    else if (step === "summary") setStep("styles");
+    else if (step === "contact") setStep("styles");
+    else if (step === "summary") setStep("contact");
   };
 
   const submit = async () => {
+    setState(p => ({ ...p, isSubmitting: true, submitError: null }));
+
     const payload = {
       dimensions: {
         widthMm: state.widthMm,
@@ -592,22 +642,47 @@ export default function SwQuoteModal({
         category: state.styleCategory,
         finish: state.finish,
       },
+      contact: {
+        name: state.contact.name,
+        email: state.contact.email,
+        phone: state.contact.phone,
+        address: state.contact.address,
+        message: state.contact.message,
+      },
       aiSEO: genAISeo(state),
       domain: "thewallshop.co.uk",
     };
 
     try {
       if (onSubmit) onSubmit(payload);
-      // Optional: attempt to send to backend if present
-       await fetch("/api/sendSwQuote", {
+      
+      const response = await fetch("/api/sendSwQuote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      onClose();
-    } catch (e) {
-      console.error(e);
-      onClose();
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.ok) {
+        setState(p => ({ ...p, isSubmitting: false, submitSuccess: true }));
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        throw new Error(result.error || "Unknown error occurred");
+      }
+    } catch (e: any) {
+      console.error("Submit error:", e);
+      setState(p => ({ 
+        ...p, 
+        isSubmitting: false, 
+        submitError: e.message || "Failed to submit quote. Please try again." 
+      }));
     }
   };
 
@@ -634,6 +709,7 @@ export default function SwQuoteModal({
             aria-label="Close"
             className="p-2 rounded-full hover:bg-gray-100"
             onClick={onClose}
+            disabled={state.isSubmitting}
           >
             <X className="w-5 h-5" />
           </button>
@@ -677,6 +753,9 @@ export default function SwQuoteModal({
             {step === "styles" && (
               <StepStyles key="styles" state={state} setState={setState} />
             )}
+            {step === "contact" && (
+              <StepContact key="contact" state={state} setState={setState} />
+            )}
             {step === "summary" && (
               <StepSummary
                 key="summary"
@@ -692,7 +771,7 @@ export default function SwQuoteModal({
         <div className="px-4 sm:px-6 py-3 border-t flex items-center justify-between">
           <button
             onClick={goBack}
-            disabled={step === "dimensions"}
+            disabled={step === "dimensions" || state.isSubmitting}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border hover:bg-gray-50 disabled:opacity-50"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -700,13 +779,27 @@ export default function SwQuoteModal({
           </button>
 
           <div className="flex items-center gap-3">
+            {state.submitSuccess && (
+              <div className="flex items-center gap-2 text-green-600">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-sm">Quote submitted successfully!</span>
+              </div>
+            )}
+            {state.submitError && (
+              <div className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm">{state.submitError}</span>
+              </div>
+            )}
             {step !== "summary" ? (
               <button
                 onClick={goNext}
                 disabled={
                   (step === "dimensions" && !canNextDimensions) ||
                   (step === "gaming" && dualScreenBlocked) ||
-                  (step === "styles" && !state.finish)
+                  (step === "styles" && !state.finish) ||
+                  (step === "contact" && !canNextContact) ||
+                  state.isSubmitting
                 }
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white hover:opacity-90 disabled:opacity-50"
               >
@@ -716,10 +809,20 @@ export default function SwQuoteModal({
             ) : (
               <button
                 onClick={submit}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
+                disabled={state.isSubmitting || state.submitSuccess}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                Submit Quote
+                {state.isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    Submit Quote
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -765,6 +868,7 @@ function ProgressBar({ step }: { step: Step }) {
     "gaming",
     "devices",
     "styles",
+    "contact",
     "summary",
   ];
   const idx = steps.indexOf(step);
@@ -777,6 +881,7 @@ function ProgressBar({ step }: { step: Step }) {
         <span>Gaming</span>
         <span>Devices</span>
         <span>Styles</span>
+        <span>Contact</span>
         <span>Summary</span>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -797,15 +902,18 @@ function Field({
   label,
   children,
   helper,
+  error,
 }: {
   label: string;
   children: React.ReactNode;
   helper?: React.ReactNode;
+  error?: string;
 }) {
   return (
     <div className="space-y-1">
       <label className="text-sm font-medium">{label}</label>
       {children}
+      {error && <p className="text-xs text-red-600">{error}</p>}
       {helper && <p className="text-xs text-gray-600">{helper}</p>}
     </div>
   );
@@ -1358,6 +1466,150 @@ function StepStyles({
   );
 }
 
+/** Step: Contact */
+function StepContact({
+  state,
+  setState,
+}: {
+  state: SwQuoteState;
+  setState: React.Dispatch<React.SetStateAction<SwQuoteState>>;
+}) {
+  const updateContact = (field: keyof ContactInfo, value: string | boolean) => {
+    setState((p) => ({
+      ...p,
+      contact: { ...p.contact, [field]: value },
+    }));
+  };
+
+  const nameError = state.contact.name.trim() === "" ? "Name is required" : "";
+  const emailError = !validateEmail(state.contact.email) ? "Valid email is required" : "";
+  const phoneError = !validatePhone(state.contact.phone) ? "Valid phone number is required" : "";
+  const addressError = state.contact.address.trim() === "" ? "Address is required" : "";
+  const consentError = !state.contact.consent ? "You must agree to be contacted" : "";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24 }}
+      className="space-y-5"
+    >
+      <h3 className="text-lg font-semibold flex items-center gap-2">
+        <User className="w-5 h-5" />
+        Contact Details
+      </h3>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field
+          label="Full Name"
+          error={nameError}
+        >
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={state.contact.name}
+              onChange={(e) => updateContact("name", e.target.value)}
+              placeholder="Enter your full name"
+              className={`w-full border rounded-xl px-10 py-2 ${nameError ? "border-red-300" : ""}`}
+            />
+          </div>
+        </Field>
+
+        <Field
+          label="Email Address"
+          error={emailError}
+        >
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="email"
+              value={state.contact.email}
+              onChange={(e) => updateContact("email", e.target.value)}
+              placeholder="your.email@example.com"
+              className={`w-full border rounded-xl px-10 py-2 ${emailError ? "border-red-300" : ""}`}
+            />
+          </div>
+        </Field>
+
+        <Field
+          label="Phone Number"
+          error={phoneError}
+        >
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="tel"
+              value={state.contact.phone}
+              onChange={(e) => updateContact("phone", e.target.value)}
+              placeholder="+44 123 456 7890"
+              className={`w-full border rounded-xl px-10 py-2 ${phoneError ? "border-red-300" : ""}`}
+            />
+          </div>
+        </Field>
+
+        <Field
+          label="Address"
+          error={addressError}
+        >
+          <div className="relative">
+            <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+            <textarea
+              value={state.contact.address}
+              onChange={(e) => updateContact("address", e.target.value)}
+              placeholder="Enter your full address"
+              rows={3}
+              className={`w-full border rounded-xl px-10 py-2 resize-none ${addressError ? "border-red-300" : ""}`}
+            />
+          </div>
+        </Field>
+      </div>
+
+      <Field
+        label="Additional Message (Optional)"
+      >
+        <div className="relative">
+          <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+          <textarea
+            value={state.contact.message}
+            onChange={(e) => updateContact("message", e.target.value)}
+            placeholder="Any specific requirements or questions about your smart wall project..."
+            rows={4}
+            className="w-full border rounded-xl px-10 py-2 resize-none"
+          />
+        </div>
+      </Field>
+
+      <div className="space-y-3">
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="consent"
+            checked={state.contact.consent}
+            onChange={(e) => updateContact("consent", e.target.checked)}
+            className="mt-1"
+          />
+          <label htmlFor="consent" className="text-sm text-gray-700">
+            I agree to be contacted by The Wall Shop regarding my smart wall quote. 
+            I understand that my information will be used to provide a personalized quote 
+            and follow-up services. I can withdraw consent at any time.
+          </label>
+        </div>
+        {consentError && <p className="text-xs text-red-600">{consentError}</p>}
+      </div>
+
+      <div className="rounded-xl bg-blue-50 border border-blue-200 p-4">
+        <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li>• We'll review your smart wall configuration within 24 hours</li>
+          <li>• Our team will contact you to discuss your requirements</li>
+          <li>• We'll provide a detailed quote and timeline</li>
+          <li>• Schedule a consultation if needed</li>
+        </ul>
+      </div>
+    </motion.div>
+  );
+}
 
 /** Step: Summary */
 function StepSummary({
@@ -1370,6 +1622,10 @@ function StepSummary({
   usableWidth: number;
 }) {
   const rows: { label: string; value: React.ReactNode }[] = [
+    {
+      label: "Contact",
+      value: `${state.contact.name} (${state.contact.email})`,
+    },
     {
       label: "Dimensions",
       value: `${numberFormat(state.widthMm)} × ${numberFormat(state.heightMm)} mm`,
@@ -1454,14 +1710,21 @@ function StepSummary({
         ))}
       </div>
 
+      {state.contact.message && (
+        <div className="rounded-xl bg-gray-50 border p-4">
+          <h4 className="font-medium mb-2">Additional Message:</h4>
+          <p className="text-sm text-gray-700">{state.contact.message}</p>
+        </div>
+      )}
+
       <div className="flex items-start gap-2 text-sm text-gray-600">
         <AlertTriangle className="w-4 h-4 mt-0.5" />
         <p>
-          This summary will be sent to our team. We’ll follow up from{" "}
+          This summary will be sent to our team. We'll follow up from{" "}
           <a href="mailto:stephen@thewallshop.co.uk" className="underline">
             stephen@thewallshop.co.uk
           </a>{" "}
-          or call +44 141 739 3377 (Mon–Fri, 9:00 AM–6:00 PM PST).
+          or call +44 141 739 3377 (Mon–Fri, 9:00 AM–6:00 PM GMT).
         </p>
       </div>
     </motion.div>
