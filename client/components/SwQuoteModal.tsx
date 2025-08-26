@@ -278,7 +278,7 @@ const textureCategories = [
       { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
       { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
       { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
-      { id: "T9012", name: "leatherwood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
+      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
       { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
       { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
     ]
@@ -329,13 +329,56 @@ const textureCategories = [
     color: "from-amber-100 to-yellow-100",
     accent: "amber-600",
     panels: [
-      { id: "M1001", name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/1.jpg", desc: "Elegant bronze with a brushed satin finish", stock: 10 },
-      { id: "M1002", name: "Antique Copper", img: "/images/carbon-rock-boards/metal/2.jpg", desc: "Warm copper tone with vintage character", stock: 10 },
-      { id: "M1003", name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/3.jpg", desc: "Subtle golden shimmer with soft elegance", stock: 10 },
-      { id: "M1004", name: "Urban Brass", img: "/images/carbon-rock-boards/metal/4.jpg", desc: "Contemporary brass with matte warmth", stock: 10 },
-      { id: "M1005", name: "Mirror Silver", img: "/images/carbon-rock-boards/metal/5.jpg", desc: "Sleek silver chrome for high reflectivity", stock: 10 },
-      { id: "M1006", name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/6.jpg", desc: "Modern titanium finish with silky texture", stock: 10 }
-    ]
+  { 
+    id: "LS-2A05", 
+    name: "Antique Copper", 
+    img: "/images/carbon-rock-boards/metal/1.jpg", 
+    desc: "Rich antique copper finish with timeless, rustic charm.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A06", 
+    name: "Urban Brass", 
+    img: "/images/carbon-rock-boards/metal/2.jpg", 
+    desc: "Bold brass tone with an industrial, modern character.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A08", 
+    name: "Champagne Gold", 
+    img: "/images/carbon-rock-boards/metal/3.jpg", 
+    desc: "Luxurious champagne gold with a refined, soft glow.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A09", 
+    name: "Brushed Bronze", 
+    img: "/images/carbon-rock-boards/metal/4.jpg", 
+    desc: "Matte brushed bronze with warm, contemporary appeal.", 
+    stock: 10 
+  },
+  { 
+    id: "SZ-703", 
+    name: "Brushed Silver", 
+    img: "/images/carbon-rock-boards/metal/5.jpg", 
+    desc: "Sleek brushed silver offering a clean, modern look.", 
+    stock: 10 
+  },
+  { 
+    id: "SZ-705", 
+    name: "Satin Titanium", 
+    img: "/images/carbon-rock-boards/metal/6.jpg", 
+    desc: "Smooth satin titanium with a durable, futuristic finish.", 
+    stock: 10 
+  },
+  { 
+    id: "H-8301", 
+    name: "Brushed Copper", 
+    img: "/images/carbon-rock-boards/metal/7.jpg", 
+    desc: "Textured brushed copper with a warm metallic tone.", 
+    stock: 10 
+  }
+]
   },
   {
     id: 'mirror',
@@ -346,13 +389,49 @@ const textureCategories = [
     color: "from-leather-100 to-leather-100",
     accent: "stone-600",
     panels: [
-      { id: "MR2001", name: "Bronze Mirror", img: "/images/carbon-rock-boards/mirror/1.jpg", desc: "Warm bronze-tinted mirror with elegant shine", stock: 10 },
-      { id: "MR2002", name: "Copper Reflection", img: "/images/carbon-rock-boards/mirror/2.jpg", desc: "Vintage copper tone with smooth mirrored surface", stock: 10 },
-      { id: "MR2003", name: "Golden Glow", img: "/images/carbon-rock-boards/mirror/3.jpg", desc: "Champagne gold mirror finish with rich sheen", stock: 10 },
-      { id: "MR2004", name: "Brass Luxe", img: "/images/carbon-rock-boards/mirror/4.jpg", desc: "Matte brass reflection with subtle warmth", stock: 10 },
-      { id: "MR2005", name: "Crystal Silver", img: "/images/carbon-rock-boards/mirror/5.jpg", desc: "Sleek silver mirror with crisp reflectivity", stock: 10 },
-      { id: "MR2006", name: "Titanium Gloss", img: "/images/carbon-rock-boards/mirror/6.jpg", desc: "Cool titanium mirror with polished finish", stock: 10 }
-    ]
+  { 
+    id: "MR2001", 
+    name: "Mirror Black", 
+    img: "/images/carbon-rock-boards/mirror/1.jpg", 
+    desc: "Deep black mirror surface with a sleek, dramatic reflection.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2002", 
+    name: "Mirror White", 
+    img: "/images/carbon-rock-boards/mirror/2.jpg", 
+    desc: "Bright white mirrored finish that adds clarity and light.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2003", 
+    name: "Mirror Silver", 
+    img: "/images/carbon-rock-boards/mirror/3.jpg", 
+    desc: "Classic silver mirror with crisp, high reflectivity.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2004", 
+    name: "Mirror Gold", 
+    img: "/images/carbon-rock-boards/mirror/4.jpg", 
+    desc: "Luxurious gold mirror with a warm, radiant shine.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2005", 
+    name: "Mirror Ripple Gold", 
+    img: "/images/carbon-rock-boards/mirror/5.jpg", 
+    desc: "Ripple-textured gold mirror creating a dynamic, shimmering effect.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2006", 
+    name: "Mirror Ripple Silver", 
+    img: "/images/carbon-rock-boards/mirror/6.jpg", 
+    desc: "Ripple-textured silver mirror with modern reflective depth.", 
+    stock: 10 
+  }
+]
   }
 ];
 

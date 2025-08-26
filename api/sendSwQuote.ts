@@ -350,7 +350,11 @@ function renderHtmlEmail(p: Payload) {
             
             ${s.finish?.img ? `
             <div style="margin-top: 12px; text-align: center;">
-              <img src="${s.finish.img}" alt="${escapeHtml(s.finish.name)}" style="max-width: 200px; height: auto; border-radius: 8px; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+              <img 
+                src="https://www.thewallshop.co.uk${s.finish.img}" 
+                alt="${escapeHtml(s.finish.name)}" 
+                style="max-width: 200px; height: auto; border-radius: 8px; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
+              />
               <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280;">Selected Finish: ${escapeHtml(s.finish.name)}</p>
             </div>` : ""}
           </td>
@@ -360,7 +364,7 @@ function renderHtmlEmail(p: Payload) {
             <!-- AI-SEO Information -->
             <tr>
               <td style="padding: 20px 40px;">
-                <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">SEO Metadata (Generated)</h3>
+                <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">SEO Metadata</h3>
                 <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
                   ${p.aiSEO?.title ? `
                   <tr>
