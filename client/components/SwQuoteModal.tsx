@@ -392,21 +392,21 @@ const textureCategories = [
   { 
     id: "MR2001", 
     name: "Mirror Black", 
-    img: "/images/carbon-rock-boards/mirror/1.jpg", 
+    img: "/images/carbon-rock-boards/mirror/3.jpg", 
     desc: "Deep black mirror surface with a sleek, dramatic reflection.", 
     stock: 10 
   },
   { 
     id: "MR2002", 
     name: "Mirror White", 
-    img: "/images/carbon-rock-boards/mirror/2.jpg", 
+    img: "/images/carbon-rock-boards/mirror/5.jpg", 
     desc: "Bright white mirrored finish that adds clarity and light.", 
     stock: 10 
   },
   { 
     id: "MR2003", 
     name: "Mirror Silver", 
-    img: "/images/carbon-rock-boards/mirror/3.jpg", 
+    img: "/images/carbon-rock-boards/mirror/6.jpg", 
     desc: "Classic silver mirror with crisp, high reflectivity.", 
     stock: 10 
   },
@@ -420,18 +420,19 @@ const textureCategories = [
   { 
     id: "MR2005", 
     name: "Mirror Ripple Gold", 
-    img: "/images/carbon-rock-boards/mirror/5.jpg", 
+    img: "/images/carbon-rock-boards/mirror/1.jpg", 
     desc: "Ripple-textured gold mirror creating a dynamic, shimmering effect.", 
     stock: 10 
   },
   { 
     id: "MR2006", 
     name: "Mirror Ripple Silver", 
-    img: "/images/carbon-rock-boards/mirror/6.jpg", 
+    img: "/images/carbon-rock-boards/mirror/5.jpg", 
     desc: "Ripple-textured silver mirror with modern reflective depth.", 
     stock: 10 
   }
 ]
+
   }
 ];
 
