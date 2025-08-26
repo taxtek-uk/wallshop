@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import Navigation from '@/components/Navigation';
 import TextureSection from '@/components/TextureSection';
 import Footer from '@/components/Footer';
-import QuoteModal from '@/components/QuoteModal';
+import SwQuoteModal from '@/components/SwQuoteModal';
 
 import { 
   Lightbulb, 
@@ -830,10 +830,9 @@ function SmartWalls() {
       </section>
  
       <Footer />
-      <QuoteModal
+      <SwQuoteModal
         isOpen={isQuoteModalOpen}
         onClose={() => setIsQuoteModalOpen(false)}
-        productCategory="smart-walls"
       />
     </div>
   );
