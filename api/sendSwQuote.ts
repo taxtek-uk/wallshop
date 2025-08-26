@@ -324,41 +324,60 @@ function renderHtmlEmail(p: Payload) {
               </tr>
             </table>
 
-            <!-- Smart Devices -->
-            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Smart Devices</h3>
-            <div style="background-color: #f8fafc; border-radius: 6px; padding: 12px;">
+           <!-- Smart Devices -->
+            <h3 style="margin: 20px 0 12px 0; color: #111827; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px;">
+              Smart Devices
+            </h3>
+            <div style="background: linear-gradient(to right, #f1f5f9, #f8fafc); border-radius: 8px; padding: 12px 14px; border: 1px solid #e5e7eb;">
               ${devices.length > 0 ? 
-                devices.map(device => `<span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 16px; font-size: 13px; margin: 2px 4px 2px 0; font-weight: 500;">${device.replace(/([A-Z])/g, ' $1').trim()}</span>`).join('') :
+                devices.map(device => `
+                  <span style="
+                    display: inline-block; 
+                    background: linear-gradient(to right, #dbeafe, #bfdbfe); 
+                    color: #1e40af; 
+                    padding: 5px 14px; 
+                    border-radius: 20px; 
+                    font-size: 13px; 
+                    margin: 4px 6px 4px 0; 
+                    font-weight: 500; 
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+                  ">
+                    ${device.replace(/([A-Z])/g, ' $1').trim()}
+                  </span>`
+                ).join('') :
                 '<p style="margin: 0; color: #6b7280; font-size: 14px; font-style: italic;">No smart devices selected</p>'
               }
             </div>
 
-            <!-- Style Selection -->
-            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Style & Finish</h3>
-            <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
-              <tr>
-                <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Category:</td>
-                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px; text-transform: capitalize;">${s.category || "—"}</td>
-              </tr>
-              <tr style="background-color: #ffffff;">
-                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Finish:</td>
-                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">
-                  ${s.finish ? `<strong>${escapeHtml(s.finish.name)}</strong> <span style="color: #6b7280;">(${escapeHtml(s.finish.id)})</span>` : "—"}
-                </td>
-              </tr>
-            </table>
-            
-            ${s.finish?.img ? `
-            <div style="margin-top: 12px; text-align: center;">
-              <img 
-                src="https://www.thewallshop.co.uk${s.finish.img}" 
-                alt="${escapeHtml(s.finish.name)}" 
-                style="max-width: 200px; height: auto; border-radius: 8px; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" 
-              />
-              <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280;">Selected Finish: ${escapeHtml(s.finish.name)}</p>
-            </div>` : ""}
-          </td>
-        </tr>
+          <!-- Style Selection -->
+          <h3 style="margin: 24px 0 12px 0; color: #111827; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px;">
+            Style & Finish
+          </h3>
+          <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background: linear-gradient(to bottom, #f9fafb, #ffffff); border-radius: 8px; border: 1px solid #e5e7eb;">
+            <tr>
+              <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 10px 12px; background-color: #f8fafc;">Category:</td>
+              <td style="color: #1e293b; font-size: 14px; padding: 10px 12px; text-transform: capitalize;">${s.category || "—"}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 10px 12px; background-color: #f8fafc;">Finish:</td>
+              <td style="color: #1e293b; font-size: 14px; padding: 10px 12px;">
+                ${s.finish ? `<strong>${escapeHtml(s.finish.name)}</strong> <span style="color: #6b7280;">(${escapeHtml(s.finish.id)})</span>` : "—"}
+              </td>
+            </tr>
+          </table>
+
+          ${s.finish?.img ? `
+          <div style="margin-top: 14px; text-align: center;">
+            <img 
+              src="https://www.thewallshop.co.uk${s.finish.img}" 
+              alt="${escapeHtml(s.finish.name)}" 
+              style="max-width: 220px; height: auto; border-radius: 10px; border: 2px solid #e5e7eb; box-shadow: 0 3px 6px rgba(0,0,0,0.12);" 
+            />
+            <p style="margin: 10px 0 0 0; font-size: 13px; color: #6b7280; font-style: italic;">
+              Selected Finish: <span style="color: #111827; font-weight: 500;">${escapeHtml(s.finish.name)}</span>
+            </p>
+          </div>` : ""}
+
 
             ${p.aiSEO?.title || p.aiSEO?.description || p.aiSEO?.keywords ? `
             <!-- AI-SEO Information -->
@@ -370,11 +389,6 @@ function renderHtmlEmail(p: Payload) {
                   <tr>
                     <td style="width: 100px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px; vertical-align: top;">Title:</td>
                     <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">${escapeHtml(p.aiSEO.title)}</td>
-                  </tr>` : ""}
-                  ${p.aiSEO?.description ? `
-                  <tr style="background-color: #ffffff;">
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px; vertical-align: top;">Description:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 12px; line-height: 1.5;">${escapeHtml(p.aiSEO.description)}</td>
                   </tr>` : ""}
                   ${p.aiSEO?.keywords ? `
                   <tr>
