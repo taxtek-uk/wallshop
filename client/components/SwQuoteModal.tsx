@@ -599,15 +599,11 @@ export default function SwQuoteModal({
     try {
       if (onSubmit) onSubmit(payload);
       // Optional: attempt to send to backend if present
-      const res = await fetch("/api/sendQuote", {
+       await fetch("/api/sendSwQuote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) {
-        // Fail gracefully if not implemented
-        console.warn("sendQuote not available, handled locally.");
-      }
       onClose();
     } catch (e) {
       console.error(e);
