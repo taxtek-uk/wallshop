@@ -375,9 +375,11 @@ const validateEmail = (email: string): boolean => {
 };
 
 const validatePhone = (phone: string): boolean => {
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  // Flexible: allows + for international, or local starting with 0
+  const phoneRegex = /^(?:\+?\d{1,15}|0\d{1,15})$/;
   return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
 };
+
 
 const genAISeo = (state: SwQuoteState) => {
   const keys: string[] = [];

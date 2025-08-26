@@ -150,205 +150,211 @@ function renderHtmlEmail(p: Payload) {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB").format(n);
 
   // Corporate gradient background - fallback to inline CSS for email compatibility
-  const gradientStyle = `
-    background: linear-gradient(135deg, #f43f5e 0%, #be185d 50%, #831843 100%);
-    background: -webkit-linear-gradient(135deg, #f43f5e 0%, #be185d 50%, #831843 100%);
-    background: -moz-linear-gradient(135deg, #f43f5e 0%, #be185d 50%, #831843 100%);
-  `;
+ const gradientStyle = `
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+  background: -webkit-linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+  background: -moz-linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+  padding: 30px 20px;
+  text-align: center;
+`;
+
 
   return /* html */ `
   <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Smart Wall Quote - The Wall Shop</title>
-    <!--[if mso]>
-    <noscript>
-      <xml>
-        <o:OfficeDocumentSettings>
-          <o:PixelsPerInch>96</o:PixelsPerInch>
-        </o:OfficeDocumentSettings>
-      </xml>
-    </noscript>
-    <![endif]-->
-  </head>
-  <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc;">
-      <tr>
-        <td align="center" style="padding: 20px 0;">
-          <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Smart Wall Quote - The Wall Shop</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc;">
+  <tr>
+    <td align="center" style="padding: 20px 0;">
+      <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        
+        <!-- Header with Gradient Background -->
+        <tr>
+          <td style="background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+                     background: -webkit-linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+                     background: -moz-linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #111827 100%);
+                     padding: 30px 20px; text-align: center;">
+            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+              New Smart Wall Quote
+            </h1>
+            <p style="margin: 8px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">
+              The Wall Shop - Premium Smart Wall Solutions
+            </p>
+          </td>
+        </tr>
+
+        <!-- Domain Info -->
+        <tr>
+          <td style="padding: 20px 40px 0 40px;">
+            <div style="background-color: #f1f5f9; border-left: 4px solid #1d4ed8; padding: 12px 16px; border-radius: 6px;">
+              <p style="margin: 0; font-size: 14px; color: #64748b;">
+                <strong>Submission Source:</strong> ${escapeHtml(p.domain || "thewallshop.co.uk")}
+              </p>
+            </div>
+          </td>
+        </tr>
+
+        ${contact.name || contact.email || contact.phone || contact.address ? `
+        <!-- Contact Information -->
+        <tr>
+          <td style="padding: 30px 40px 20px 40px;">
+            <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #1d4ed8; padding-bottom: 8px;">
+              Customer Contact Details
+            </h2>
+            <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;">
+              ${contact.name ? `
+              <tr>
+                <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Name:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">${escapeHtml(contact.name)}</td>
+              </tr>` : ""}
+              ${contact.email ? `
+              <tr>
+                <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Email:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">
+                  <a href="mailto:${escapeHtml(contact.email)}" style="color: #1d4ed8; text-decoration: none;">${escapeHtml(contact.email)}</a>
+                </td>
+              </tr>` : ""}
+              ${contact.phone ? `
+              <tr>
+                <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Phone:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">
+                  <a href="tel:${escapeHtml(contact.phone.replace(/\s/g, ''))}" style="color: #1d4ed8; text-decoration: none;">${escapeHtml(contact.phone)}</a>
+                </td>
+              </tr>` : ""}
+              ${contact.address ? `
+              <tr>
+                <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Address:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 0; line-height: 1.5;">${escapeHtml(contact.address).replace(/\n/g, '<br>')}</td>
+              </tr>` : ""}
+            </table>
+          </td>
+        </tr>` : ""}
+
+        ${contact.message ? `
+        <!-- Customer Message -->
+        <tr>
+          <td style="padding: 0 40px 20px 40px;">
+            <h3 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Customer Message:</h3>
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+              <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.6;">${escapeHtml(contact.message).replace(/\n/g, '<br>')}</p>
+            </div>
+          </td>
+        </tr>` : ""}
+
+        <!-- Quote Details -->
+        <tr>
+          <td style="padding: 20px 40px;">
+            <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #1d4ed8; padding-bottom: 8px;">
+              Smart Wall Configuration
+            </h2>
+
+            <!-- Dimensions -->
+            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Dimensions</h3>
+            <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
+              <tr>
+                <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Width (mm):</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.widthMm)}</td>
+              </tr>
+              <tr style="background-color: #ffffff;">
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Height (mm):</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.heightMm)}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Module Width (mm):</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.moduleWidth)}</td>
+              </tr>
+              <tr style="background-color: #ffffff;">
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Usable Width (mm):</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.usableWidth)}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Slot Count:</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.slotCount)}</td>
+              </tr>
+            </table>
+
+            <!-- Accessories -->
+            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Accessories</h3>
+            <div style="background-color: #f8fafc; border-radius: 6px; padding: 12px;">
+              ${[
+                a.tv ? "✓ TV Module" : null,
+                a.fireplace ? "✓ Electric Fireplace" : null,
+                a.soundbar ? "✓ Soundbar" : null,
+                a.shelvingQty ? `✓ Shelving × ${fmt(a.shelvingQty)}` : null,
+              ].filter(Boolean).length > 0 ? 
+                [
+                  a.tv ? "✓ TV Module" : null,
+                  a.fireplace ? "✓ Electric Fireplace" : null,
+                  a.soundbar ? "✓ Soundbar" : null,
+                  a.shelvingQty ? `✓ Shelving × ${fmt(a.shelvingQty)}` : null,
+                ].filter(Boolean).map(item => `<p style="margin: 4px 0; color: #059669; font-size: 14px; font-weight: 500;">${item}</p>`).join('') :
+                '<p style="margin: 0; color: #6b7280; font-size: 14px; font-style: italic;">No accessories selected</p>'
+              }
+            </div>
+
+            <!-- Gaming -->
+            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Gaming Configuration</h3>
+            <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
+              <tr>
+                <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Mode:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">${g.mode ? (g.mode === "dual" ? "Dual Screen" : "Single Screen") : "Not selected"}</td>
+              </tr>
+              <tr style="background-color: #ffffff;">
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px; vertical-align: top;">Options:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">
+                  ${(g.options || []).length > 0 ? 
+                    (g.options || []).map(opt => `<span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin: 2px 4px 2px 0;">${opt.replace(/([A-Z])/g, ' $1').trim()}</span>`).join('') :
+                    '<span style="color: #6b7280; font-style: italic;">None selected</span>'
+                  }
+                </td>
+              </tr>
+            </table>
+
+            <!-- Smart Devices -->
+            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Smart Devices</h3>
+            <div style="background-color: #f8fafc; border-radius: 6px; padding: 12px;">
+              ${devices.length > 0 ? 
+                devices.map(device => `<span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 16px; font-size: 13px; margin: 2px 4px 2px 0; font-weight: 500;">${device.replace(/([A-Z])/g, ' $1').trim()}</span>`).join('') :
+                '<p style="margin: 0; color: #6b7280; font-size: 14px; font-style: italic;">No smart devices selected</p>'
+              }
+            </div>
+
+            <!-- Style Selection -->
+            <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Style & Finish</h3>
+            <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
+              <tr>
+                <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Category:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px; text-transform: capitalize;">${s.category || "—"}</td>
+              </tr>
+              <tr style="background-color: #ffffff;">
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Finish:</td>
+                <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">
+                  ${s.finish ? `<strong>${escapeHtml(s.finish.name)}</strong> <span style="color: #6b7280;">(${escapeHtml(s.finish.id)})</span>` : "—"}
+                </td>
+              </tr>
+            </table>
             
-            <!-- Header with Gradient Background -->
-            <tr>
-              <td style="${gradientStyle} padding: 30px 40px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                  New Smart Wall Quote
-                </h1>
-                <p style="margin: 8px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">
-                  The Wall Shop - Premium Smart Wall Solutions
-                </p>
-              </td>
-            </tr>
-
-            <!-- Domain Info -->
-            <tr>
-              <td style="padding: 20px 40px 0 40px;">
-                <div style="background-color: #f1f5f9; border-left: 4px solid #be185d; padding: 12px 16px; border-radius: 6px;">
-                  <p style="margin: 0; font-size: 14px; color: #64748b;">
-                    <strong>Submission Source:</strong> ${escapeHtml(p.domain || "thewallshop.co.uk")}
-                  </p>
-                </div>
-              </td>
-            </tr>
-
-            ${contact.name || contact.email || contact.phone || contact.address ? `
-            <!-- Contact Information -->
-            <tr>
-              <td style="padding: 30px 40px 20px 40px;">
-                <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #be185d; padding-bottom: 8px;">
-                  Customer Contact Details
-                </h2>
-                <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;">
-                  ${contact.name ? `
-                  <tr>
-                    <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Name:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">${escapeHtml(contact.name)}</td>
-                  </tr>` : ""}
-                  ${contact.email ? `
-                  <tr>
-                    <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Email:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">
-                      <a href="mailto:${escapeHtml(contact.email)}" style="color: #be185d; text-decoration: none;">${escapeHtml(contact.email)}</a>
-                    </td>
-                  </tr>` : ""}
-                  ${contact.phone ? `
-                  <tr>
-                    <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Phone:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 0;">
-                      <a href="tel:${escapeHtml(contact.phone.replace(/\s/g, ''))}" style="color: #be185d; text-decoration: none;">${escapeHtml(contact.phone)}</a>
-                    </td>
-                  </tr>` : ""}
-                  ${contact.address ? `
-                  <tr>
-                    <td style="width: 120px; font-weight: 600; color: #475569; font-size: 14px; vertical-align: top; padding: 8px 0;">Address:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 0; line-height: 1.5;">${escapeHtml(contact.address).replace(/\n/g, '<br>')}</td>
-                  </tr>` : ""}
-                </table>
-              </td>
-            </tr>` : ""}
-
-            ${contact.message ? `
-            <!-- Customer Message -->
-            <tr>
-              <td style="padding: 0 40px 20px 40px;">
-                <h3 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Customer Message:</h3>
-                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
-                  <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.6;">${escapeHtml(contact.message).replace(/\n/g, '<br>')}</p>
-                </div>
-              </td>
-            </tr>` : ""}
-
-            <!-- Quote Details -->
-            <tr>
-              <td style="padding: 20px 40px;">
-                <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #be185d; padding-bottom: 8px;">
-                  Smart Wall Configuration
-                </h2>
-
-                <!-- Dimensions -->
-                <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Dimensions</h3>
-                <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
-                  <tr>
-                    <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Width (mm):</td>
-                    <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.widthMm)}</td>
-                  </tr>
-                  <tr style="background-color: #ffffff;">
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Height (mm):</td>
-                    <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.heightMm)}</td>
-                  </tr>
-                  <tr>
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Module Width (mm):</td>
-                    <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.moduleWidth)}</td>
-                  </tr>
-                  <tr style="background-color: #ffffff;">
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Usable Width (mm):</td>
-                    <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.usableWidth)}</td>
-                  </tr>
-                  <tr>
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Slot Count:</td>
-                    <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.slotCount)}</td>
-                  </tr>
-                </table>
-
-                <!-- Accessories -->
-                <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Accessories</h3>
-                <div style="background-color: #f8fafc; border-radius: 6px; padding: 12px;">
-                  ${[
-                    a.tv ? "✓ TV Module" : null,
-                    a.fireplace ? "✓ Electric Fireplace" : null,
-                    a.soundbar ? "✓ Soundbar" : null,
-                    a.shelvingQty ? `✓ Shelving × ${fmt(a.shelvingQty)}` : null,
-                  ].filter(Boolean).length > 0 ? 
-                    [
-                      a.tv ? "✓ TV Module" : null,
-                      a.fireplace ? "✓ Electric Fireplace" : null,
-                      a.soundbar ? "✓ Soundbar" : null,
-                      a.shelvingQty ? `✓ Shelving × ${fmt(a.shelvingQty)}` : null,
-                    ].filter(Boolean).map(item => `<p style="margin: 4px 0; color: #059669; font-size: 14px; font-weight: 500;">${item}</p>`).join('') :
-                    '<p style="margin: 0; color: #6b7280; font-size: 14px; font-style: italic;">No accessories selected</p>'
-                  }
-                </div>
-
-                <!-- Gaming -->
-                <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Gaming Configuration</h3>
-                <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
-                  <tr>
-                    <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Mode:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">${g.mode ? (g.mode === "dual" ? "Dual Screen" : "Single Screen") : "Not selected"}</td>
-                  </tr>
-                  <tr style="background-color: #ffffff;">
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px; vertical-align: top;">Options:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">
-                      ${(g.options || []).length > 0 ? 
-                        (g.options || []).map(opt => `<span style="display: inline-block; background-color: #ddd6fe; color: #5b21b6; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin: 2px 4px 2px 0;">${opt.replace(/([A-Z])/g, ' $1').trim()}</span>`).join('') :
-                        '<span style="color: #6b7280; font-style: italic;">None selected</span>'
-                      }
-                    </td>
-                  </tr>
-                </table>
-
-                <!-- Smart Devices -->
-                <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Smart Devices</h3>
-                <div style="background-color: #f8fafc; border-radius: 6px; padding: 12px;">
-                  ${devices.length > 0 ? 
-                    devices.map(device => `<span style="display: inline-block; background-color: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 16px; font-size: 13px; margin: 2px 4px 2px 0; font-weight: 500;">${device.replace(/([A-Z])/g, ' $1').trim()}</span>`).join('') :
-                    '<p style="margin: 0; color: #6b7280; font-size: 14px; font-style: italic;">No smart devices selected</p>'
-                  }
-                </div>
-
-                <!-- Style Selection -->
-                <h3 style="margin: 20px 0 12px 0; color: #374151; font-size: 16px; font-weight: 600;">Style & Finish</h3>
-                <table cellpadding="8" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #f8fafc; border-radius: 6px;">
-                  <tr>
-                    <td style="width: 150px; font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Category:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 12px; text-transform: capitalize;">${s.category || "—"}</td>
-                  </tr>
-                  <tr style="background-color: #ffffff;">
-                    <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Finish:</td>
-                    <td style="color: #1e293b; font-size: 14px; padding: 8px 12px;">
-                      ${s.finish ? `<strong>${escapeHtml(s.finish.name)}</strong> <span style="color: #6b7280;">(${escapeHtml(s.finish.id)})</span>` : "—"}
-                    </td>
-                  </tr>
-                </table>
-                
-                ${s.finish?.img ? `
-                <div style="margin-top: 12px; text-align: center;">
-                  <img src="${s.finish.img}" alt="${escapeHtml(s.finish.name)}" style="max-width: 200px; height: auto; border-radius: 8px; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
-                  <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280;">Selected Finish: ${escapeHtml(s.finish.name)}</p>
-                </div>` : ""}
-              </td>
-            </tr>
+            ${s.finish?.img ? `
+            <div style="margin-top: 12px; text-align: center;">
+              <img src="${s.finish.img}" alt="${escapeHtml(s.finish.name)}" style="max-width: 200px; height: auto; border-radius: 8px; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+              <p style="margin: 8px 0 0 0; font-size: 12px; color: #6b7280;">Selected Finish: ${escapeHtml(s.finish.name)}</p>
+            </div>` : ""}
+          </td>
+        </tr>
 
             ${p.aiSEO?.title || p.aiSEO?.description || p.aiSEO?.keywords ? `
             <!-- AI-SEO Information -->
@@ -376,54 +382,54 @@ function renderHtmlEmail(p: Payload) {
             </tr>` : ""}
 
             <!-- Contact Information -->
-            <tr>
-              <td style="padding: 30px 40px 20px 40px;">
-                <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #be185d; padding-bottom: 8px;">
-                  Contact Information
-                </h2>
-                <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px;">
-                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                    <tr>
-                      <td style="padding-bottom: 12px;">
-                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">📞 Phone</p>
-                        <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">
-                          <a href="tel:+441417393377" style="color: #be185d; text-decoration: none; font-weight: 500;">+44 141 739 3377</a>
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding-bottom: 12px;">
-                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">📧 Email</p>
-                        <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">
-                          <a href="mailto:stephen@thewallshop.co.uk" style="color: #be185d; text-decoration: none; font-weight: 500;">stephen@thewallshop.co.uk</a>
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">🕒 Business Hours</p>
-                        <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">Monday - Friday, 9:00 AM - 6:00 PM GMT</p>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
-            </tr>
+              <tr>
+                <td style="padding: 30px 40px 20px 40px;">
+                  <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600; border-bottom: 2px solid #1d4ed8; padding-bottom: 8px;">
+                    Contact Information
+                  </h2>
+                  <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="padding-bottom: 12px;">
+                          <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">Phone</p>
+                          <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">
+                            <a href="tel:+441417393377" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">+44 141 739 3377</a>
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-bottom: 12px;">
+                          <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">Email</p>
+                          <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">
+                            <a href="mailto:stephen@thewallshop.co.uk" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">stephen@thewallshop.co.uk</a>
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">Business Hours</p>
+                          <p style="margin: 4px 0 0 0; color: #475569; font-size: 14px;">Monday - Friday, 9:00 AM - 6:00 PM GMT</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
 
             <!-- Signature -->
-            <tr>
-              <td style="padding: 20px 40px 30px 40px;">
-                <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
-                  <p style="margin: 0 0 8px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Best regards,</p>
-                  <p style="margin: 0 0 4px 0; color: #be185d; font-size: 18px; font-weight: bold;">The Wall Shop Team</p>
-                  <p style="margin: 0 0 12px 0; color: #475569; font-size: 14px; line-height: 1.5;">
-                    SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK<br>
-                    Phone: <a href="tel:+441417393377" style="color: #be185d; text-decoration: none;">+44 141 739 3377</a> | 
-                    Email: <a href="mailto:stephen@thewallshop.co.uk" style="color: #be185d; text-decoration: none;">stephen@thewallshop.co.uk</a>
-                  </p>
-                </div>
-              </td>
-            </tr>
+              <tr>
+                <td style="padding: 20px 40px 30px 40px;">
+                  <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                    <p style="margin: 0 0 8px 0; color: #1e293b; font-size: 16px; font-weight: 600;">Best regards,</p>
+                    <p style="margin: 0 0 4px 0; color: #1d4ed8; font-size: 18px; font-weight: bold;">The Wall Shop Team</p>
+                    <p style="margin: 0 0 12px 0; color: #475569; font-size: 14px; line-height: 1.5;">
+                      SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE, UK<br>
+                      Phone: <a href="tel:+441417393377" style="color: #1d4ed8; text-decoration: none;">+44 141 739 3377</a> | 
+                      Email: <a href="mailto:stephen@thewallshop.co.uk" style="color: #1d4ed8; text-decoration: none;">stephen@thewallshop.co.uk</a>
+                    </p>
+                  </div>
+                </td>
+              </tr>
 
             <!-- Footer with Disclaimer -->
             <tr>
@@ -553,7 +559,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const from = process.env.FROM_EMAIL || "The Wall Shop <no-reply@thewallshop.co.uk>";
   const to = process.env.TO_EMAIL || "stephen@thewallshop.co.uk";
-  const cc = process.env.CC_EMAIL;
   const bcc = process.env.BCC_EMAIL;
 
   try {
@@ -575,11 +580,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const slotCount = payload.dimensions.slotCount;
     
     const subject = `Smart Wall Quote — ${customerName} — ${finishName} (${slotCount} slots)`;
+    const ccRecipient = payload.contact?.email || process.env.CC_EMAIL;
 
     const { data, error } = await resend.emails.send({
       from,
       to,
-      ...(cc ? { cc } : {}),
+      ...(ccRecipient ? { cc: ccRecipient } : {}),
       ...(bcc ? { bcc } : {}),
       subject,
       html: renderHtmlEmail(payload),
