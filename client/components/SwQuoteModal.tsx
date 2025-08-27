@@ -306,12 +306,12 @@ const textureCategories = [
     color: "from-amber-100 to-orange-100",
     accent: "amber-600",
     panels: [
-      { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/16.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
+      { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
       { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
       { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
-      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/11.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
+      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
       { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
-      { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/14.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
+      { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
     ]
   },
   {
@@ -325,11 +325,11 @@ const textureCategories = [
     panels: [
       { id: "T8201", name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism", stock: 10 },
       { id: "T8026", name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look", stock: 10 },
-      { id: "T8107", name: "Slate Blue", img: "/images/carbon-rock-boards/solid/10.jpg", desc: "Dark blue-grey with a sophisticated edge", stock: 10 },
-      { id: "T8039", name: "Ivory", img: "/images/carbon-rock-boards/solid/11.jpg", desc: "Soft ivory tone perfect for elegant settings", stock: 10 },
-      { id: "T8103", name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/17.jpg", desc: "Soft pearl-beige tone for warm ambience", stock: 10 },
-      { id: "T8036", name: "Desert Sand", img: "/images/carbon-rock-boards/solid/12.jpg", desc: "Warm tan reminiscent of natural sands", stock: 10 },
-      { id: "T8008", name: "Obsidian", img: "/images/carbon-rock-boards/solid/15.jpg", desc: "Matte black with premium depth and richness", stock: 10 }
+      { id: "T8107", name: "Slate Blue", img: "/images/carbon-rock-boards/solid/3.jpg", desc: "Dark blue-grey with a sophisticated edge", stock: 10 },
+      { id: "T8039", name: "Ivory", img: "/images/carbon-rock-boards/solid/4.jpg", desc: "Soft ivory tone perfect for elegant settings", stock: 10 },
+      { id: "T8103", name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/5.jpg", desc: "Soft pearl-beige tone for warm ambience", stock: 10 },
+      { id: "T8036", name: "Desert Sand", img: "/images/carbon-rock-boards/solid/6.jpg", desc: "Warm tan reminiscent of natural sands", stock: 10 },
+      { id: "T8008", name: "Obsidian", img: "/images/carbon-rock-boards/solid/7.jpg", desc: "Matte black with premium depth and richness", stock: 10 }
     ]
   },
   {
@@ -343,12 +343,8 @@ const textureCategories = [
     panels: [
       { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 0 },
       { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture Black & Blue", stock: 0 },
-      { id: "S240", name: "S240", img: "/images/carbon-rock-boards/stone/3.jpg", desc: "Stone texture S240", stock: 0 },
-      { id: "T3205", name: "Mid Grey & Dark Grey", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & Dark Grey", stock: 0 },
-      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Mid Grey & White", stock: 0 },
-      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/6.jpg", desc: "Stone texture Dark Grey & Black", stock: 0 },
-      { id: "T3207", name: "T3207", img: "/images/carbon-rock-boards/stone/7.jpg", desc: "Stone texture T3207", stock: 0 },
-      { id: "T3024", name: "Dark Grey & White", img: "/images/carbon-rock-boards/stone/8.jpg", desc: "Stone texture Dark Grey & White", stock: 0 }
+      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & White", stock: 0 },
+      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Dark Grey & Black", stock: 0 }
     ]
   },
   {
