@@ -259,12 +259,43 @@ const textureCategories = [
     color: "from-leather-100 to-mocha-100",
     accent: "leather-600",
     panels: [
-      { id: "T6301", name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/3.jpg", desc: "Chambray Grid texture for contemporary interior walls", stock: 10 },
-      { id: "S6029", name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/9.jpg", desc: "Rice Grain Weave texture for contemporary interior walls", stock: 10 },
-      { id: "T6102", name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/5.jpg", desc: "Silver Mesh texture for contemporary interior walls", stock: 10 },
-      { id: "T6306", name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/11.jpg", desc: "Alabaster Cotton texture for contemporary interior walls", stock: 10 },
-      { id: "S6020", name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/6.jpg", desc: "Soft Gauze texture for contemporary interior walls", stock: 10 }
-    ]
+  { 
+    id: "T6301", 
+    name: "Chambray Grid", 
+    img: "/images/carbon-rock-boards/fabric/1.jpg", 
+    desc: "Chambray Grid texture with subtle woven pattern, ideal for modern interiors.", 
+    stock: 10 
+  },
+  { 
+    id: "S6029",
+    name: "Rice Grain Weave", 
+    img: "/images/carbon-rock-boards/fabric/2.jpg", 
+    desc: "Rice Grain Weave surface resembling natural linen threads.", 
+    stock: 10 
+  },
+  { 
+    id: "T6102", 
+    name: "Silver Mesh", 
+    img: "/images/carbon-rock-boards/fabric/3.jpg", 
+    desc: "Silver Mesh metallic-style weave, adding reflective depth.", 
+    stock: 10 
+  },
+  { 
+    id: "T6306", 
+    name: "Alabaster Cotton", 
+    img: "/images/carbon-rock-boards/fabric/4.jpg", 
+    desc: "Alabaster Cotton smooth textile finish with soft tone.", 
+    stock: 10 
+  },
+  { 
+    id: "S6020", 
+    name: "Soft Gauze", 
+    img: "/images/carbon-rock-boards/fabric/5.jpg", 
+    desc: "Soft Gauze airy fabric effect with delicate transparency.", 
+    stock: 10 
+  }
+]
+
   },
   {
     id: 'wood',
@@ -394,13 +425,6 @@ const textureCategories = [
     name: "Mirror Bronze", 
     img: "/images/carbon-rock-boards/mirror/1.webp", 
     desc: "Elegant bronze mirror with a warm reflection.", 
-    stock: 10 
-  },
-  { 
-    id: "MR2002", 
-    name: "Ripple Silver Mirror", 
-    img: "/images/carbon-rock-boards/mirror/5.webp", 
-    desc: "Textured silver mirror with a modern shine.", 
     stock: 10 
   },
   { 
@@ -1358,19 +1382,19 @@ function StepGaming({
         {gamingToggles.map(({ key, title, Icon }) => {
           const active = !!state.gaming.options[key];
           return (
-            <Card
-              key={key}
-              active={active}
-              onClick={() =>
-                setState((p) => ({
-                  ...p,
-                  gaming: {
-                    ...p.gaming,
-                    options: { ...p.gaming.options, [key]: !active },
-                  },
-                }))
-              }
-            >
+           <Card
+            key={key}
+            active={active}
+            onClick={() =>
+              setState((p) => ({
+                ...p,
+                gaming: {
+                  ...p.gaming,
+                  options: { ...p.gaming.options, [key]: !active },
+                },
+              }))
+            }
+          >
               <div className="flex items-center gap-3">
                 <Icon className="w-6 h-6" />
                 <div>

@@ -282,9 +282,7 @@ const CarbonRockBoards = () => {
 
 
       {/* Explore Our Panel Series – Visual Gallery */}
- 
 
-      <TextureSection />
 
       {/* Application Scenarios */}
       <section className="py-16 bg-[#faf7f3]">
