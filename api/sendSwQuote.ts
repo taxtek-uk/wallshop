@@ -38,7 +38,7 @@ type Payload = {
   dimensions?: {
     widthMm: number;
     heightMm: number;
-    moduleWidth: number;
+    moduleDepth: number;
     usableWidth: number;
     slotCount: number;
   };
@@ -90,7 +90,7 @@ function sanitizePayload(input: any): Payload {
     p.dimensions = {
       widthMm: isFiniteNumber(d.widthMm) ? d.widthMm : 0,
       heightMm: isFiniteNumber(d.heightMm) ? d.heightMm : 0,
-      moduleWidth: isFiniteNumber(d.moduleWidth) ? d.moduleWidth : 0,
+      moduleDepth: isFiniteNumber(d.moduleDepth) ? d.moduleDepth : 0,
       usableWidth: isFiniteNumber(d.usableWidth) ? d.usableWidth : 0,
       slotCount: isFiniteNumber(d.slotCount) ? d.slotCount : 0,
     };
@@ -274,8 +274,8 @@ function renderHtmlEmail(p: Payload) {
                 <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.heightMm)}</td>
               </tr>
               <tr>
-                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Module Width (mm):</td>
-                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.moduleWidth)}</td>
+                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Module Depth (mm):</td>
+                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.moduleDepth)}</td>
               </tr>
               <tr style="background-color: #ffffff;">
                 <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Usable Width (mm):</td>
@@ -501,8 +501,7 @@ function renderTextEmail(p: Payload) {
     "Dimensions:",
     `- Width (mm): ${d.widthMm}`,
     `- Height (mm): ${d.heightMm}`,
-    `- Module Width (mm): ${d.moduleWidth}`,
-    `- Usable Width (mm): ${d.usableWidth}`,
+    `- Module Depth (mm): ${fmt(d.moduleDepth)}`,   `- Usable Width (mm): ${d.usableWidth}`,
     `- Slot Count: ${d.slotCount}`,
     "",
     "Accessories:",
