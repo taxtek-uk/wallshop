@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // adjust import based on your setup
 import Navigation from '@/components/Navigation';
-import TextureSection from '@/components/TextureSection';
+
 import Footer from '@/components/Footer';
 import SwQuoteModal from '@/components/SwQuoteModal';
 
@@ -737,11 +737,7 @@ function SmartWalls() {
 
 
       {/* Board Styles Section */}
-      <section className="py-20 bg-gradient-to-br from-[#faf7f3] to-white">
-
-        <TextureSection />
-        
-      </section>
+      
 
       {/* Process Steps Section */}
       <section className="py-20 bg-white">

@@ -473,6 +473,7 @@ function renderTextEmail(p: Payload) {
   const g = p.gaming!;
   const s = p.style!;
   const contact = p.contact || {};
+  const fmt = (n: number) => new Intl.NumberFormat("en-GB").format(n);
   
   return [
     "NEW SMART WALL QUOTE - THE WALL SHOP",
