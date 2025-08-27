@@ -391,48 +391,47 @@ const textureCategories = [
     panels: [
   { 
     id: "MR2001", 
-    name: "Mirror Black", 
-    img: "/images/carbon-rock-boards/mirror/3.jpg", 
-    desc: "Deep black mirror surface with a sleek, dramatic reflection.", 
+    name: "Mirror Bronze", 
+    img: "/images/carbon-rock-boards/mirror/1.webp", 
+    desc: "Elegant bronze mirror with a warm reflection.", 
     stock: 10 
   },
   { 
     id: "MR2002", 
-    name: "Mirror White", 
-    img: "/images/carbon-rock-boards/mirror/5.jpg", 
-    desc: "Bright white mirrored finish that adds clarity and light.", 
+    name: "Ripple Silver Mirror", 
+    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    desc: "Textured silver mirror with a modern shine.", 
     stock: 10 
   },
   { 
     id: "MR2003", 
-    name: "Mirror Silver", 
-    img: "/images/carbon-rock-boards/mirror/6.jpg", 
-    desc: "Classic silver mirror with crisp, high reflectivity.", 
+    name: "Mirror Black", 
+    img: "/images/carbon-rock-boards/mirror/2.webp", 
+    desc: "Bold black mirror with a dramatic reflection.", 
     stock: 10 
   },
   { 
     id: "MR2004", 
-    name: "Mirror Gold", 
-    img: "/images/carbon-rock-boards/mirror/4.jpg", 
-    desc: "Luxurious gold mirror with a warm, radiant shine.", 
+    name: "Ripple Gold Mirror", 
+    img: "/images/carbon-rock-boards/mirror/4.webp", 
+    desc: "Textured gold mirror with a radiant glow.", 
     stock: 10 
   },
   { 
     id: "MR2005", 
-    name: "Mirror Ripple Gold", 
-    img: "/images/carbon-rock-boards/mirror/1.jpg", 
-    desc: "Ripple-textured gold mirror creating a dynamic, shimmering effect.", 
+    name: "Mirror Silver", 
+    img: "/images/carbon-rock-boards/mirror/3.webp", 
+    desc: "Classic silver mirror with a clear finish.", 
     stock: 10 
   },
   { 
-    id: "MR2006", 
-    name: "Mirror Ripple Silver", 
-    img: "/images/carbon-rock-boards/mirror/5.jpg", 
-    desc: "Ripple-textured silver mirror with modern reflective depth.", 
+    id: "MR2006",
+    name: "Mirror White", 
+    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    desc: "Clean white mirror with a bright reflection.", 
     stock: 10 
   }
 ]
-
   }
 ];
 
@@ -1166,13 +1165,13 @@ function StepDimensions({
           <p className="text-sm">
             Usable width: <strong>{numberFormat(usableWidth)} mm</strong>
           </p>
-          <p className="text-sm">
+          {/* <p className="text-sm">
             Slot count:{" "}
             <strong>
-              {slotCount} × {state.moduleWidth} mm
+              {slotCount} × {state.moduleDepth} mm
             </strong>{" "}
             after {WIDTH_CLEARANCE} mm clearance.
-          </p>
+          </p> */}
           <p className="text-xs text-gray-600">
             Modules will scale to fit total height ({numberFormat(state.heightMm)} mm).
           </p>
@@ -1711,7 +1710,7 @@ function StepSummary({
     },
     {
       label: "Module Width",
-      value: `${state.moduleWidth} mm`,
+      value: `${state.moduleDepth} mm`,
     },
     {
       label: "Usable Width",
