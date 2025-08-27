@@ -51,7 +51,7 @@ type Step =
   | "contact"
   | "summary";
 
-type ModuleWidth = 400 | 600 | 800 | 1000 | 1100 | 1200;
+type ModuleDepth = 120 | 150 | 180;
 
 type AccessoryKey = "tv" | "fireplace" | "soundbar";
 type GamingMode = "single" | "dual";
@@ -106,7 +106,7 @@ type SwQuoteState = {
   widthUnit: Unit;
   heightInput: string; // as typed
   heightUnit: Unit;
-  moduleWidth: ModuleWidth;
+  moduleDepth: ModuleDepth;
 
   // Derived, normalized (mm)
   widthMm: number;
@@ -157,7 +157,7 @@ const DEFAULT_HEIGHT = 2400;
 const WIDTH_CLEARANCE = 100; // mm
 const DUAL_SCREEN_MIN_WIDTH = 3000; // mm
 
-const MODULE_WIDTHS: ModuleWidth[] = [400, 600, 800, 1000, 1100, 1200];
+const MODULE_DEPTHS: ModuleDepth[] = [120, 150, 180];
 
 const deviceCatalog: {
   key: DeviceKey;
@@ -582,7 +582,7 @@ export default function SwQuoteModal({
     widthUnit: "mm",
     heightInput: "",
     heightUnit: "mm",
-    moduleWidth: 800,
+    moduleDepth: 120,
     widthMm: 0,
     heightMm: 0,
     accessories: { tv: false, fireplace: false, soundbar: false, shelvingQty: 0 },
@@ -614,8 +614,8 @@ export default function SwQuoteModal({
 
   const usableWidth = Math.max(0, state.widthMm - WIDTH_CLEARANCE);
   const slotCount = useMemo(() => {
-    return Math.floor(usableWidth / state.moduleWidth);
-  }, [usableWidth, state.moduleWidth]);
+    return Math.floor(usableWidth / state.moduleDepth);
+  }, [usableWidth, state.moduleDepth]);
 
   const canNextDimensions =
     state.widthMm > 0 &&
@@ -701,7 +701,7 @@ export default function SwQuoteModal({
       dimensions: {
         widthMm: state.widthMm,
         heightMm: state.heightMm,
-        moduleWidth: state.moduleWidth,
+        moduleDepth: state.moduleDepth,
         usableWidth,
         slotCount,
       },
@@ -902,7 +902,7 @@ export default function SwQuoteModal({
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    Submit Quote
+                    Submit Quote Request
                   </>
                 )}
               </button>
@@ -1147,16 +1147,16 @@ function StepDimensions({
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Preferred Module Width">
+        <Field label="Preferred Module Depth">
           <div className="flex flex-wrap gap-2">
-            {MODULE_WIDTHS.map((mw) => (
-              <RadioPill<ModuleWidth>
-                key={mw}
-                value={mw}
-                current={state.moduleWidth}
-                onSelect={(v) => setState((p) => ({ ...p, moduleWidth: v }))}
+            {MODULE_DEPTHS.map((md) => (
+              <RadioPill<ModuleDepth>
+                key={md}
+                value={md}
+                current={state.moduleDepth}
+                onSelect={(v) => setState((p) => ({ ...p, moduleDepth: v }))}
               >
-                {mw} mm
+                {md} mm
               </RadioPill>
             ))}
           </div>
@@ -1532,16 +1532,13 @@ function StepStyles({
                   <div className="mt-2 text-center">
                     <div className="text-sm font-medium">{f.name}</div>
                     <div className="text-xs text-gray-600">{f.id}</div>
-                    {typeof f.stock === "number" && (
-                      <div className="text-[11px] text-gray-500">
-                        Stock: {f.stock}
-                      </div>
-                    )}
+
                   </div>
                 </button>
               );
             })}
           </div>
+          <p className="text-xs text-gray-600 text-center">Many more options are available on request</p>
         </>
       )}
     </motion.div>
