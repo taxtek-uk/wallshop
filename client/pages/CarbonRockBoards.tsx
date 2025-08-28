@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
-import TextureSection from "@/components/TextureSection"
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Footer from "@/components/Footer";
 import CrbQuoteModal from "@/components/CrbQuoteModal";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,222 @@ import {
   ArrowRight,
   MessagesSquare,
   Users,
+  Square,
   Warehouse,
   ChevronRight,
+  TreePine,
+  Gem
 } from "lucide-react";
 
 
+
+
+// Texture Categories Data
+const textureCategories = [
+  {
+    id: 'fabric',
+    name: "Cloth Pattern Series",
+    desc: "Soft textile pattern with acoustic value.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/cloth.jpg",
+    color: "from-leather-100 to-mocha-100",
+    accent: "leather-600",
+    panels: [
+  { 
+    id: "T6301", 
+    name: "Chambray Grid", 
+    img: "/images/carbon-rock-boards/fabric/1.jpg", 
+    desc: "Chambray Grid texture with subtle woven pattern, ideal for modern interiors.", 
+    stock: 10 
+  },
+  { 
+    id: "S6029",
+    name: "Rice Grain Weave", 
+    img: "/images/carbon-rock-boards/fabric/2.jpg", 
+    desc: "Rice Grain Weave surface resembling natural linen threads.", 
+    stock: 10 
+  },
+  { 
+    id: "T6102", 
+    name: "Silver Mesh", 
+    img: "/images/carbon-rock-boards/fabric/3.jpg", 
+    desc: "Silver Mesh metallic-style weave, adding reflective depth.", 
+    stock: 10 
+  },
+  { 
+    id: "T6306", 
+    name: "Alabaster Cotton", 
+    img: "/images/carbon-rock-boards/fabric/4.jpg", 
+    desc: "Alabaster Cotton smooth textile finish with soft tone.", 
+    stock: 10 
+  },
+  { 
+    id: "S6020", 
+    name: "Soft Gauze", 
+    img: "/images/carbon-rock-boards/fabric/5.jpg", 
+    desc: "Soft Gauze airy fabric effect with delicate transparency.", 
+    stock: 10 
+  }
+]
+
+  },
+  {
+    id: 'wood',
+    name: "Wood Grain Series",
+    desc: "Warm wood aesthetics with durable surface.",
+    icon: TreePine,
+    img: "/images/carbon-rock-boards/wood.jpg",
+    color: "from-amber-100 to-orange-100",
+    accent: "amber-600",
+    panels: [
+      { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
+      { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
+      { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
+      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
+      { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
+      { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
+    ]
+  },
+  {
+    id: 'solid',
+    name: "Solid Color Series",
+    desc: "Industrial elegance with raw, minimalist tones.",
+    icon: Square,
+    img: "/images/carbon-rock-boards/wpc.jpg",
+    color: "from-slate-100 to-gray-100",
+    accent: "slate-600",
+    panels: [
+      { id: "T8201", name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism", stock: 10 },
+      { id: "T8026", name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look", stock: 10 },
+      { id: "T8107", name: "Slate Blue", img: "/images/carbon-rock-boards/solid/3.jpg", desc: "Dark blue-grey with a sophisticated edge", stock: 10 },
+      { id: "T8039", name: "Ivory", img: "/images/carbon-rock-boards/solid/4.jpg", desc: "Soft ivory tone perfect for elegant settings", stock: 10 },
+      { id: "T8103", name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/5.jpg", desc: "Soft pearl-beige tone for warm ambience", stock: 10 },
+      { id: "T8036", name: "Desert Sand", img: "/images/carbon-rock-boards/solid/6.jpg", desc: "Warm tan reminiscent of natural sands", stock: 10 },
+      { id: "T8008", name: "Obsidian", img: "/images/carbon-rock-boards/solid/7.jpg", desc: "Matte black with premium depth and richness", stock: 10 }
+    ]
+  },
+  {
+    id: 'stone',
+    name: "Stone Grain Series",
+    desc: "Classic stone surface with timeless elegance.",
+    icon: Gem,
+    img: "/images/carbon-rock-boards/stone.jpg",
+    color: "from-stone-100 to-slate-100",
+    accent: "stone-600",
+    panels: [
+      { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 0 },
+      { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture Black & Blue", stock: 0 },
+      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & White", stock: 0 },
+      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Dark Grey & Black", stock: 0 }
+    ]
+  },
+  {
+    id: 'metallic',
+    name: "Metal Series",
+    desc: "Luxury feel with metallic luster and reflectivity.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/metal.jpg",
+    color: "from-amber-100 to-yellow-100",
+    accent: "amber-600",
+    panels: [
+  { 
+    id: "LS-2A05", 
+    name: "Antique Copper", 
+    img: "/images/carbon-rock-boards/metal/1.jpg", 
+    desc: "Rich antique copper finish with timeless, rustic charm.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A06", 
+    name: "Urban Brass", 
+    img: "/images/carbon-rock-boards/metal/2.jpg", 
+    desc: "Bold brass tone with an industrial, modern character.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A08", 
+    name: "Champagne Gold", 
+    img: "/images/carbon-rock-boards/metal/3.jpg", 
+    desc: "Luxurious champagne gold with a refined, soft glow.", 
+    stock: 10 
+  },
+  { 
+    id: "LS-2A09", 
+    name: "Brushed Bronze", 
+    img: "/images/carbon-rock-boards/metal/4.jpg", 
+    desc: "Matte brushed bronze with warm, contemporary appeal.", 
+    stock: 10 
+  },
+  { 
+    id: "SZ-703", 
+    name: "Brushed Silver", 
+    img: "/images/carbon-rock-boards/metal/5.jpg", 
+    desc: "Sleek brushed silver offering a clean, modern look.", 
+    stock: 10 
+  },
+  { 
+    id: "SZ-705", 
+    name: "Satin Titanium", 
+    img: "/images/carbon-rock-boards/metal/6.jpg", 
+    desc: "Smooth satin titanium with a durable, futuristic finish.", 
+    stock: 10 
+  },
+  { 
+    id: "H-8301", 
+    name: "Brushed Copper", 
+    img: "/images/carbon-rock-boards/metal/7.jpg", 
+    desc: "Textured brushed copper with a warm metallic tone.", 
+    stock: 10 
+  }
+]
+  },
+  {
+    id: 'mirror',
+    name: "Mirror Series",
+    desc: "Reflective brilliance with a sleek, high-gloss finish.",
+    icon: Square,
+    img: "/images/carbon-rock-boards/mirror.jpg",
+    color: "from-leather-100 to-leather-100",
+    accent: "stone-600",
+    panels: [
+  { 
+    id: "MR2001", 
+    name: "Mirror Bronze", 
+    img: "/images/carbon-rock-boards/mirror/1.webp", 
+    desc: "Elegant bronze mirror with a warm reflection.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2003", 
+    name: "Mirror Black", 
+    img: "/images/carbon-rock-boards/mirror/2.webp", 
+    desc: "Bold black mirror with a dramatic reflection.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2004", 
+    name: "Ripple Gold Mirror", 
+    img: "/images/carbon-rock-boards/mirror/4.webp", 
+    desc: "Textured gold mirror with a radiant glow.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2005", 
+    name: "Mirror Silver", 
+    img: "/images/carbon-rock-boards/mirror/3.webp", 
+    desc: "Classic silver mirror with a clear finish.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2006",
+    name: "Mirror White", 
+    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    desc: "Clean white mirror with a bright reflection.", 
+    stock: 10 
+  }
+]
+  }
+];
 
 // AI Chatbot widget (basic floating bubble, triggers chat on click)
 const AIChatWidget = () => (
@@ -54,6 +265,7 @@ const AIChatWidget = () => (
 const CarbonRockBoards = () => {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string }>({ name: "", price: "" });
+  const [selectedCategory, setSelectedCategory] = useState('fabric');
   // --- SEO and Schema ---
   useEffect(() => {
     document.title =
@@ -281,8 +493,155 @@ const CarbonRockBoards = () => {
 </section>
 
 
-      {/* Explore Our Panel Series – Visual Gallery */}
+      {/* NEW SECTION: Premium Texture Collection */}
+      <section id="textures" className="py-20 bg-gradient-to-br from-[#f8f6f3] to-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white mb-6 text-sm px-4 py-2 rounded-full inline-block shadow-md">
+              Premium Materials
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight">
+              <span className="block text-gray-800">Premium Texture</span>
+              <span className="block bg-gradient-to-r from-[#b69777] via-[#b89773] to-[#907252] bg-clip-text text-transparent">
+                Collection
+              </span>
+            </h2>
+            <p className="text-xl text-[#6b5c47] max-w-4xl mx-auto leading-relaxed">
+              Choose from our extensive collection of premium textures and finishes. Each series offers unique aesthetic qualities and functional benefits to perfectly complement your smart wall system.
+            </p>
+          </motion.div>
 
+          {/* Category Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-wrap justify-center gap-4 mb-16"
+          >
+            {textureCategories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex items-center space-x-3 px-6 py-3 rounded-full transition-all duration-300 ${
+                  selectedCategory === category.id
+                    ? 'bg-gradient-to-r from-[#b69777] to-[#907252] text-white shadow-lg'
+                    : 'bg-white border border-[#e2d5c4] text-[#6b5c47] hover:border-[#b69777] hover:shadow-md'
+                }`}
+              >
+                <category.icon className="w-5 h-5" />
+                <span className="font-medium">{category.name}</span>
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Selected Category Display */}
+          {textureCategories.map((category) => (
+            selectedCategory === category.id && (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                {/* Category Header */}
+                <div className="text-center mb-12">
+                  <div className="flex items-center justify-center space-x-4 mb-6">
+                    <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center`}>
+                      <category.icon className="w-8 h-8 text-[#6b5c47]" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-3xl font-bold text-[#231c14] mb-2">{category.name}</h3>
+                      <p className="text-lg text-[#6b5c47]">{category.desc}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panels Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {category.panels.map((panel, i) => (
+                    <motion.div
+                      key={panel.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: i * 0.1 }}
+                      className="group"
+                    >
+                      <div className="bg-white rounded-2xl shadow-lg border border-[#e2d5c4] overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                        <div className="relative h-48 overflow-hidden">
+                          <img
+                            src={panel.img}
+                            alt={panel.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0" />
+                          {/* <div className="absolute top-3 right-3">
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              panel.stock > 0 
+                                ? 'bg-green-500 text-white' 
+                                : 'bg-red-500 text-white'
+                            }`}>
+                              {panel.stock > 0 ? `${panel.stock} In Stock` : 'Out of Stock'}
+                            </div>
+                          </div> */}
+                          <div className="absolute bottom-3 left-3">
+                            <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
+                              {panel.id}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-6">
+                          <h4 className="text-xl font-bold text-[#231c14] mb-3">{panel.name}</h4>
+                          <p className="text-[#6b5c47] text-sm leading-relaxed">{panel.desc}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )
+          ))}
+
+          {/* Call to Action */}
+          <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="bg-gradient-to-r from-[#b69777]/5 to-[#907252]/5 rounded-3xl p-8 border border-[#e2d5c4] text-center"
+            >
+              <h3 className="text-3xl font-bold text-[#231c14] mb-4">Need Help Choosing?</h3>
+              
+              <p className="text-xl text-[#6b5c47] mb-4 max-w-3xl mx-auto">
+                Our design experts can help you select the perfect texture combination for your smart wall system. 
+                Get personalised recommendations based on your space and style preferences.
+              </p>
+
+              {/* Animated extra line */}
+              <motion.p
+                initial={{ opacity: 0, y:     10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg text-[#907252] italic mb-8"
+              >
+                Many more options are available on request.
+              </motion.p>
+
+              <button
+                className="bg-gradient-to-r from-[#b69777] to-[#907252] text-white hover:from-[#907252] hover:to-[#b69777] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 px-8 py-4 text-lg rounded-full font-semibold flex items-center justify-center mx-auto"
+                onClick={() => setIsQuoteModalOpen(true)}
+              >
+                Get Consultation <ArrowRight className="ml-2 h-5 w-5" />
+              </button>
+            </motion.div>
+
+        </div>
+      </section>
 
       {/* Application Scenarios */}
       <section className="py-16 bg-[#faf7f3]">
