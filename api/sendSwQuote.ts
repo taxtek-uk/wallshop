@@ -281,10 +281,7 @@ function renderHtmlEmail(p: Payload) {
                 <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Usable Width (mm):</td>
                 <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.usableWidth)}</td>
               </tr>
-              <tr>
-                <td style="font-weight: 600; color: #475569; font-size: 14px; padding: 8px 12px;">Slot Count:</td>
-                <td style="color: #1e293b; font-size: 14px; font-weight: 600; padding: 8px 12px;">${fmt(d.slotCount)}</td>
-              </tr>
+              
             </table>
 
             <!-- Accessories -->
@@ -503,7 +500,7 @@ function renderTextEmail(p: Payload) {
     `- Width (mm): ${d.widthMm}`,
     `- Height (mm): ${d.heightMm}`,
     `- Module Depth (mm): ${fmt(d.moduleDepth)}`,   `- Usable Width (mm): ${d.usableWidth}`,
-    `- Slot Count: ${d.slotCount}`,
+    
     "",
     "Accessories:",
     a.tv ? "- ✓ TV Module" : "",
@@ -597,7 +594,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const finishName = payload.style?.finish?.name || "Custom Configuration";
     const slotCount = payload.dimensions.slotCount;
     
-    const subject = `Smart Wall Quote — ${customerName} — ${finishName} (${slotCount} slots)`;
+    const subject = `Smart Wall Quote — ${customerName} — ${finishName}`;
     const ccRecipient = payload.contact?.email || process.env.CC_EMAIL;
 
     const { data, error } = await resend.emails.send({
