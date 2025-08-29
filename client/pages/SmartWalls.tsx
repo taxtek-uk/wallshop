@@ -69,42 +69,69 @@ const textureCategories = [
     accent: "leather-600",
     panels: [
   { 
-    id: "T6301", 
-    name: "Chambray Grid", 
-    img: "/images/carbon-rock-boards/fabric/1.jpg", 
-    desc: "Chambray Grid texture with subtle woven pattern, ideal for modern interiors.", 
-    stock: 10 
-  },
-  { 
-    id: "S6029",
-    name: "Rice Grain Weave", 
-    img: "/images/carbon-rock-boards/fabric/2.jpg", 
-    desc: "Rice Grain Weave surface resembling natural linen threads.", 
-    stock: 10 
-  },
-  { 
-    id: "T6102", 
-    name: "Silver Mesh", 
-    img: "/images/carbon-rock-boards/fabric/3.jpg", 
-    desc: "Silver Mesh metallic-style weave, adding reflective depth.", 
-    stock: 10 
-  },
-  { 
-    id: "T6306", 
-    name: "Alabaster Cotton", 
-    img: "/images/carbon-rock-boards/fabric/4.jpg", 
-    desc: "Alabaster Cotton smooth textile finish with soft tone.", 
-    stock: 10 
-  },
-  { 
-    id: "S6020", 
-    name: "Soft Gauze", 
-    img: "/images/carbon-rock-boards/fabric/5.jpg", 
-    desc: "Soft Gauze airy fabric effect with delicate transparency.", 
-    stock: 10 
-  }
+  id: "T6004", 
+  name: "Stone Weave", 
+  img: "/images/carbon-rock-boards/fabric/t6004.jpg", 
+  desc: "Subtle woven texture with a natural stone-inspired fabric look, ideal for refined interiors.", 
+  stock: 10 
+},
+{ 
+  id: "T6104", 
+  name: "Stone Bead", 
+  img: "/images/carbon-rock-boards/fabric/t6104.jpg", 
+  desc: "Delicate beaded weave with a tactile stone-like surface, offering a modern textile effect.", 
+  stock: 10 
+},
+{ 
+  id: "T6201", 
+  name: "Pearl Shimmer", 
+  img: "/images/carbon-rock-boards/fabric/t6201.jpg", 
+  desc: "Elegant woven finish with a soft pearl shimmer, adding subtle radiance to interiors.", 
+  stock: 10 
+},
+{ 
+  id: "T6301", 
+  name: "Chambray Grid", 
+  img: "/images/carbon-rock-boards/fabric/t6301.jpg", 
+  desc: "Classic chambray-style grid pattern with a balanced woven texture for modern spaces.", 
+  stock: 10 
+},
+{ 
+  id: "S6026", 
+  name: "Mauve Weave", 
+  img: "/images/carbon-rock-boards/fabric/s6026.jpg", 
+  desc: "Textured weave in a soft mauve tone, blending warmth with subtle sophistication.", 
+  stock: 10 
+},
+{ 
+  id: "S6029",
+  name: "Rice Grain Weave", 
+  img: "/images/carbon-rock-boards/fabric/s6029.jpg", 
+  desc: "Distinctive rice-grain weave resembling natural linen threads for an organic appeal.", 
+  stock: 10 
+},
+{ 
+  id: "T6102", 
+  name: "Silver Mesh", 
+  img: "/images/carbon-rock-boards/fabric/t6102.jpg", 
+  desc: "Reflective mesh weave with a silver metallic effect, adding depth and dimension.", 
+  stock: 10 
+},
+{ 
+  id: "T6306", 
+  name: "Alabaster Cotton", 
+  img: "/images/carbon-rock-boards/fabric/t6306.jpg", 
+  desc: "Smooth cotton-inspired surface in an alabaster tone, offering a clean and minimal look.", 
+  stock: 10 
+},
+{ 
+  id: "S6020", 
+  name: "Soft Gauze", 
+  img: "/images/carbon-rock-boards/fabric/t6020.jpg", 
+  desc: "Lightweight gauze-like texture with a delicate, airy transparency.", 
+  stock: 10 
+}
 ]
-
   },
   {
     id: 'wood',
@@ -150,10 +177,12 @@ const textureCategories = [
     color: "from-stone-100 to-slate-100",
     accent: "stone-600",
     panels: [
-      { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 0 },
-      { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/2.jpg", desc: "Stone texture Black & Blue", stock: 0 },
-      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & White", stock: 0 },
-      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Dark Grey & Black", stock: 0 }
+      { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 10 },
+      { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/s3232.jpg", desc: "Stone texture Black & Blue", stock: 10 },
+      { id: "S3233", name: "Grey & Blue", img: "/images/carbon-rock-boards/stone/s3233.jpg", desc: "Stone texture Grey & Blue", stock: 10 },
+      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & White", stock: 10 },
+      { id: "T3019", name: "Black & Brown", img: "/images/carbon-rock-boards/stone/t3019.jpg", desc: "Stone texture Black & Brown", stock: 10 },
+      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Dark Grey & Black", stock: 10 }
     ]
   },
   {
@@ -168,52 +197,66 @@ const textureCategories = [
   { 
     id: "LS-2A05", 
     name: "Antique Copper", 
-    img: "/images/carbon-rock-boards/metal/1.jpg", 
+    img: "/images/carbon-rock-boards/metal/ls-2a05.jpg", 
     desc: "Rich antique copper finish with timeless, rustic charm.", 
     stock: 10 
   },
   { 
     id: "LS-2A06", 
     name: "Urban Brass", 
-    img: "/images/carbon-rock-boards/metal/2.jpg", 
+    img: "/images/carbon-rock-boards/metal/ls-2a06.jpg", 
     desc: "Bold brass tone with an industrial, modern character.", 
     stock: 10 
   },
   { 
     id: "LS-2A08", 
     name: "Champagne Gold", 
-    img: "/images/carbon-rock-boards/metal/3.jpg", 
+    img: "/images/carbon-rock-boards/metal/ls-2a08.jpg", 
     desc: "Luxurious champagne gold with a refined, soft glow.", 
     stock: 10 
   },
   { 
     id: "LS-2A09", 
     name: "Brushed Bronze", 
-    img: "/images/carbon-rock-boards/metal/4.jpg", 
+    img: "/images/carbon-rock-boards/metal/ls-2a09.jpg", 
     desc: "Matte brushed bronze with warm, contemporary appeal.", 
     stock: 10 
   },
   { 
     id: "SZ-703", 
     name: "Brushed Silver", 
-    img: "/images/carbon-rock-boards/metal/5.jpg", 
+    img: "/images/carbon-rock-boards/metal/sz-703.jpg", 
     desc: "Sleek brushed silver offering a clean, modern look.", 
     stock: 10 
   },
   { 
     id: "SZ-705", 
     name: "Satin Titanium", 
-    img: "/images/carbon-rock-boards/metal/6.jpg", 
+    img: "/images/carbon-rock-boards/metal/sz-705.jpg", 
     desc: "Smooth satin titanium with a durable, futuristic finish.", 
     stock: 10 
   },
   { 
     id: "H-8301", 
     name: "Brushed Copper", 
-    img: "/images/carbon-rock-boards/metal/7.jpg", 
+    img: "/images/carbon-rock-boards/metal/h-8301.jpg", 
     desc: "Textured brushed copper with a warm metallic tone.", 
     stock: 10 
-  }
+  },
+  { 
+  id: "SJ-2003", 
+  name: "Cobalt Satin Metal", 
+  img: "/images/carbon-rock-boards/metal/sj-2003.jpg", 
+  desc: "Smooth satin finish with a cool cobalt blue metallic tone.", 
+  stock: 10 
+},
+{ 
+  id: "S-8026", 
+  name: "Bronze Satin Metal", 
+  img: "/images/carbon-rock-boards/metal/s-8026.jpg", 
+  desc: "Elegant satin finish with a rich bronze metallic appearance.", 
+  stock: 10 
+}
 ]
   },
   {
@@ -230,6 +273,13 @@ const textureCategories = [
     name: "Mirror Bronze", 
     img: "/images/carbon-rock-boards/mirror/1.webp", 
     desc: "Elegant bronze mirror with a warm reflection.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2002", 
+    name: "Ripple Silver Mirror", 
+    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    desc: "Elegant silver mirror with a subtle ripple texture for a modern reflective finish.", 
     stock: 10 
   },
   { 
@@ -256,7 +306,7 @@ const textureCategories = [
   { 
     id: "MR2006",
     name: "Mirror White", 
-    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    img: "/images/carbon-rock-boards/mirror/jm03.jpg", 
     desc: "Clean white mirror with a bright reflection.", 
     stock: 10 
   }
