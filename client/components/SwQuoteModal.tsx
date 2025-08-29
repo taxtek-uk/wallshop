@@ -418,9 +418,16 @@ const textureCategories = [
     panels: [
   { 
     id: "MR2001", 
-    name: "Mirror Gold", 
+    name: "Mirror Bronze", 
     img: "/images/carbon-rock-boards/mirror/1.webp", 
     desc: "Elegant bronze mirror with a warm reflection.", 
+    stock: 10 
+  },
+  { 
+    id: "MR2002", 
+    name: "Ripple Silver Mirror", 
+    img: "/images/carbon-rock-boards/mirror/5.webp", 
+    desc: "Elegant silver mirror with a subtle ripple texture for a modern reflective finish.", 
     stock: 10 
   },
   { 
@@ -446,13 +453,6 @@ const textureCategories = [
   },
   { 
     id: "MR2006",
-    name: "Ripple Mirror Silver", 
-    img: "/images/carbon-rock-boards/mirror/5.webp", 
-    desc: "Clean white mirror with a bright reflection.", 
-    stock: 10 
-  },
-  { 
-    id: "MR2007",
     name: "Mirror White", 
     img: "/images/carbon-rock-boards/mirror/5.webp", 
     desc: "Clean white mirror with a bright reflection.", 
