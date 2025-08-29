@@ -447,6 +447,13 @@ const textureCategories = [
   img: "/images/carbon-rock-boards/metal/s-8026.jpg", 
   desc: "Elegant satin finish with a rich bronze metallic appearance.", 
   stock: 10 
+},
+{ 
+  id: "S-8115", 
+  name: "Steel Shine Mosaic", 
+  img: "/images/carbon-rock-boards/metal/s8115.jpg", 
+  desc: "The brushed texture gives it a modern, reflective, metallic look.", 
+  stock: 10 
 }
 ]
   },
