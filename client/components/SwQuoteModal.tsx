@@ -468,9 +468,9 @@ const textureCategories = [
     panels: [
   { 
     id: "MR2001", 
-    name: "Mirror Bronze", 
+    name: "Mirror Gold", 
     img: "/images/carbon-rock-boards/mirror/1.webp", 
-    desc: "Elegant bronze mirror with a warm reflection.", 
+    desc: "Elegant gold mirror with a warm reflection.", 
     stock: 10 
   },
   { 
