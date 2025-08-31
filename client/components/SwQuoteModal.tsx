@@ -1778,24 +1778,20 @@ function StepSummary({
 }) {
   const rows: { label: string; value: React.ReactNode }[] = [
     {
-      label: "Contact",
+      label: "Contact Person",
       value: `${state.contact.name} (${state.contact.email})`,
     },
     {
-      label: "Dimensions",
+      label: "Dimensions (w x h)",
       value: `${numberFormat(state.widthMm)} × ${numberFormat(state.heightMm)} mm`,
     },
     {
-      label: "Module Width",
+      label: "Module Depth",
       value: `${state.moduleDepth} mm`,
     },
     {
       label: "Usable Width",
       value: `${numberFormat(usableWidth)} mm`,
-    },
-    {
-      label: "Slots",
-      value: `${slotCount}`,
     },
     {
       label: "Accessories",
@@ -1829,7 +1825,7 @@ function StepSummary({
           : ""),
     },
     {
-      label: "Devices",
+      label: "Selected Smart Devices",
       value:
         Object.entries(state.devices)
           .filter(([, v]) => v)
@@ -1837,7 +1833,7 @@ function StepSummary({
           .join(", ") || "None",
     },
     {
-      label: "Style",
+      label: "Selected Finish Style",
       value: state.finish
         ? `${state.styleCategory?.toUpperCase()} • ${state.finish.name} (${state.finish.id})`
         : "None selected",
