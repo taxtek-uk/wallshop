@@ -14,7 +14,15 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'Home', to: '/' },
-  { name: 'Smart Walls', to: '/smart-walls' },
+  { name: 'Smart Walls', to: '/smart-walls', children: [
+      { name: 'Smart Bedroom Wall', to: '/smart-bedroom'},
+      { name: 'Smart Gaming Wall', to: '/smart-gaming'},
+      { name: 'Smart Living Room Wall', to: '#' },
+      { name: 'Smart Kitchen Wall', to: '#' },
+      { name: 'Smart Office Wall', to: '#' },
+      { name: 'All Smart Walls', to: '/smart-walls' },
+      
+  ] },
   { name: 'Smart Devices', to: '/smart-devices', children: [
       { name: 'Control Panels', to: '/smart-devices/orvibo/control-panels' },
       { name: 'Switches', to: '/smart-devices/orvibo/switches' },

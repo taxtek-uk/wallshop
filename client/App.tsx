@@ -27,6 +27,8 @@ const ContactUs = lazy(() => import("./pages/ContactUs"));
 
 // Product Pages - lazy loaded
 const SmartWalls = lazy(() => import("./pages/SmartWalls"));
+const SmartBedroomWall = lazy(() => import("./pages/SmartBedroomWall"));
+const SmartGamingWall = lazy(() => import("./pages/SmartGamingWall"));
 const SmartDevices = lazy(() => import("./pages/SmartDevices"));
 const LuxuryWallpapers = lazy(() => import("./pages/LuxuryWallpapers"));
 const AcousticPanels = lazy(() => import("./pages/AcousticPanels"));
@@ -109,6 +111,8 @@ const App = () => (
             
             {/* Product Pages */}
             <Route path="/smart-walls" element={<SmartWalls />} />
+            <Route path="/smart-bedroom" element={<SmartBedroomWall />} />
+            <Route path="/smart-gaming" element={<SmartGamingWall />} />
             <Route path="/luxury-wallpapers" element={<LuxuryWallpapers />} />
             <Route path="/acoustic-panels" element={<AcousticPanels />} />
             <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />

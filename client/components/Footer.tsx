@@ -121,7 +121,7 @@ const Footer = () => {
   return (
 <footer
   ref={sectionRef}
-  className="relative text-white overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1c0a00] via-[#361500] to-[#603601] backdrop-blur-md"
+  className="relative text-white overflow-hidden bg-gradient-to-r from-[#0f172a]  to-[#334155] backdrop-blur-md"
 >
 
 
