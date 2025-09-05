@@ -483,7 +483,7 @@ function generateAdminEmailHtml(data: QuoteModalData, analysis: QuoteModalAnalys
                   border-left: 4px solid ${analysis.priority === 'premium' ? '#F59E0B' : analysis.priority === 'urgent' ? '#EF4444' : '#10B981'}; 
                   padding: 15px; margin-bottom: 20px;">
         <h3 style="margin: 0 0 5px 0; color: #1F2937; font-size: 16px;">Priority: ${analysis.priority.toUpperCase()}</h3>
-        <p style="margin: 0; color: #4B5563; font-size: 14px;">Estimated Value: £${analysis.estimatedValue.toLocaleString()}</p>
+       
       </div>
 
       <!-- Customer Information -->
@@ -631,7 +631,6 @@ function generateAdminEmailText(data: QuoteModalData, analysis: QuoteModalAnalys
   return `
 NEW QUOTE REQUEST - ${quoteId}
 Priority: ${analysis.priority.toUpperCase()}
-Estimated Value: £${analysis.estimatedValue.toLocaleString()}
 
 CUSTOMER INFORMATION:
 Name: ${data.fullName}

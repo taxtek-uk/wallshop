@@ -267,7 +267,7 @@ class WallShopEmailTemplate {
       ${data.wallPanels ? `<p><strong>Wall Panels Data:</strong> ${this.escapeHtml(JSON.stringify(data.wallPanels))}</p>` : ''}
       ${data.carbonRockBoards ? `<p><strong>Carbon Rock Boards Data:</strong> ${this.escapeHtml(JSON.stringify(data.carbonRockBoards))}</p>` : ''}
       <p><strong>Priority:</strong> ${analysis.priority.toUpperCase()}</p>
-      <p><strong>Estimated Value:</strong> £${analysis.estimatedValue.toLocaleString()}</p>
+      
     </div>
     <p><strong>View Full Quote Details:</strong> <a href="${this.ctaLinks.viewLink}">${this.ctaLinks.viewLink}</a></p>
     <p><strong>Reply to Customer:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
@@ -290,7 +290,6 @@ ${data.smartDevices ? `Smart Devices Data: ${JSON.stringify(data.smartDevices)}`
 ${data.wallPanels ? `Wall Panels Data: ${JSON.stringify(data.wallPanels)}` : ''}
 ${data.carbonRockBoards ? `Carbon Rock Boards Data: ${JSON.stringify(data.carbonRockBoards)}` : ''}
 Priority: ${analysis.priority.toUpperCase()}
-Estimated Value: £${analysis.estimatedValue.toLocaleString()}
 
 View Full Quote Details: ${this.ctaLinks.viewLink}
 Reply to Customer: mailto:${data.email}
