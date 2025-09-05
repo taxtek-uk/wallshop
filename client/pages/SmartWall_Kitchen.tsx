@@ -51,7 +51,13 @@ import {
   Layers,
   Droplets,
   Flame,
-  Mic
+  Mic,
+  PanelsTopLeft,
+  LampCeiling,
+  Fan,
+  TreePine,
+  Square,
+  Gem
 } from 'lucide-react'; 
 
 // SEO Head Management Utility 
@@ -262,18 +268,91 @@ const SmartWallKitchen: React.FC = () => {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false); 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null); 
 
-  // Features data
+  // Orvibo Smart Devices for Kitchen
+  const orviboDevices = [
+    {
+      key: "mixPad",
+      title: "MixPad D1 Smart Panel",
+      category: "Control Panel",
+      desc: "All-in-one scene control with voice intercom, perfect for hands-free kitchen operation.",
+      features: ["Touch + App + Voice", "Scene shortcuts", "Intercom"],
+      Icon: PanelsTopLeft,
+    },
+    {
+      key: "smartSwitch",
+      title: "Smart Switch System",
+      category: "Lighting Control",
+      desc: "Programmable scenes and schedules with timer functions for kitchen automation.",
+      features: ["Timer/Countdown", "Voice control", "Group control"],
+      Icon: Lightbulb,
+    },
+    {
+      key: "smartClimate",
+      title: "Smart Climate Control",
+      category: "HVAC",
+      desc: "Zone heating and cooling with energy efficiency for optimal kitchen comfort.",
+      features: ["Schedules", "Sensors", "Remote control"],
+      Icon: Fan,
+    },
+    {
+      key: "smartLighting",
+      title: "Task & Ambient Lighting",
+      category: "Lighting",
+      desc: "Separate task and ambient lighting zones with dynamic scene control.",
+      features: ["RGB scenes", "Task zones", "Voice control"],
+      Icon: LampCeiling,
+    }
+  ];
+
+  // Kitchen-Specific Wall Panel Finishes
+  const finishCategories = [
+    {
+      id: 'solid',
+      name: "Easy-Clean Solid Series",
+      desc: "Wipe-clean surfaces perfect for kitchen environments.",
+      icon: Square,
+      panels: [
+        { id: "T8026", name: "Ash Silver", desc: "Neutral silver-gray with stain-resistant finish", img: "/images/carbon-rock-boards/solid/2.jpg" },
+        { id: "T8039", name: "Ivory", desc: "Soft ivory tone perfect for bright kitchen spaces", img: "/images/carbon-rock-boards/solid/4.jpg" },
+        { id: "T8008", name: "Obsidian", desc: "Matte black with premium depth and easy maintenance", img: "/images/carbon-rock-boards/solid/7.jpg" }
+      ]
+    },
+    {
+      id: 'wood',
+      name: "Moisture-Resistant Wood Grain",
+      desc: "Natural wood aesthetics with kitchen-safe protection.",
+      icon: TreePine,
+      panels: [
+        { id: "T9016", name: "Ash Grey", desc: "Light ash grain with moisture protection", img: "/images/carbon-rock-boards/wood/1.jpg" },
+        { id: "T9051", name: "Walnut Mist", desc: "Mid-brown walnut with easy-clean coating", img: "/images/carbon-rock-boards/wood/2.jpg" },
+        { id: "T9015", name: "Weathered Storm", desc: "Weathered texture with enhanced durability", img: "/images/carbon-rock-boards/wood/5.jpg" }
+      ]
+    },
+    {
+      id: 'stone',
+      name: "Kitchen Stone Series",
+      desc: "Stone-look panels with superior heat and moisture resistance.",
+      icon: Gem,
+      panels: [
+        { id: "S3231", name: "White & Gold", desc: "Elegant stone texture with gold veining", img: "/images/carbon-rock-boards/stone/1.jpg" },
+        { id: "T3017", name: "Mid Grey & White", desc: "Neutral stone pattern ideal for modern kitchens", img: "/images/carbon-rock-boards/stone/4.jpg" },
+        { id: "T3204", name: "Dark Grey & Black", desc: "Bold stone texture with dramatic contrast", img: "/images/carbon-rock-boards/stone/5.jpg" }
+      ]
+    }
+  ];
+
+  // Features data with Orvibo integration
   const features = [
     {
       icon: <Droplets className="w-8 h-8" />,
-      title: "Splash-Resistant WPC Shezhi Panels",
+      title: "Splash-Resistant WPC Panels",
       description: "Moisture and heat-resistant wood-plastic composite panels perfect for kitchen environments with easy-clean surfaces.",
       gradient: "from-clay-500 to-taupe-500"
     },
     {
-      icon: <Lightbulb className="w-8 h-8" />,
-      title: "Orvibo MixPad D1 Scene Lighting",
-      description: "Intelligent lighting control for cooking and dining modes with smartphone and voice control integration.",
+      icon: <PanelsTopLeft className="w-8 h-8" />,
+      title: "Orvibo MixPad D1 Control",
+      description: "Intelligent scene control for cooking and dining modes with smartphone and voice integration.",
       gradient: "from-taupe-500 to-clay-600"
     },
     {
@@ -284,14 +363,14 @@ const SmartWallKitchen: React.FC = () => {
     },
     {
       icon: <Archive className="w-8 h-8" />,
-      title: "Modular Shelving with Easy-Clean Finishes",
-      description: "Customisable storage solutions with wipe-clean surfaces designed for kitchen use.",
+      title: "Easy-Clean Modular Storage",
+      description: "Customisable storage solutions with wipe-clean surfaces designed specifically for kitchen use.",
       gradient: "from-taupe-400 to-clay-500"
     },
     {
-      icon: <Sun className="w-8 h-8" />,
-      title: "Ambient + Task Light Separation",
-      description: "Dedicated task lighting for cooking and ambient lighting for dining with independent control.",
+      icon: <LampCeiling className="w-8 h-8" />,
+      title: "Task + Ambient Lighting",
+      description: "Dedicated Orvibo task lighting for cooking and ambient lighting for dining with independent control.",
       gradient: "from-clay-500 to-taupe-600"
     },
     {
@@ -306,7 +385,7 @@ const SmartWallKitchen: React.FC = () => {
   const faqData = [ 
     { 
       question: "Are these panels heat-resistant?", 
-      answer: "Yes, Shezhi WPC panels are specifically designed for kitchen environments with excellent heat resistance up to 80°C, making them safe for use behind cooktops and near cooking areas." 
+      answer: "Yes, our WPC panels are specifically designed for kitchen environments with excellent heat resistance up to 80°C, making them safe for use behind cooktops and near cooking areas." 
     }, 
     { 
       question: "Can I use voice control in the kitchen?", 
@@ -314,7 +393,7 @@ const SmartWallKitchen: React.FC = () => {
     },
     { 
       question: "How easy are the panels to clean?", 
-      answer: "Shezhi WPC panels feature a wipe-clean surface that resists stains, grease, and moisture. Simply wipe with a damp cloth or mild cleaning solution for easy maintenance." 
+      answer: "Our WPC panels feature a wipe-clean surface that resists stains, grease, and moisture. Simply wipe with a damp cloth or mild cleaning solution for easy maintenance." 
     },
     { 
       question: "What lighting scenes are available?", 
@@ -526,6 +605,122 @@ const SmartWallKitchen: React.FC = () => {
             ))} 
           </div> 
         </div> 
+      </section> 
+
+      {/* Orvibo Smart Devices Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Orvibo Kitchen</span>
+              <span className="block text-clay-100 mt-2">Smart Automation</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Professional-grade Orvibo smart home devices designed specifically for kitchen environments.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {orviboDevices.map((device, index) => (
+              <motion.div
+                key={device.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center mb-4">
+                  <device.Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{device.title}</h3>
+                <p className="text-sm text-clay-400 mb-3">{device.category}</p>
+                <p className="text-clay-300 text-sm mb-4">{device.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {device.features.map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-clay-600/30 text-clay-200 px-2 py-1 rounded-full">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Kitchen Panel Finishes Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Kitchen-Safe Panel</span>
+              <span className="block text-clay-100 mt-2">Finish Options</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Specially selected finishes with enhanced moisture, heat, and stain resistance for kitchen environments.
+            </p>
+          </motion.div>
+
+          <div className="space-y-12">
+            {finishCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                    <category.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
+                    <p className="text-clay-300">{category.desc}</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {category.panels.map((panel) => (
+                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
+                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
+                        <img 
+                          src={panel.img} 
+                          alt={panel.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-white">{panel.name}</h4>
+                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
+                        </div>
+                        <p className="text-sm text-clay-300">{panel.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section> 
 
       {/* Compliance Section */}

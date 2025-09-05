@@ -458,9 +458,9 @@ const SmartBedroomWall: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-clay-900 via-taupe-900 to-mocha-900"> 
         {/* Navigation */} 
         
-       <div className="sticky top-0 z-50 bg-white shadow overflow-visible">
-  <Navigation />
-</div>
+        
+        <Navigation />
+ 
 
        {/* Enhanced Hero Section */} 
 <section className="relative min-h-screen flex flex-col justify-start md:justify-center overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pt-24 md:pt-0">
@@ -769,21 +769,7 @@ const SmartBedroomWall: React.FC = () => {
         </p> 
         
         {/* Action buttons */}
-        <motion.div 
-          className="mt-6 flex flex-col sm:flex-row gap-4 justify-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          <button className="px-6 py-3 bg-gradient-to-r from-clay-600 to-taupe-600 text-white rounded-full font-medium hover:from-clay-700 hover:to-taupe-700 transition-all duration-300 flex items-center justify-center space-x-2">
-            <Ruler className="w-4 h-4" />
-            <span>Customize This Size</span>
-          </button>
-          <button className="px-6 py-3 border border-clay-500/40 text-clay-300 rounded-full font-medium hover:bg-clay-500/10 transition-all duration-300 flex items-center justify-center space-x-2">
-            <Download className="w-4 h-4" />
-            <span>Download Spec Sheet</span>
-          </button>
-        </motion.div>
+         
       </div>
     </motion.div> 
   </div> 

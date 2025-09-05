@@ -48,7 +48,17 @@ import {
   Info,
   ChevronRight,
   Archive,
-  Layers
+  Layers,
+  PanelsTopLeft,
+  LampCeiling,
+  DoorOpen,
+  ScanFace,
+  Fan,
+  Music4,
+  CloudSun,
+  TreePine,
+  Square,
+  Gem
 } from 'lucide-react'; 
 
 // SEO Head Management Utility 
@@ -259,42 +269,115 @@ const SmartWallLivingRoom: React.FC = () => {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false); 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null); 
 
-  // Features data
+  // Orvibo Smart Devices for Living Room
+  const orviboDevices = [
+    {
+      key: "mixPad",
+      title: "MixPad Smart Panel",
+      category: "Control Panel",
+      desc: "All-in-one scene control with voice intercom for seamless living room automation.",
+      features: ["Touch + App + Voice", "Scene shortcuts", "Intercom"],
+      Icon: PanelsTopLeft,
+    },
+    {
+      key: "smartLighting",
+      title: "Smart Lighting System",
+      category: "Lighting",
+      desc: "Dynamic RGB scenes and ambient moods for entertainment and relaxation.",
+      features: ["RGB scenes", "Movie sync", "Voice control"],
+      Icon: LampCeiling,
+    },
+    {
+      key: "smartCurtain",
+      title: "Smart Curtain Control",
+      category: "Window Treatment",
+      desc: "Silent motorised curtains with precise control for optimal viewing conditions.",
+      features: ["App/Voice control", "Scene linkage", "Smooth motion"],
+      Icon: DoorOpen,
+    },
+    {
+      key: "musicSystem",
+      title: "Multi-Room Audio",
+      category: "Audio",
+      desc: "Integrated multi-room audio system with streaming capabilities.",
+      features: ["App control", "Zone control", "Hi-fi sound"],
+      Icon: Music4,
+    }
+  ];
+
+  // Wall Panel Finishes
+  const finishCategories = [
+    {
+      id: 'wood',
+      name: "Wood Grain Series",
+      desc: "Warm wood aesthetics with durable surface.",
+      icon: TreePine,
+      panels: [
+        { id: "T9016", name: "Ash Grey", desc: "Soft ash grain with light grey overtone", img: "/images/carbon-rock-boards/wood/1.jpg" },
+        { id: "T9051", name: "Walnut Mist", desc: "Mid-brown walnut tone with subtle striations", img: "/images/carbon-rock-boards/wood/2.jpg" },
+        { id: "T9222", name: "Smoked Ash", desc: "Dark smoked ash grain with rich contrast", img: "/images/carbon-rock-boards/wood/3.jpg" }
+      ]
+    },
+    {
+      id: 'solid',
+      name: "Solid Color Series",
+      desc: "Industrial elegance with raw, minimalist tones.",
+      icon: Square,
+      panels: [
+        { id: "T8026", name: "Ash Silver", desc: "Neutral silver-gray with clean industrial look", img: "/images/carbon-rock-boards/solid/2.jpg" },
+        { id: "T8107", name: "Slate Blue", desc: "Dark blue-grey with sophisticated edge", img: "/images/carbon-rock-boards/solid/3.jpg" },
+        { id: "T8008", name: "Obsidian", desc: "Matte black with premium depth and richness", img: "/images/carbon-rock-boards/solid/7.jpg" }
+      ]
+    },
+    {
+      id: 'metallic',
+      name: "Metal Series",
+      desc: "Luxury feel with metallic luster and reflectivity.",
+      icon: Layers,
+      panels: [
+        { id: "LS-2A05", name: "Antique Copper", desc: "Rich antique copper finish with timeless charm", img: "/images/carbon-rock-boards/metal/ls-2a05.jpg" },
+        { id: "LS-2A08", name: "Champagne Gold", desc: "Luxurious champagne gold with refined glow", img: "/images/carbon-rock-boards/metal/ls-2a08.jpg" },
+        { id: "SZ-703", name: "Brushed Silver", desc: "Sleek brushed silver with modern appeal", img: "/images/carbon-rock-boards/metal/sz-703.jpg" }
+      ]
+    }
+  ];
+
+  // Features data with Orvibo integration
   const features = [
     {
       icon: <Layers className="w-8 h-8" />,
-      title: "Shezhi WPC Acoustic Wall Panels",
-      description: "Premium wood-plastic composite panels with superior acoustic properties and elegant wood grain finish.",
+      title: "Premium WPC Acoustic Panels",
+      description: "High-quality wood-plastic composite panels with superior acoustic properties and elegant finishes.",
       gradient: "from-clay-500 to-taupe-500"
     },
     {
-      icon: <Lightbulb className="w-8 h-8" />,
-      title: "Orvibo MixPad Lighting Control",
-      description: "Advanced scene control system for ambient lighting with smartphone and voice control integration.",
+      icon: <PanelsTopLeft className="w-8 h-8" />,
+      title: "Orvibo MixPad Control System",
+      description: "Advanced all-in-one scene control with touch, app, and voice integration for seamless automation.",
       gradient: "from-taupe-500 to-clay-600"
     },
     {
       icon: <Tv className="w-8 h-8" />,
-      title: "Concealed TV Cabling",
-      description: "Professional cable management system for clean installation of TVs and entertainment consoles.",
+      title: "Concealed TV Integration",
+      description: "Professional cable management system for clean installation of TVs and entertainment systems.",
       gradient: "from-clay-600 to-taupe-400"
     },
     {
-      icon: <Speaker className="w-8 h-8" />,
-      title: "Integrated Speaker System",
-      description: "Flush-mounted speakers for immersive surround sound without visible hardware.",
+      icon: <Music4 className="w-8 h-8" />,
+      title: "Multi-Room Audio System",
+      description: "Integrated Orvibo audio system with app control, zone management, and hi-fi sound quality.",
       gradient: "from-taupe-400 to-clay-500"
     },
     {
       icon: <Archive className="w-8 h-8" />,
-      title: "Modular Shelving & Storage",
-      description: "Customisable storage solutions integrated seamlessly into the wall design.",
+      title: "Modular Storage Solutions",
+      description: "Customisable shelving and storage integrated seamlessly into the wall design.",
       gradient: "from-clay-500 to-taupe-600"
     },
     {
-      icon: <Palette className="w-8 h-8" />,
-      title: "Ambient LED Lighting Effects",
-      description: "RGB LED strips with millions of colour combinations and scene presets for any mood.",
+      icon: <LampCeiling className="w-8 h-8" />,
+      title: "Smart RGB Lighting",
+      description: "Dynamic Orvibo lighting system with millions of colours, scene presets, and movie synchronisation.",
       gradient: "from-taupe-600 to-clay-400"
     }
   ];
@@ -307,7 +390,7 @@ const SmartWallLivingRoom: React.FC = () => {
     }, 
     { 
       question: "Is it reconfigurable later?", 
-      answer: "Absolutely. The modular design of Shezhi WPC panels allows for easy reconfiguration. You can add new sections, change layouts, or upgrade components without major reconstruction work." 
+      answer: "Absolutely. The modular design of our WPC panels allows for easy reconfiguration. You can add new sections, change layouts, or upgrade components without major reconstruction work." 
     },
     { 
       question: "What smart devices are compatible?", 
@@ -315,11 +398,11 @@ const SmartWallLivingRoom: React.FC = () => {
     },
     { 
       question: "How does the acoustic performance work?", 
-      answer: "Shezhi WPC acoustic panels provide excellent sound absorption and noise reduction. The integrated speaker system delivers immersive audio while the panels reduce echo and improve room acoustics." 
+      answer: "Our WPC acoustic panels provide excellent sound absorption and noise reduction. The integrated audio system delivers immersive sound while the panels reduce echo and improve room acoustics." 
     },
     { 
       question: "What lighting options are available?", 
-      answer: "RGB LED strips provide ambient lighting effects with millions of colour combinations. The system includes scene presets for movie watching, entertaining, relaxation, and can sync with your TV content." 
+      answer: "Orvibo RGB lighting system provides ambient effects with millions of colour combinations. The system includes scene presets for movie watching, entertaining, relaxation, and can sync with your TV content." 
     },
     { 
       question: "Is professional installation required?", 
@@ -523,6 +606,138 @@ const SmartWallLivingRoom: React.FC = () => {
         </div> 
       </section> 
 
+      {/* Orvibo Smart Devices Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Orvibo Smart</span>
+              <span className="block text-clay-100 mt-2">Home Integration</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Professional-grade Orvibo smart home devices seamlessly integrated into your living room wall system.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {orviboDevices.map((device, index) => (
+              <motion.div
+                key={device.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center mb-4">
+                  <device.Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{device.title}</h3>
+                <p className="text-sm text-clay-400 mb-3">{device.category}</p>
+                <p className="text-clay-300 text-sm mb-4">{device.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {device.features.map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-clay-600/30 text-clay-200 px-2 py-1 rounded-full">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Wall Panel Finishes Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Premium Panel</span>
+              <span className="block text-clay-100 mt-2">Finish Options</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Choose from our curated selection of premium finishes to match your interior design vision.
+            </p>
+          </motion.div>
+
+          <div className="space-y-12">
+            {finishCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                    <category.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
+                    <p className="text-clay-300">{category.desc}</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                    {category.panels.map((panel) => (
+                        <div
+                        key={panel.id}
+                        className="group relative bg-gradient-to-br from-clay-800/60 to-clay-900/40 rounded-2xl border border-clay-600/30 shadow-md hover:shadow-xl hover:border-clay-400/50 transition-all duration-500 overflow-hidden"
+                        >
+                        {/* Image Section */}
+                        <div className="aspect-video relative overflow-hidden">
+                            <img
+                            src={panel.img}
+                            alt={panel.name}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-out"
+                            onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.style.display = 'none'
+                            }}
+                            />
+
+                            {/* Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
+
+                            {/* Badge */}
+                            <span className="absolute top-3 right-3 text-xs font-medium text-white bg-clay-700/70 px-2 py-1 rounded-lg backdrop-blur-sm">
+                            {panel.id}
+                            </span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-5 space-y-2">
+                            <h4 className="font-semibold text-lg text-white group-hover:text-clay-200 transition-colors">
+                            {panel.name}
+                            </h4>
+                            <p className="text-sm text-clay-300 leading-relaxed">
+                            {panel.desc}
+                            </p>
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section> 
+
       {/* Compliance Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-clay-900">
         <div className="max-w-5xl mx-auto">
@@ -650,54 +865,121 @@ const SmartWallLivingRoom: React.FC = () => {
       </section> 
 
       {/* CTA Section */} 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-mocha-900 via-clay-800 to-mocha-900"> 
-        <div className="max-w-5xl mx-auto"> 
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
-            viewport={{ once: true }} 
-            transition={{ duration: 0.8 }} 
-            className="bg-gradient-to-r from-clay-500/10 to-taupe-500/10 backdrop-blur-sm rounded-3xl p-12 border border-clay-500/30 text-center relative overflow-hidden" 
-          > 
-            {/* Background Pattern */} 
-            <div className="absolute inset-0 opacity-10"> 
-              <div className="absolute inset-0" style={{ 
-                backgroundImage: `radial-gradient(circle at 20% 20%, rgba(172, 137, 104, 0.3) 0%, transparent 50%), 
-                                 radial-gradient(circle at 80% 80%, rgba(166, 144, 128, 0.3) 0%, transparent 50%)` 
-              }}></div> 
-            </div> 
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-mocha-950 via-clay-900 to-mocha-950 overflow-hidden">
+  {/* Subtle animated background accents */}
+  <div className="absolute inset-0">
+    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_left,rgba(166,144,128,0.25),transparent_60%)]"></div>
+    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_bottom_right,rgba(172,137,104,0.25),transparent_60%)]"></div>
+  </div>
 
-            <div className="relative z-10"> 
-              <h2 className="text-4xl md:text-5xl font-bold mb-6"> 
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Ready to Transform</span> 
-                <span className="block text-clay-100">Your Living Room?</span> 
-              </h2> 
-              <p className="text-xl text-clay-300 mb-10 max-w-3xl mx-auto"> 
-                Join hundreds of satisfied customers who've transformed their living rooms into intelligent entertainment spaces.  
-                Get your free consultation and custom quote today. 
-              </p> 
-              <div className="flex flex-col sm:flex-row gap-6 justify-center"> 
-                <button 
-                  onClick={() => setIsQuoteModalOpen(true)} 
-                  className="px-10 py-5 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-3 group bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300" 
-                > 
-                  <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" /> 
-                  <span>Request a Tailored Quote</span> 
-                </button> 
-                <a 
-                  href="tel:+441417393377" 
-                  className="border-2 border-clay-500/50 text-clay-200 px-10 py-5 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3 group" 
-                > 
-                  <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" /> 
-                  <span>Call: +44 141 739 3377</span> 
-                </a> 
-              </div> 
-            </div> 
-          </motion.div> 
-        </div> 
-      </section> 
+  <div className="max-w-5xl mx-auto relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.9, ease: "easeOut" }}
+      className="relative bg-gradient-to-r from-clay-600/10 to-taupe-600/10 backdrop-blur-md rounded-3xl p-12 border border-clay-500/30 shadow-2xl text-center overflow-hidden"
+    >
+      {/* Inner floating light effect */}
+      <div className="absolute -top-20 -right-20 w-72 h-72 bg-gradient-to-br from-clay-400/20 to-taupe-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-gradient-to-tr from-taupe-400/20 to-clay-400/10 rounded-full blur-3xl animate-pulse-slower"></div>
 
-      <Footer /> 
+      <div className="relative z-10">
+        {/* Heading */}
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-200 via-clay-100 to-clay-300 drop-shadow-md">
+            Ready to Transform
+          </span>
+          <span className="block text-clay-100">Your Living Room?</span>
+        </h2>
+
+        {/* Subtext */}
+        <p className="text-lg md:text-xl text-clay-300/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+          Join hundreds of satisfied customers who’ve turned their living rooms
+          into intelligent entertainment spaces.  
+          Get your free consultation and custom quote today.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <button
+            onClick={() => setIsQuoteModalOpen(true)}
+            className="px-10 py-5 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-3 group bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:shadow-xl hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+            <span>Request a Tailored Quote</span>
+          </button>
+
+          <a
+            href="tel:+441417393377"
+            className="border-2 border-clay-500/50 text-clay-200 px-10 py-5 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3 group"
+          >
+            <Phone className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+            <span>Call: +44 141 739 3377</span>
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</section>
+<section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-mocha-950 via-clay-900 to-mocha-950 overflow-hidden">
+  {/* Subtle animated background accents */}
+  <div className="absolute inset-0">
+    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_left,rgba(166,144,128,0.25),transparent_60%)]"></div>
+    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_bottom_right,rgba(172,137,104,0.25),transparent_60%)]"></div>
+  </div>
+
+  <div className="max-w-5xl mx-auto relative z-10">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.9, ease: "easeOut" }}
+      className="relative bg-gradient-to-r from-clay-600/10 to-taupe-600/10 backdrop-blur-md rounded-3xl p-12 border border-clay-500/30 shadow-2xl text-center overflow-hidden"
+    >
+      {/* Inner floating light effect */}
+      <div className="absolute -top-20 -right-20 w-72 h-72 bg-gradient-to-br from-clay-400/20 to-taupe-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-gradient-to-tr from-taupe-400/20 to-clay-400/10 rounded-full blur-3xl animate-pulse-slower"></div>
+
+      <div className="relative z-10">
+        {/* Heading */}
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-200 via-clay-100 to-clay-300 drop-shadow-md">
+            Ready to Transform
+          </span>
+          <span className="block text-clay-100">Your Living Room?</span>
+        </h2>
+
+        {/* Subtext */}
+        <p className="text-lg md:text-xl text-clay-300/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+          Join hundreds of satisfied customers who’ve turned their living rooms
+          into intelligent entertainment spaces.  
+          Get your free consultation and custom quote today.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <button
+            onClick={() => setIsQuoteModalOpen(true)}
+            className="px-10 py-5 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-3 group bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:shadow-xl hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+            <span>Request a Tailored Quote</span>
+          </button>
+
+          <a
+            href="tel:+441417393377"
+            className="border-2 border-clay-500/50 text-clay-200 px-10 py-5 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3 group"
+          >
+            <Phone className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+            <span>Call: +44 141 739 3377</span>
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</section>
+      <Footer />
 
       {/* Quote Modal */} 
       <SwQuoteModal 

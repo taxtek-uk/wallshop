@@ -415,9 +415,9 @@ const SmartGamingWall: React.FC = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-mocha-900 via-mocha-800 to-leather-900">
         {/* Navigation */}
-        <div className="sticky top-0 z-50 bg-white shadow">
+         
           <Navigation />
-        </div>
+        
 
          
 
