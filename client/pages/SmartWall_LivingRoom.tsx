@@ -922,63 +922,7 @@ const SmartWallLivingRoom: React.FC = () => {
     </motion.div>
   </div>
 </section>
-<section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-mocha-950 via-clay-900 to-mocha-950 overflow-hidden">
-  {/* Subtle animated background accents */}
-  <div className="absolute inset-0">
-    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_left,rgba(166,144,128,0.25),transparent_60%)]"></div>
-    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_bottom_right,rgba(172,137,104,0.25),transparent_60%)]"></div>
-  </div>
-
-  <div className="max-w-5xl mx-auto relative z-10">
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.9, ease: "easeOut" }}
-      className="relative bg-gradient-to-r from-clay-600/10 to-taupe-600/10 backdrop-blur-md rounded-3xl p-12 border border-clay-500/30 shadow-2xl text-center overflow-hidden"
-    >
-      {/* Inner floating light effect */}
-      <div className="absolute -top-20 -right-20 w-72 h-72 bg-gradient-to-br from-clay-400/20 to-taupe-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-gradient-to-tr from-taupe-400/20 to-clay-400/10 rounded-full blur-3xl animate-pulse-slower"></div>
-
-      <div className="relative z-10">
-        {/* Heading */}
-        <h2 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-200 via-clay-100 to-clay-300 drop-shadow-md">
-            Ready to Transform
-          </span>
-          <span className="block text-clay-100">Your Living Room?</span>
-        </h2>
-
-        {/* Subtext */}
-        <p className="text-lg md:text-xl text-clay-300/90 mb-10 max-w-3xl mx-auto leading-relaxed">
-          Join hundreds of satisfied customers who’ve turned their living rooms
-          into intelligent entertainment spaces.  
-          Get your free consultation and custom quote today.
-        </p>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-6 justify-center">
-          <button
-            onClick={() => setIsQuoteModalOpen(true)}
-            className="px-10 py-5 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-3 group bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:shadow-xl hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
-          >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-            <span>Request a Tailored Quote</span>
-          </button>
-
-          <a
-            href="tel:+441417393377"
-            className="border-2 border-clay-500/50 text-clay-200 px-10 py-5 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3 group"
-          >
-            <Phone className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-            <span>Call: +44 141 739 3377</span>
-          </a>
-        </div>
-      </div>
-    </motion.div>
-  </div>
-</section>
+ 
       <Footer />
 
       {/* Quote Modal */} 
