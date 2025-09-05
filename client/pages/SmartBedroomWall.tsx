@@ -457,12 +457,14 @@ const SmartBedroomWall: React.FC = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-clay-900 via-taupe-900 to-mocha-900"> 
         {/* Navigation */} 
-        <div className="sticky top-0 z-50 bg-white shadow"> 
-          <Navigation /> 
-        </div> 
+        
+       <div className="sticky top-0 z-50 bg-white shadow overflow-visible">
+  <Navigation />
+</div>
 
        {/* Enhanced Hero Section */} 
-<section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"> 
+<section className="relative min-h-screen flex flex-col justify-start md:justify-center overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pt-24 md:pt-0">
+
   {/* Enhanced Background Pattern */} 
   <div className="absolute inset-0">
     <div className="absolute inset-0 bg-gradient-to-r from-clay-500/15 to-taupe-500/15"></div> 
@@ -598,21 +600,6 @@ const SmartBedroomWall: React.FC = () => {
     </motion.div> 
   </div> 
 
-  {/* Enhanced Scroll Indicator */} 
-  <motion.div 
-    initial={{ opacity: 0 }} 
-    animate={{ opacity: 1 }} 
-    transition={{ duration: 1, delay: 1 }} 
-    className="absolute bottom-8 left-1/2 transform -translate-x-1/2" 
-  > 
-    <div className="w-6 h-10 border-2 border-clay-400/50 rounded-full flex justify-center backdrop-blur-sm"> 
-      <motion.div 
-        animate={{ y: [0, 12, 0] }} 
-        transition={{ duration: 2, repeat: Infinity }} 
-        className="w-1 h-3 bg-clay-400 rounded-full mt-2" 
-      /> 
-    </div> 
-  </motion.div> 
 
   <style>{`
     @keyframes shimmer {
