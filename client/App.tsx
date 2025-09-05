@@ -31,6 +31,10 @@ const SmartBedroomWall = lazy(() => import("./pages/SmartBedroomWall"));
 const SmartWall_Kitchen = lazy(() => import("./pages/SmartWall_Kitchen"));
 const SmartWall_LivingRoom = lazy(() => import("./pages/SmartWall_LivingRoom"));
 const SmartGamingWall = lazy(() => import("./pages/SmartGamingWall"));
+const SmartWallOffice = lazy(() => import("./pages/SmartWall_Office"));
+const SmartWallBathroom = lazy(() => import("./pages/SmartWall_Bathroom"));
+const SmartWallRestaurant = lazy(() => import("./pages/SmartWall_Restaurants"));
+const SmartWallEvents = lazy(() => import("./pages/SmartWall_Events"));
 const SmartDevices = lazy(() => import("./pages/SmartDevices"));
 const LuxuryWallpapers = lazy(() => import("./pages/LuxuryWallpapers"));
 const AcousticPanels = lazy(() => import("./pages/AcousticPanels"));
@@ -61,7 +65,6 @@ const SPCWaterproofWallPanel = lazy(() => import("./pages/SPCWaterproofWallPanel
  
 const WoodGrainWallPanels = lazy(() => import("./pages/WoodGrainWallPanels"));
 const ClothPatternWallPanels = lazy(() => import("./pages/ClothPatternWallPanels"));
-
 // Loading component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f8f6f3] to-[#faf7f3]">
@@ -115,8 +118,12 @@ const App = () => (
             <Route path="/smart-walls" element={<SmartWalls />} />
             <Route path="/smart-walls/bedroom" element={<SmartBedroomWall />} />
             <Route path="/smart-walls/gaming" element={<SmartGamingWall />} />
-             <Route path="/smart-walls/kitchen" element={<SmartWall_Kitchen />} />
+            <Route path="/smart-walls/kitchen" element={<SmartWall_Kitchen />} />
             <Route path="/smart-walls/living-room" element={<SmartWall_LivingRoom />} />
+            <Route path="/smart-walls/office" element={<SmartWallOffice />} />
+            <Route path="/smart-walls/bathroom" element={<SmartWallBathroom />} />
+            <Route path="/smart-walls/restaurants" element={<SmartWallRestaurant />} />
+            <Route path="/smart-walls/events" element={<SmartWallEvents />} />
             <Route path="/luxury-wallpapers" element={<LuxuryWallpapers />} />
             <Route path="/acoustic-panels" element={<AcousticPanels />} />
             <Route path="/carbon-rock-boards" element={<CarbonRockBoards />} />
