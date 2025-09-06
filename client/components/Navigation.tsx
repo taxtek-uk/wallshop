@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, X, ChevronDown, ChevronRight, ChevronUp, ExternalLink } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import useScrollPosition from '@/hooks/useScrollPosition';
@@ -15,28 +15,38 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'Home', to: '/' },
-  { name: 'Smart Walls', to: '/smart-walls', children: [
-      { name: 'Smart Walls for the', highlight: 'Living Room', to: '/smart-walls/living-room' },  
-    { name: 'Smart Wall for', highlight: 'Gamers', to: '/smart-walls/gaming' },  
-    { name: 'Smart Walls for the', highlight: 'Bedroom', to: '/smart-walls/bedroom' },  
-    { name: 'Smart Walls for the', highlight: 'Kitchen', to: '/smart-walls/kitchen' },  
-    { name: 'Smart Walls for the', highlight: 'Bathroom', to: '/smart-walls/bathroom' },  
-    { name: 'Smart Wall for the', highlight: 'Office', to: '/smart-walls/office' },  
-    { name: 'Smart Walls for', highlight: 'Restaurants', to: '/smart-walls/restaurants' },  
-    { name: 'Smart Wall for', highlight: 'Events', to: '/smart-walls/events' },  
-    { name: 'Smart Walls for', highlight: 'Hotel Reception Areas', to: '/smart-walls/hotels' },  
-    { name: 'All Smart Walls', to: '/smart-walls' },
-  ] },
-  { name: 'Smart Devices', to: '/smart-devices', children: [
+  {
+    name: 'Smart Walls',
+    to: '/smart-walls',
+    children: [
+      { name: 'Smart Walls for the', highlight: 'Living Room', to: '/smart-walls/living-room' },
+      { name: 'Smart Wall for', highlight: 'Gamers', to: '/smart-walls/gaming' },
+      { name: 'Smart Walls for the', highlight: 'Bedroom', to: '/smart-walls/bedroom' },
+      { name: 'Smart Walls for the', highlight: 'Kitchen', to: '/smart-walls/kitchen' },
+      { name: 'Smart Walls for the', highlight: 'Bathroom', to: '/smart-walls/bathroom' },
+      { name: 'Smart Wall for the', highlight: 'Office', to: '/smart-walls/office' },
+      { name: 'Smart Walls for', highlight: 'Restaurants', to: '/smart-walls/restaurants' },
+      { name: 'Smart Wall for', highlight: 'Events', to: '/smart-walls/events' },
+      { name: 'Smart Walls for', highlight: 'Hotel Reception Areas', to: '/smart-walls/hotels' },
+      { name: 'All Smart Walls', to: '/smart-walls' },
+    ],
+  },
+  {
+    name: 'Smart Devices',
+    to: '/smart-devices',
+    children: [
       { name: 'Control Panels', to: '/smart-devices/orvibo/control-panels' },
       { name: 'Switches', to: '/smart-devices/orvibo/switches' },
       { name: 'Lighting', to: '/smart-devices/orvibo/lighting' },
       { name: 'Security & Sensors', to: '/smart-devices/orvibo/security-sensors' },
       { name: 'Shading', to: '/smart-devices/orvibo/shading' },
       { name: 'HVAC', to: '/smart-devices/orvibo/hvac' },
-  ] },
-  
-  { name: 'Wall Panels', to: '/wall-panels', children: [
+    ],
+  },
+  {
+    name: 'Wall Panels',
+    to: '/wall-panels',
+    children: [
       { name: 'WPC', to: '/wall-panels/wpc' },
       { name: 'Anti-Collision', to: '/wall-panels/anti-collision' },
       { name: 'Wood Grain', to: '/wall-panels/wood-grain' },
@@ -50,10 +60,9 @@ const NAV_ITEMS: NavItem[] = [
       { name: 'SPC Background', to: '/wall-panels/spc-background' },
       { name: 'UHD Continuous', to: '/wall-panels/uhd-continuous' },
       { name: 'Waterproof', to: '/wall-panels/spc-waterproof' },
-  
-  ]},
+    ],
+  },
   { name: 'Carbon Rock', to: '/carbon-rock-boards' },
-  
   { name: 'Warranty', to: '/warranty' },
   { name: 'Contact', to: '/contact', isHash: false },
 ];
@@ -69,7 +78,7 @@ export default function Navigation() {
     clearTimeout(dropdownTimeout.current);
     setOpenDropdown(name);
   };
-  
+
   const handleMouseLeave = () => {
     dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 150);
   };
@@ -77,11 +86,8 @@ export default function Navigation() {
   const toggleMobileDropdown = (itemName: string) => {
     setMobileExpandedItems(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(itemName)) {
-        newSet.delete(itemName);
-      } else {
-        newSet.add(itemName);
-      }
+      if (newSet.has(itemName)) newSet.delete(itemName);
+      else newSet.add(itemName);
       return newSet;
     });
   };
@@ -99,7 +105,9 @@ export default function Navigation() {
 
   const linkBase = 'relative px-6 py-3 font-medium transition-all duration-200';
   const activeClass = 'text-[#b89773] font-semibold';
-  const inactiveClass = isScrolled ? 'text-gray-800 hover:text-[#b89773]' : 'text-white hover:text-gray-200';
+  const inactiveClass = isScrolled
+    ? 'text-gray-800 hover:text-[#b89773]'
+    : 'text-white hover:text-gray-200';
 
   const navBg = isScrolled
     ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 py-2'
@@ -108,23 +116,25 @@ export default function Navigation() {
   // Desktop dropdown item (recursive)
   const DropdownItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
     const hasKids = item.children?.length > 0;
+    const paddingLeft = depth * 16 + 16;
     return (
       <div className="relative group">
         <NavLink
           to={item.to || '#'}
           className={({ isActive }) =>
-            `block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#b89773] rounded-md transition-colors ${
-              depth ? 'pl-6' : ''
-            } ${isActive ? 'text-[#b89773] bg-gray-50' : ''}`
+            `flex-1 block py-4 px-4 text-gray-800 font-medium hover:bg-gray-50 transition-colors ${
+              isActive ? 'text-[#b89773] bg-gray-50' : ''
+            }`
           }
-          onClick={() => setOpenDropdown(null)}
+          style={{ paddingLeft: `${paddingLeft}px` }}
+          onClick={closeMobileMenu}
         >
-          <div className="flex justify-between items-center">
-            <span>
-              {item.name} {item.highlight && <span className="font-bold">{item.highlight}</span>}
-            </span>
-            {hasKids && <ChevronRight size={14} className="text-gray-400" />}
-          </div>
+          <span className="text-base">
+            {item.name}{' '}
+            {item.highlight && (
+              <span className="font-bold text-[#b89773]">{item.highlight}</span>
+            )}
+          </span>
         </NavLink>
         {hasKids && (
           <AnimatePresence>
@@ -135,8 +145,12 @@ export default function Navigation() {
               transition={{ duration: 0.2 }}
               className="absolute left-full top-0 mt-0 min-w-[200px] bg-white shadow-xl rounded-lg border border-gray-200 overflow-hidden z-50"
             >
-              {item.children!.map(child => (
-                <DropdownItem key={child.name} item={child} depth={depth + 1} />
+              {item.children!.map((child, index) => (
+                <DropdownItem
+                  key={child.to || `${child.name}-${index}`}
+                  item={child}
+                  depth={depth + 1}
+                />
               ))}
             </motion.div>
           </AnimatePresence>
@@ -157,12 +171,15 @@ export default function Navigation() {
           {hasKids ? (
             <button
               onClick={() => toggleMobileDropdown(item.name)}
-              className={`flex-1 text-left py-4 px-4 text-gray-800 font-medium hover:bg-gray-50 transition-colors`}
+              className="flex-1 text-left py-4 px-4 text-gray-800 font-medium hover:bg-gray-50 transition-colors"
               style={{ paddingLeft: `${paddingLeft}px` }}
             >
               <div className="flex items-center justify-between">
                 <span className="text-base">
-                  {item.name} {item.highlight && <span className="font-bold">{item.highlight}</span>}
+                  {item.name}{' '}
+                  {item.highlight && (
+                    <span className="font-bold text-[#b89773]">{item.highlight}</span>
+                  )}
                 </span>
                 <motion.div
                   animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -183,11 +200,16 @@ export default function Navigation() {
               style={{ paddingLeft: `${paddingLeft}px` }}
               onClick={closeMobileMenu}
             >
-              <span className="text-base">{item.name}</span>
+              <span className="text-base">
+                {item.name}{' '}
+                {item.highlight && (
+                  <span className="font-bold text-[#b89773]">{item.highlight}</span>
+                )}
+              </span>
             </NavLink>
           )}
         </div>
-        
+
         {hasKids && (
           <AnimatePresence>
             {isExpanded && (
@@ -198,8 +220,12 @@ export default function Navigation() {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="overflow-hidden bg-gray-50"
               >
-                {item.children!.map(child => (
-                  <MobileMenuItem key={child.name} item={child} depth={depth + 1} />
+                {item.children!.map((child, index) => (
+                  <MobileMenuItem
+                    key={child.to || `${child.name}-${index}`}
+                    item={child}
+                    depth={depth + 1}
+                  />
                 ))}
               </motion.div>
             )}
@@ -210,22 +236,26 @@ export default function Navigation() {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${navBg}`}>  
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${navBg}`}>
       <div className="container mx-auto flex items-center justify-between px-4 lg:px-8">
         {/* Logo */}
         <NavLink to="/" className="text-2xl font-bold">
-          <span className={`transition-colors ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
+          <span
+            className={`transition-colors ${
+              isScrolled ? 'text-gray-800' : 'text-white'
+            }`}
+          >
             The Wall Shop
           </span>
         </NavLink>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex space-x-8 items-center">
-          {NAV_ITEMS.map(item => {
+          {NAV_ITEMS.map((item, index) => {
             const hasKids = item.children?.length > 0;
             return (
               <div
-                key={item.name}
+                key={item.to || `${item.name}-${index}`}
                 className="relative"
                 onMouseEnter={() => hasKids && handleMouseEnter(item.name)}
                 onMouseLeave={handleMouseLeave}
@@ -257,8 +287,11 @@ export default function Navigation() {
                       transition={{ duration: 0.2 }}
                       className="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 min-w-[260px] overflow-hidden z-50 py-2"
                     >
-                      {item.children!.map(child => (
-                        <DropdownItem key={child.name} item={child} />
+                      {item.children!.map((child, index) => (
+                        <DropdownItem
+                          key={child.to || `${child.name}-${index}`}
+                          item={child}
+                        />
                       ))}
                     </motion.div>
                   )}
@@ -266,7 +299,7 @@ export default function Navigation() {
               </div>
             );
           })}
-          
+
           {/* Smart Wall Builder Button - Desktop */}
           <Button
             onClick={handleSmartWallBuilderClick}
@@ -305,10 +338,13 @@ export default function Navigation() {
             className="lg:hidden bg-white shadow-xl border-t border-gray-100 overflow-hidden"
           >
             <div className="max-h-[70vh] overflow-y-auto">
-              {NAV_ITEMS.map(item => (
-                <MobileMenuItem key={item.name} item={item} />
+              {NAV_ITEMS.map((item, index) => (
+                <MobileMenuItem
+                  key={item.to || `${item.name}-${index}`}
+                  item={item}
+                />
               ))}
-              
+
               {/* Smart Wall Builder Button - Mobile */}
               <div className="p-4 bg-gray-50 border-t border-gray-200">
                 <Button
@@ -323,7 +359,7 @@ export default function Navigation() {
                     <ExternalLink size={18} className="opacity-80" />
                   </div>
                 </Button>
-              </div>             
+              </div>
             </div>
           </motion.div>
         )}
