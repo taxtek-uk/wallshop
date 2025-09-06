@@ -1,46 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
- 
+import SwQuoteModal from '@/components/SwQuoteModal';
 import {
-  Monitor,
-  Gamepad2,
-  Volume2,
-  Lightbulb,
-  Wifi,
-  Settings,
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-  ChevronDown,
-  Star,
-  Shield,
-  Zap,
-  Home,
-  Users,
-  Trophy,
-  Target,
+  Gamepad,
   Headphones,
-  ArrowUpRight,
-  HelpCircle,
-  MousePointer,
-  Speaker,
-  Tv,
-  Play,
-  Pause,
-  RotateCcw,
-  Search,
+  Volume2,
+  Cable,
+  Lightbulb,
+  Shield,
   MessageCircle,
+  Phone,
+  MapPin,
+  ChevronDown,
   CheckCircle,
   ArrowRight,
-  X,
-  Sparkles,
-  Cpu,
-  HardDrive,
-  Palette
+  Search,
+  Palette,
+  Settings,
+  Layers,
+  Monitor,
+  Mic,
+  Sun,
+  PanelsTopLeft,
+  BedDouble,
+  DoorOpen,
+  Thermometer,
+  Square,
+  Gem,
+  TreePine,
+  ChevronRight
 } from 'lucide-react';
+
+/* ----------------------------- Types (fix TS) ----------------------------- */
+type LucideIconType = React.ComponentType<React.SVGProps<SVGSVGElement> & { className?: string }>;
+type FinishPanel = { id: string; name: string; img: string; desc?: string; stock?: number };
+type FinishCategory = {
+  id: string;
+  name: string;
+  desc: string;
+  icon: LucideIconType;
+  panels: FinishPanel[];
+  // optional meta if you ever want to use them
+  img?: string;
+  color?: string;
+  accent?: string;
+};
 
 // SEO Head Management Utility
 const SEOHead: React.FC<{
@@ -77,6 +83,7 @@ const SEOHead: React.FC<{
     setMetaTag('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
     setMetaTag('author', 'The Wall Shop');
     setMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+    setMetaTag('hreflang', 'en-GB');
 
     // Canonical URL
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
@@ -110,34 +117,100 @@ const SEOHead: React.FC<{
     }
 
     // JSON-LD Structured Data
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "The Wall Shop",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "knowsAbout": [
+        "gaming wall",
+        "RGB ambient lighting",
+        "dual-monitor mount",
+        "console docking",
+        "PC cable management",
+        "acoustic wall panels",
+        "blackout curtains",
+        "scene control",
+        "low-latency setup",
+        "ventilation for consoles/PCs",
+        "LED light strips",
+        "sound isolation"
+      ]
+    };
+
     const serviceSchema = {
       "@context": "https://schema.org",
       "@type": "Service",
-      "name": "Smart Gaming Wall Installation",
-      "description": "Professional smart gaming wall installation with integrated lighting, audio, and gaming console storage. Transform your gaming space with intelligent automation.",
-      "provider": {
-        "@type": "Organization",
-        "name": "The Wall Shop",
-        "url": "https://www.thewallshop.co.uk",
-        "telephone": "+44 141 739 3377",
-        "email": "info@thewallshop.co.uk",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "SMK Business Centre, 4 The Piazza",
-          "addressLocality": "Glasgow",
-          "postalCode": "G5 8BE",
-          "addressCountry": "GB"
-        }
-      },
+      "name": "Smart Gaming Walls",
+      "description": "Design a pro-grade gaming wall with modular finishes, acoustic control, hidden cabling, RGB scenes and smart controls—installed across the UK.",
+      "provider": organizationSchema,
       "areaServed": "United Kingdom",
-      "serviceType": "Smart Wall Installation",
+      "serviceType": "Smart Gaming Wall Installation",
       "category": "Gaming Room Design",
       "offers": {
         "@type": "Offer",
         "availability": "https://schema.org/InStock",
         "priceCurrency": "GBP",
-        "description": "Custom smart gaming wall solutions starting from consultation to full installation"
+        "description": "Custom smart gaming wall solutions from consultation to full installation"
       }
+    };
+
+    const localBusinessSchema = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "The Wall Shop",
+      "description": "Professional smart wall installation specialists serving gamers across the UK",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 55.8642,
+        "longitude": -4.2518
+      },
+      "openingHours": "Mo-Fr 09:00-18:00 PST",
+      "priceRange": "£££"
+    };
+
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.thewallshop.co.uk"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Smart Walls",
+          "item": "https://www.thewallshop.co.uk/smart-walls"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Gaming",
+          "item": "https://www.thewallshop.co.uk/smart-walls/gaming"
+        }
+      ]
     };
 
     const faqSchema = {
@@ -146,66 +219,42 @@ const SEOHead: React.FC<{
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What gaming consoles are compatible with smart gaming walls?",
+          "name": "How do smart gaming walls improve acoustics?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Our smart gaming walls support all major gaming consoles including PlayStation 5, Xbox Series X/S, Nintendo Switch, and PC gaming setups. Custom storage and cable management solutions are designed for each console type."
+            "text": "Our smart gaming walls incorporate acoustic panels and sound-dampening materials that reduce echo and reverberation, creating a clearer audio environment for gaming and streaming. This helps to minimize distractions and enhance immersion."
           }
         },
         {
           "@type": "Question",
-          "name": "How does the LED lighting system work in gaming walls?",
+          "name": "Can the walls help with heat management for consoles and PCs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The integrated LED lighting system features RGB colour-changing capabilities, sync with gameplay, ambient lighting modes, and smartphone app control. Lighting can be programmed for different gaming scenarios and times of day."
+            "text": "Yes, our designs can include integrated ventilation solutions and strategic placement of components to ensure optimal airflow, preventing overheating of gaming consoles and high-performance PCs. This helps maintain system stability and longevity."
           }
         },
         {
           "@type": "Question",
-          "name": "Can I control my smart gaming wall with voice commands?",
+          "name": "Are the RGB lighting scenes customizable?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes, our smart gaming walls integrate with Alexa, Google Assistant, and Apple HomeKit for voice control of lighting, audio, display settings, and gaming console power management."
+            "text": "Absolutely. The integrated RGB lighting systems are fully customizable, allowing you to create dynamic scenes for different moods—whether you're in a competitive match, streaming, watching a movie, or just relaxing. Control is intuitive via smart panels or mobile apps."
           }
         },
         {
           "@type": "Question",
-          "name": "What's included in a dual TV gaming wall setup?",
+          "name": "How is cable management handled?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Dual TV setups include two premium displays, independent audio zones, separate gaming console storage, advanced cable management, coordinated lighting effects, and multi-zone climate control for extended gaming sessions."
+            "text": "Our smart gaming walls feature hidden cable raceways and integrated power solutions, ensuring a clean, clutter-free setup. All cables for monitors, consoles, PCs, and peripherals are neatly concealed within the wall structure for a professional look."
           }
         },
         {
           "@type": "Question",
-          "name": "How long does smart gaming wall installation take?",
+          "name": "Is it safe to wall-mount heavy monitors or TVs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Installation typically takes 2-4 days depending on complexity. This includes wall preparation, smart system integration, cable management, testing, and user training on all smart features."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do smart gaming walls work with streaming services?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Absolutely. Our smart gaming walls seamlessly integrate with Netflix, Amazon Prime, Disney+, Twitch, YouTube Gaming, and other streaming platforms with optimised audio and visual settings for each service."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What warranty comes with smart gaming wall installation?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We provide a comprehensive 5-year warranty covering all smart components, LED lighting systems, and installation workmanship. Extended warranty options are available for premium installations."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can existing gaming setups be upgraded to smart walls?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, we specialise in retrofitting existing gaming rooms with smart wall technology. We assess your current setup and integrate smart features while preserving your existing equipment where possible."
+            "text": "Yes, our wall systems are engineered for secure mounting of all gaming equipment, including large monitors and TVs. We use robust VESA-compatible mounting solutions and ensure proper structural support, providing a safe and stable setup for your gear."
           }
         }
       ]
@@ -223,7 +272,10 @@ const SEOHead: React.FC<{
       script.textContent = JSON.stringify(schema);
     };
 
+    insertJsonLd(organizationSchema, 'organization-schema');
     insertJsonLd(serviceSchema, 'service-schema');
+    insertJsonLd(localBusinessSchema, 'local-business-schema');
+    insertJsonLd(breadcrumbSchema, 'breadcrumb-schema');
     insertJsonLd(faqSchema, 'faq-schema');
 
   }, [title, description, canonical, keywords, ogImage]);
@@ -231,1150 +283,791 @@ const SEOHead: React.FC<{
   return null;
 };
 
-// Types
-interface Hotspot {
-  id: string;
-  x: number;
-  y: number;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  features: string[];
-}
-
-interface TabContent {
-  id: string;
-  label: string;
-  hotspots: Hotspot[];
-  description: string;
-}
-
 const SmartGamingWall: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'single' | 'dual'>('single');
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null);
 
-  // Check if mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // Local UI state for finishes expand/collapse per category
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const DEFAULT_MAX_VISIBLE = 6; // 2 rows on md (md:grid-cols-3)
 
- 
+  const toggleCategory = (id: string) =>
+    setExpanded((s) => ({ ...s, [id]: !s[id] }));
 
-  // Hotspot configurations
-  const tabContent: Record<'single' | 'dual', TabContent> = {
-    single: {
-      id: 'single',
-      label: 'Single TV Setup',
-      description: 'Perfect for focused gaming with premium audio and intelligent lighting',
-      hotspots: [
-        {
-          id: 'display',
-          x: 50,
-          y: 35,
-          title: 'Premium Gaming Display',
-          description: 'Ultra-low latency 4K gaming monitor with HDR support',
-          icon: <Monitor className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['4K 120Hz display', 'HDR10+ support', 'Variable refresh rate', 'Ultra-low input lag']
-        },
-        {
-          id: 'audio',
-          x: 15,
-          y: 45,
-          title: 'Immersive Audio System',
-          description: 'Spatial audio with gaming-optimised sound profiles',
-          icon: <Volume2 className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['7.1 surround sound', 'Gaming audio profiles', 'Voice chat clarity', 'Bass enhancement']
-        },
-        {
-          id: 'lighting',
-          x: 85,
-          y: 25,
-          title: 'Dynamic RGB Lighting',
-          description: 'Responsive lighting that syncs with your gameplay',
-          icon: <Lightbulb className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['Gameplay sync', 'Colour customisation', 'Ambient modes', 'Voice control']
-        },
-        {
-          id: 'storage',
-          x: 50,
-          y: 75,
-          title: 'Console Storage Hub',
-          description: 'Organised storage with integrated cooling and cable management',
-          icon: <Gamepad2 className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['Multiple console support', 'Active cooling', 'Cable management', 'Quick access design']
-        }
-      ]
-    },
-    dual: {
-      id: 'dual',
-      label: 'Dual TV Setup',
-      description: 'Ultimate gaming experience with dual displays and advanced automation',
-      hotspots: [
-        {
-          id: 'primary-display',
-          x: 25,
-          y: 35,
-          title: 'Primary Gaming Display',
-          description: 'Main 4K gaming display with competitive gaming features',
-          icon: <Monitor className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['4K 144Hz gaming', 'G-Sync/FreeSync', 'Tournament mode', 'Blue light filter']
-        },
-        {
-          id: 'secondary-display',
-          x: 75,
-          y: 35,
-          title: 'Secondary Display',
-          description: 'Streaming, chat, or secondary gaming display',
-          icon: <Tv className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['1440p 120Hz', 'Stream monitoring', 'Chat display', 'Media playback']
-        },
-        {
-          id: 'advanced-audio',
-          x: 85,
-          y: 55,
-          title: 'Premium Audio Zone',
-          description: 'Dual-zone audio with independent control',
-          icon: <Speaker className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['Dual audio zones', 'Independent volume', 'Noise cancellation', 'Stream audio mixing']
-        },
-        {
-          id: 'smart-hub',
-          x: 50,
-          y: 75,
-          title: 'Smart Gaming Hub',
-          description: 'Central control for all gaming systems and automation',
-          icon: <Settings className="w-4 h-4 md:w-5 md:h-5" />,
-          features: ['Multi-console switching', 'Automated profiles', 'Climate control', 'Smart scheduling']
-        }
-      ]
-    }
-  };
-
-  // FAQ Data
-  const faqData = [
+  // Orvibo Smart Devices for Gaming
+  const orviboDevices = [
     {
-      question: "What gaming consoles are compatible with smart gaming walls?",
-      answer: "Our smart gaming walls support all major gaming consoles including PlayStation 5, Xbox Series X/S, Nintendo Switch, and PC gaming setups. We provide custom storage solutions and cable management designed specifically for each console type, ensuring optimal ventilation and easy access."
+      key: "mixPad",
+      title: "Smart Control Panel",
+      category: "Central Control",
+      desc: "Intuitive control for lighting, audio, and scene presets, optimizing your gaming environment.",
+      features: ["Scene presets", "Intercom", "Customizable UI"],
+      Icon: PanelsTopLeft,
     },
     {
-      question: "How does the LED lighting system work in gaming walls?",
-      answer: "The integrated LED lighting system features RGB colour-changing capabilities that can sync with your gameplay for an immersive experience. Control lighting through smartphone apps, voice commands, or automated gaming profiles. Choose from ambient lighting modes, reactive gaming effects, or custom colour schemes."
+      key: "smartSwitch",
+      title: "Smart Switch & Dimmer",
+      category: "Lighting Control",
+      desc: "Precise control over gaming room lighting, with dimming and color temperature adjustments.",
+      features: ["RGB control", "Scheduling", "Energy monitoring"],
+      Icon: Lightbulb,
     },
     {
-      question: "Can I control my smart gaming wall with voice commands?",
-      answer: "Yes, our smart gaming walls integrate seamlessly with Alexa, Google Assistant, and Apple HomeKit. Control lighting, audio levels, display settings, gaming console power, and even launch specific games using simple voice commands."
+      key: "smartCurtain",
+      title: "Smart Blackout Curtain",
+      category: "Glare Control",
+      desc: "Automated curtains for instant blackout, perfect for immersive gaming or movie watching.",
+      features: ["Automated schedules", "Remote operation", "Quiet motor"],
+      Icon: BedDouble,
     },
     {
-      question: "What's included in a dual TV gaming wall setup?",
-      answer: "Dual TV setups include two premium displays with independent control, separate audio zones, dedicated gaming console storage, advanced cable management systems, coordinated lighting effects, and multi-zone climate control for extended gaming sessions."
+      key: "skyDome",
+      title: "Sky-Style Ambient Lighting",
+      category: "Ambiance & Focus",
+      desc: "Dynamic ceiling lighting that simulates daylight or creates custom RGB scenes for focus or relaxation.",
+      features: ["Circadian rhythm", "Dynamic scenes", "Low-latency sync"],
+      Icon: Sun,
     },
     {
-      question: "How long does smart gaming wall installation take?",
-      answer: "Installation typically takes 2-4 days depending on the complexity of your setup. This includes wall preparation, smart system integration, cable management, comprehensive testing, and user training on all smart features and controls."
-    },
-    {
-      question: "Do smart gaming walls work with streaming services?",
-      answer: "Absolutely. Our smart gaming walls seamlessly integrate with Netflix, Amazon Prime, Disney+, Twitch, YouTube Gaming, and other streaming platforms. Each service gets optimised audio and visual settings for the best viewing experience."
-    },
-    {
-      question: "What warranty comes with smart gaming wall installation?",
-      answer: "We provide a comprehensive 5-year warranty covering all smart components, LED lighting systems, and installation workmanship. This includes free maintenance visits and software updates. Extended warranty options are available for premium installations."
-    },
-    {
-      question: "Can existing gaming setups be upgraded to smart walls?",
-      answer: "Yes, we specialise in retrofitting existing gaming rooms with smart wall technology. Our team assesses your current setup and integrates smart features while preserving and enhancing your existing equipment wherever possible."
+      key: "presenceSensor",
+      title: "Presence & Door Sensors",
+      category: "Automation & Security",
+      desc: "Automates lighting and power based on room occupancy, enhancing convenience and energy efficiency.",
+      features: ["Auto-lighting", "Energy saving", "Security alerts"],
+      Icon: DoorOpen,
     }
   ];
 
-  // Related searches data
-  const relatedSearches = [
-    "gaming room design UK", "smart gaming setup", "LED gaming wall", "console storage solutions",
-    "gaming room lighting", "dual monitor gaming", "smart home gaming", "gaming wall installation",
-    "RGB gaming lights", "gaming room automation", "custom gaming walls", "gaming entertainment centre"
+  // Gaming-Specific Wall Panel Finishes
+  const finishCategories: FinishCategory[] = [
+  {
+    id: 'fabric',
+    name: "Cloth Pattern Series",
+    desc: "Soft textile pattern with acoustic value.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/cloth.jpg",
+    color: "from-leather-100 to-mocha-100",
+    accent: "leather-600",
+    panels: [
+      { id: "T6004", name: "Stone Weave", img: "/images/carbon-rock-boards/fabric/t6004.jpg", desc: "Subtle woven texture with a natural stone-inspired fabric look, ideal for refined interiors.", stock: 10 },
+      { id: "T6104", name: "Stone Bead", img: "/images/carbon-rock-boards/fabric/t6104.jpg", desc: "Delicate beaded weave with a tactile stone-like surface, offering a modern textile effect.", stock: 10 },
+      { id: "T6201", name: "Pearl Shimmer", img: "/images/carbon-rock-boards/fabric/t6201.jpg", desc: "Elegant woven finish with a soft pearl shimmer, adding subtle radiance to interiors.", stock: 10 },
+      { id: "T6301", name: "Chambray Grid", img: "/images/carbon-rock-boards/fabric/t6301.jpg", desc: "Classic chambray-style grid pattern with a balanced woven texture for modern spaces.", stock: 10 },
+      { id: "S6026", name: "Mauve Weave", img: "/images/carbon-rock-boards/fabric/s6026.jpg", desc: "Textured weave in a soft mauve tone, blending warmth with subtle sophistication.", stock: 10 },
+      { id: "S6029", name: "Rice Grain Weave", img: "/images/carbon-rock-boards/fabric/s6029.jpg", desc: "Distinctive rice-grain weave resembling natural linen threads for an organic appeal.", stock: 10 },
+      { id: "T6102", name: "Silver Mesh", img: "/images/carbon-rock-boards/fabric/t6102.jpg", desc: "Reflective mesh weave with a silver metallic effect, adding depth and dimension.", stock: 10 },
+      { id: "T6306", name: "Alabaster Cotton", img: "/images/carbon-rock-boards/fabric/t6306.jpg", desc: "Smooth cotton-inspired surface in an alabaster tone, offering a clean and minimal look.", stock: 10 },
+      { id: "S6020", name: "Soft Gauze", img: "/images/carbon-rock-boards/fabric/t6020.jpg", desc: "Lightweight gauze-like texture with a delicate, airy transparency.", stock: 10 }
+    ]
+  },
+  {
+    id: 'wood',
+    name: "Wood Grain Series",
+    desc: "Warm wood aesthetics with durable surface.",
+    icon: TreePine,
+    img: "/images/carbon-rock-boards/wood.jpg",
+    color: "from-amber-100 to-orange-100",
+    accent: "amber-600",
+    panels: [
+      { id: "T9016", name: "Ash Grey", img: "/images/carbon-rock-boards/wood/1.jpg", desc: "Soft ash grain with light grey overtone", stock: 10 },
+      { id: "T9051", name: "Walnut Mist", img: "/images/carbon-rock-boards/wood/2.jpg", desc: "Mid-brown walnut tone with subtle striations", stock: 10 },
+      { id: "T9222", name: "Smoked Ash", img: "/images/carbon-rock-boards/wood/3.jpg", desc: "Dark smoked ash grain with rich contrast", stock: 10 },
+      { id: "T9012", name: "Rosewood Brown", img: "/images/carbon-rock-boards/wood/4.jpg", desc: "Warm reddish grain like tropical leatherwood", stock: 10 },
+      { id: "T9015", name: "Weathered Storm", img: "/images/carbon-rock-boards/wood/5.jpg", desc: "Weathered wood texture with a stormy tone", stock: 10 },
+      { id: "T9053", name: "Walnut Stream", img: "/images/carbon-rock-boards/wood/6.jpg", desc: "Strong walnut character with deep flowing grain", stock: 10 }
+    ]
+  },
+  {
+    id: 'solid',
+    name: "Solid Color Series",
+    desc: "Industrial elegance with raw, minimalist tones.",
+    icon: Square,
+    img: "/images/carbon-rock-boards/wpc.jpg",
+    color: "from-slate-100 to-gray-100",
+    accent: "slate-600",
+    panels: [
+      { id: "T8201", name: "Warm Blush", img: "/images/carbon-rock-boards/solid/1.jpg", desc: "A soft blush hue for cozy minimalism", stock: 10 },
+      { id: "T8026", name: "Ash Silver", img: "/images/carbon-rock-boards/solid/2.jpg", desc: "Neutral silver-gray with a clean industrial look", stock: 10 },
+      { id: "T8107", name: "Slate Blue", img: "/images/carbon-rock-boards/solid/3.jpg", desc: "Dark blue-grey with a sophisticated edge", stock: 10 },
+      { id: "T8039", name: "Ivory", img: "/images/carbon-rock-boards/solid/4.jpg", desc: "Soft ivory tone perfect for elegant settings", stock: 10 },
+      { id: "T8103", name: "Pearl Cream", img: "/images/carbon-rock-boards/solid/5.jpg", desc: "Soft pearl-beige tone for warm ambience", stock: 10 },
+      { id: "T8036", name: "Desert Sand", img: "/images/carbon-rock-boards/solid/6.jpg", desc: "Warm tan reminiscent of natural sands", stock: 10 },
+      { id: "T8008", name: "Obsidian", img: "/images/carbon-rock-boards/solid/7.jpg", desc: "Matte black with premium depth and richness", stock: 10 }
+    ]
+  },
+  {
+    id: 'stone',
+    name: "Stone Grain Series",
+    desc: "Classic stone surface with timeless elegance.",
+    icon: Gem,
+    img: "/images/carbon-rock-boards/stone.jpg",
+    color: "from-stone-100 to-slate-100",
+    accent: "stone-600",
+    panels: [
+      { id: "S3231", name: "White & Gold", img: "/images/carbon-rock-boards/stone/1.jpg", desc: "Stone texture White & Gold", stock: 10 },
+      { id: "S3232", name: "Black & Blue", img: "/images/carbon-rock-boards/stone/s3232.jpg", desc: "Stone texture Black & Blue", stock: 10 },
+      { id: "S3233", name: "Grey & Blue", img: "/images/carbon-rock-boards/stone/s3233.jpg", desc: "Stone texture Grey & Blue", stock: 10 },
+      { id: "T3017", name: "Mid Grey & White", img: "/images/carbon-rock-boards/stone/4.jpg", desc: "Stone texture Mid Grey & White", stock: 10 },
+      { id: "T3019", name: "Black & Brown", img: "/images/carbon-rock-boards/stone/t3019.jpg", desc: "Stone texture Black & Brown", stock: 10 },
+      { id: "T3204", name: "Dark Grey & Black", img: "/images/carbon-rock-boards/stone/5.jpg", desc: "Stone texture Dark Grey & Black", stock: 10 }
+    ]
+  },
+  {
+    id: 'metallic',
+    name: "Metal Series",
+    desc: "Luxury feel with metallic luster and reflectivity.",
+    icon: Layers,
+    img: "/images/carbon-rock-boards/metal.jpg",
+    color: "from-amber-100 to-yellow-100",
+    accent: "amber-600",
+    panels: [
+      { id: "LS-2A05", name: "Antique Copper", img: "/images/carbon-rock-boards/metal/ls-2a05.jpg", desc: "Rich antique copper finish with timeless, rustic charm.", stock: 10 },
+      { id: "LS-2A06", name: "Urban Brass", img: "/images/carbon-rock-boards/metal/ls-2a06.jpg", desc: "Bold brass tone with an industrial, modern character.", stock: 10 },
+      { id: "LS-2A08", name: "Champagne Gold", img: "/images/carbon-rock-boards/metal/ls-2a08.jpg", desc: "Luxurious champagne gold with a refined, soft glow.", stock: 10 },
+      { id: "LS-2A09", name: "Brushed Bronze", img: "/images/carbon-rock-boards/metal/ls-2a09.jpg", desc: "Matte brushed bronze with warm, contemporary appeal.", stock: 10 },
+      { id: "SZ-703",  name: "Brushed Silver", img: "/images/carbon-rock-boards/metal/sz-703.jpg",  desc: "Sleek brushed silver offering a clean, modern look.", stock: 10 },
+      { id: "SZ-705",  name: "Satin Titanium", img: "/images/carbon-rock-boards/metal/sz-705.jpg",  desc: "Smooth satin titanium with a durable, futuristic finish.", stock: 10 },
+      { id: "H-8301",  name: "Brushed Copper", img: "/images/carbon-rock-boards/metal/h-8301.jpg",  desc: "Textured brushed copper with a warm metallic tone.", stock: 10 },
+      { id: "SJ-2003", name: "Cobalt Satin Metal", img: "/images/carbon-rock-boards/metal/sj-2003.jpg", desc: "Smooth satin finish with a cool cobalt blue metallic tone.", stock: 10 },
+      { id: "S-8026",  name: "Bronze Satin Metal", img: "/images/carbon-rock-boards/metal/s-8026.jpg",  desc: "Elegant satin finish with a rich bronze metallic appearance.", stock: 10 },
+      { id: "S-8115",  name: "Steel Shine Mosaic", img: "/images/carbon-rock-boards/metal/s8115.jpg",  desc: "The brushed texture gives it a modern, reflective, metallic look.", stock: 10 }
+    ]
+  },
+  {
+    id: 'mirror',
+    name: "Mirror Series",
+    desc: "Reflective brilliance with a sleek, high-gloss finish.",
+    icon: Square,
+    img: "/images/carbon-rock-boards/mirror.jpg",
+    color: "from-leather-100 to-leather-100",
+    accent: "stone-600",
+    panels: [
+      { id: "MR2001", name: "Mirror Gold", img: "/images/carbon-rock-boards/mirror/1.webp", desc: "Elegant gold mirror with a warm reflection.", stock: 10 },
+      { id: "MR2002", name: "Ripple Silver Mirror", img: "/images/carbon-rock-boards/mirror/5.webp", desc: "Elegant silver mirror with a subtle ripple texture for a modern reflective finish.", stock: 10 },
+      { id: "MR2003", name: "Mirror Black", img: "/images/carbon-rock-boards/mirror/2.webp", desc: "Bold black mirror with a dramatic reflection.", stock: 10 },
+      { id: "MR2004", name: "Ripple Gold Mirror", img: "/images/carbon-rock-boards/mirror/4.webp", desc: "Textured gold mirror with a radiant glow.", stock: 10 },
+      { id: "MR2005", name: "Mirror Silver", img: "/images/carbon-rock-boards/mirror/3.webp", desc: "Classic silver mirror with a clear finish.", stock: 10 },
+      { id: "MR2006", name: "Mirror White", img: "/images/carbon-rock-boards/mirror/jm03.jpg", desc: "Clean white mirror with a bright reflection.", stock: 10 }
+    ]
+  }
+];
+
+
+  // Value Propositions for Gaming
+  const features = [
+    {
+      icon: <Cable className="w-8 h-8" />,
+      title: "Pro-Grade Cable Management",
+      description: "Hidden raceways and integrated power solutions ensure a clean, clutter-free setup, enhancing aesthetics and safety.",
+      gradient: "from-clay-500 to-taupe-500"
+    },
+    {
+      icon: <Lightbulb className="w-8 h-8" />,
+      title: "Dynamic RGB & Scene Presets",
+      description: "Create immersive environments with customizable RGB lighting scenes for gaming, streaming, movie watching, or relaxation.",
+      gradient: "from-taupe-500 to-clay-600"
+    },
+    {
+      icon: <Headphones className="w-8 h-8" />,
+      title: "Acoustic Comfort & Clarity",
+      description: "Reduce echo and fan noise with integrated acoustic panels, providing a clearer audio experience for competitive play and communication.",
+      gradient: "from-clay-600 to-taupe-400"
+    },
+    {
+      icon: <Monitor className="w-8 h-8" />,
+      title: "Optimized Display Mounting",
+      description: "Secure and flexible wall-mounting solutions for single or multi-monitor setups, ensuring optimal viewing angles and ergonomic comfort.",
+      gradient: "from-taupe-400 to-clay-500"
+    },
+    {
+      icon: <Thermometer className="w-8 h-8" />,
+      title: "Advanced Thermal Management",
+      description: "Integrated ventilation and strategic component placement prevent overheating, maintaining peak performance for your consoles and PCs.",
+      gradient: "from-clay-500 to-taupe-600"
+    },
+    {
+      icon: <Gamepad className="w-8 h-8" />,
+      title: "Personalized Gaming Zones",
+      description: "Design dedicated areas for competitive gaming, content creation, or casual play, tailored to your unique style and needs.",
+      gradient: "from-taupe-600 to-clay-400"
+    }
+  ];
+
+  // FAQ Data
+  type FAQItem = { question: string; answer: string };
+  const faqData: FAQItem[] = [
+    {
+      question: "How do smart gaming walls improve acoustics?",
+      answer:
+        "Our smart gaming walls incorporate acoustic panels and sound-dampening materials that reduce echo and reverberation, creating a clearer audio environment for gaming and streaming. This helps to minimize distractions and enhance immersion.",
+    },
+    {
+      question: "Can the walls help with heat management for consoles and PCs?",
+      answer:
+        "Yes, our designs can include integrated ventilation solutions and strategic placement of components to ensure optimal airflow, preventing overheating of gaming consoles and high-performance PCs. This helps maintain system stability and longevity.",
+    },
+    {
+      question: "Are the RGB lighting scenes customizable?",
+      answer:
+        "Absolutely. The integrated RGB lighting systems are fully customizable, allowing you to create dynamic scenes for different moods—whether you're in a competitive match, streaming, watching a movie, or just relaxing. Control is intuitive via smart panels or mobile apps.",
+    },
+    {
+      question: "How is cable management handled?",
+      answer:
+        "Our smart gaming walls feature hidden cable raceways and integrated power solutions, ensuring a clean, clutter-free setup. All cables for monitors, consoles, PCs, and peripherals are neatly concealed within the wall structure for a professional look.",
+    },
+    {
+      question: "Is it safe to wall-mount heavy monitors or TVs?",
+      answer:
+        "Yes, our wall systems are engineered for secure mounting of all gaming equipment, including large monitors and TVs. We use robust VESA-compatible mounting solutions and ensure proper structural support, providing a safe and stable setup for your gear.",
+    },
   ];
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-950">
       <SEOHead
-        title="Smart Gaming Wall Installation | Premium Gaming Room Design | The Wall Shop"
-        description="Transform your gaming experience with intelligent smart gaming walls. Professional installation of LED lighting, premium audio, console storage, and automation systems. Free consultation available across the UK."
-        canonical="https://www.thewallshop.co.uk/smart-gaming-wall"
-        keywords="smart gaming wall, gaming room design, LED gaming lights, console storage, gaming wall installation, smart gaming setup, RGB lighting, gaming automation, dual TV gaming, premium gaming room, UK gaming installation"
-        ogImage="https://www.thewallshop.co.uk/images/smart-gaming-wall.webp"
+        title="Smart Gaming Walls | RGB Lighting, Cable-Free Setups & Acoustic Control | The Wall Shop"
+        description="Design a pro-grade gaming wall with modular finishes, acoustic control, hidden cabling, RGB scenes and smart controls—installed across the UK."
+        canonical="https://www.thewallshop.co.uk/smart-walls/gaming"
+        keywords="smart gaming wall, RGB lighting, acoustic gaming room, hidden cables, PC setup, console wall mount, gaming room design UK, Orvibo gaming"
+        ogImage="/images/og/smartwall-gaming.jpg"
       />
+      
+      <Navigation />
 
-      <div className="min-h-screen bg-gradient-to-br from-mocha-900 via-mocha-800 to-leather-900">
-        {/* Navigation */}
-         
-          <Navigation />
-        
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col justify-start md:justify-center items-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-950 via-clay-950 to-taupe-950 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-clay-900/20 via-transparent to-transparent"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-clay-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-taupe-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-         
-
-        {/* Enhanced Hero Section - Fully Responsive */}
-        <section className="relative min-h-screen flex flex-col justify-start md:justify-center overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 pt-24 md:pt-0">
-          {/* Enhanced Background with Particles */}
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold-500/10 to-copper-500/10"></div>
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
-                               radial-gradient(circle at 75% 75%, rgba(237, 125, 84, 0.15) 0%, transparent 50%)`
-            }}></div>
-            
-            {/* Responsive Particle Effect */}
-            <div className="absolute inset-0 opacity-30">
-              {[...Array(isMobile ? 15 : 30)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute rounded-full bg-gold-400/20"
-                  style={{
-                    width: Math.random() * (isMobile ? 8 : 15) + 5 + 'px',
-                    height: Math.random() * (isMobile ? 8 : 15) + 5 + 'px',
-                    top: Math.random() * 100 + '%',
-                    left: Math.random() * 100 + '%',
-                    animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
-                    animationDelay: Math.random() * 5 + 's'
-                  }}
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-6 md:space-y-8"
-            >
-              {/* Enhanced Badge - Responsive */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-gold-500/30 to-copper-500/30 backdrop-blur-md border border-gold-500/40 rounded-full px-4 py-2 md:px-6 md:py-3 shadow-lg"
-                whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              >
-                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-gold-300" />
-                <span className="text-gold-100 font-medium text-sm md:text-base">Premium Gaming Experience</span>
-              </motion.div>
-
-              {/* Enhanced Main Heading - Responsive Typography */}
-              <div className="space-y-4 md:space-y-6">
-                <motion.h1 
-                  className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-tight"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                >
-                  <span className="block gradient-text-luxury bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 pb-2">Smart Gaming</span>
-                  <span className="block text-clay-100 drop-shadow-lg">Wall Systems</span>
-                </motion.h1>
-                <motion.p 
-                  className="text-lg sm:text-xl md:text-2xl text-clay-200 max-w-4xl mx-auto leading-relaxed px-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                >
-                  Transform your gaming space with intelligent automation, premium audio, 
-                  dynamic lighting, and seamless console integration. Experience gaming like never before.
-                </motion.p>
-              </div>
-
-              {/* Enhanced Stats - Responsive Grid */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto"
-              >
-                {[
-                  { icon: Clock, value: "Instant", label: "Setup" },
-                  { icon: Star, value: "4.9/5", label: "Customer Rating" },
-                  { icon: Shield, value: "5 Year", label: "Warranty" },
-                  { icon: Zap, value: "24/7", label: "Smart Control" }
-                ].map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                    className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300"
-                    whileHover={{ scale: 1.05, y: -5 }}
-                  >
-                    <stat.icon className="w-6 h-6 md:w-8 md:h-8 text-gold-400 mx-auto mb-2 md:mb-3" />
-                    <div className="text-xl md:text-2xl lg:text-3xl font-bold text-white">{stat.value}</div>
-                    <div className="text-clay-300 text-xs md:text-sm mt-1">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Enhanced CTA Buttons - Responsive Layout */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center pt-6 md:pt-8 px-4"
-              >
-                <motion.button
-                  onClick={() => setIsQuoteModalOpen(true)}
-                  className="btn-luxury-gold px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden w-full sm:w-auto"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-gold-500/0 via-gold-500/20 to-gold-500/0 animate-shimmer"></span>
-                  <MessageCircle className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform z-10" />
-                  <span className="z-10">Get Free Design Consultation</span>
-                </motion.button>
-                <motion.a
-                  href="tel:+441417393377"
-                  className="border-2 border-gold-500/50 text-gold-200 px-6 py-3 md:px-8 md:py-4 rounded-2xl hover:bg-gold-500/10 hover:border-gold-400 transition-all duration-300 font-semibold text-base md:text-lg flex items-center justify-center space-x-2 group w-full sm:w-auto"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Phone className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
-                  <span>Call: +44 141 739 3377</span>
-                </motion.a>
-              </motion.div>
-            </motion.div>
-          </div>
-
-          {/* Enhanced Scroll Indicator - Hidden on Mobile */}
+        <div className="relative z-10 max-w-7xl mx-auto text-center pt-20 md:pt-0">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 hidden md:block"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="mb-8"
           >
-            <div className="w-6 h-10 border-2 border-gold-400/50 rounded-full flex justify-center backdrop-blur-sm">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-1 h-3 bg-gold-400 rounded-full mt-2"
-              />
-            </div>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">
+                The Ultimate
+              </span>
+              <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-taupe-300 via-taupe-200 to-taupe-400">
+                Smart Gaming Wall
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-clay-300 max-w-4xl mx-auto leading-relaxed">
+              Transform your gaming space into a professional-grade battle station with integrated RGB lighting, 
+              acoustic control, and hidden cabling for an immersive, clutter-free experience.
+            </p>
           </motion.div>
 
-          <style>{`
-            @keyframes float {
-              0%, 100% { transform: translateY(0) rotate(0deg); }
-              50% { transform: translateY(-10px) rotate(5deg); }
-            }
-            @keyframes shimmer {
-              0% { transform: translateX(-100%); }
-              100% { transform: translateX(100%); }
-            }
-            .animate-shimmer {
-              animation: shimmer 2s infinite;
-            }
-          `}</style>
-        </section>
-
-        {/* Enhanced Interactive Configuration Section - Fully Responsive */}
-        <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-white overflow-hidden">
-          {/* Subtle Background Pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold-500/5 to-copper-500/5"></div>
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
-                               radial-gradient(circle at 75% 75%, rgba(237, 125, 84, 0.05) 0%, transparent 50%)`
-            }}></div>
-          </div>
-
-          <div className="max-w-7xl mx-auto relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12 md:mb-16"
-            >
-              {/* Enhanced Badge */}
+          {/* Trust Chips */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-4 mb-12 max-w-4xl mx-auto"
+          >
+            {[ 
+              { icon: <MapPin className="w-5 h-5" />, label: "UK-based Installers" }, 
+              { icon: <Shield className="w-5 h-5" />, label: "Aftercare & Warranty" }, 
+              { icon: <Cable className="w-5 h-5" />, label: "Clean Cable Management" } 
+            ].map((chip, index) => (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={index}
+                className="flex items-center space-x-2 px-5 py-3 rounded-full bg-gradient-to-r from-clay-600/30 to-taupe-700/30 text-white text-lg font-semibold border border-clay-500/40"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                {chip.icon}
+                <span>{chip.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Enhanced CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+          >
+            <motion.button
+              onClick={() => setIsQuoteModalOpen(true)}
+              className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" />
+              <span className="z-10">Design Your Gaming Wall</span>
+            </motion.button>
+            <motion.a
+              href="mailto:info@thewallshop.co.uk"
+              className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span>Book a Free Consultation</span>
+            </motion.a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Breadcrumbs */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-gray-900 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex items-center space-x-2 text-sm">
+            <a href="/" className="text-clay-400 hover:text-clay-300 transition-colors">Home</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <a href="/smart-walls" className="text-clay-400 hover:text-clay-300 transition-colors">Smart Walls</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <span className="text-clay-200">Gaming</span>
+          </nav>
+        </div>
+      </section>
+
+      {/* Features Grid (Value Propositions) */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Elevate Your</span>
+              <span className="block text-clay-100 mt-2">Gaming Experience</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Our Smart Gaming Walls are engineered to provide the ultimate environment for performance, immersion, and comfort.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-gold-500/10 to-copper-500/10 backdrop-blur-sm border border-gold-500/20 rounded-full px-4 py-2 md:px-6 md:py-2 mb-4 md:mb-6 shadow-sm"
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group bg-taupe-800/50 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300 hover:transform hover:scale-105"
               >
-                <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-gold-500" />
-                <span className="text-gold-600 font-medium text-xs md:text-sm">Interactive Experience</span>
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className="text-white">{feature.icon}</div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-clay-200 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-clay-300 leading-relaxed">{feature.description}</p>
               </motion.div>
-              
-              {/* Enhanced Headings - Responsive Typography */}
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
-                <span className="gradient-text-luxury bg-clip-text text-transparent bg-gradient-to-r from-gold-600 via-gold-500 to-gold-700">Configure Your</span>
-                <span className="block text-gray-900 mt-2">Perfect Gaming Setup</span>
-              </h2>
-              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-                Explore our interactive gaming wall configurations. Click on the hotspots to discover 
-                the advanced features and technology that make each setup extraordinary.
-              </p>
-            </motion.div>
-
-            {/* Enhanced Configuration Tabs - Mobile Optimized */}
-            <motion.div 
-              className="flex justify-center mb-8 md:mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="bg-gray-100/80 backdrop-blur-sm rounded-full p-1 border border-gold-500/20 shadow-sm w-full max-w-md md:max-w-none md:w-auto">
-                {Object.entries(tabContent).map(([key, content]) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setActiveTab(key as 'single' | 'dual');
-                      setActiveHotspot(null);
-                    }}
-                    className={`px-4 py-3 md:px-8 md:py-4 rounded-full font-semibold transition-all duration-300 relative overflow-hidden text-sm md:text-base flex-1 md:flex-none ${
-                      activeTab === key
-                        ? 'text-white shadow-lg'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
-                    }`}
-                  >
-                    {activeTab === key && (
-                      <motion.div 
-                        className="absolute inset-0 bg-gradient-to-r from-leather-500 via-leather-700 to-leather-600"
-                        layoutId="activeTabBackground"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10">{content.label}</span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Interactive Image with Hotspots - Fully Responsive */}
-            <div className="relative max-w-6xl mx-auto">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                ref={imageRef}
-                className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-xl bg-gray-50 border-2 border-gold-500/20 group"
-              >
-                <img
-                  src={activeTab === 'single' ? '/images/smart-gaming-wall-2.webp' : '/images/smart-gaming-wall-3.webp'}
-                  alt={`${tabContent[activeTab].label} - Smart Gaming Wall Configuration`}
-                  className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                />
-                
-                {/* Enhanced Hotspots - Mobile Optimized */}
-                <AnimatePresence>
-                  {tabContent[activeTab].hotspots.map((hotspot) => (
-                    <motion.button
-                      key={hotspot.id}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 + (parseInt(hotspot.id) * 0.1) }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveHotspot(activeHotspot === hotspot.id ? null : hotspot.id);
-                      }}
-                      className={`absolute rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                        isMobile ? 'w-8 h-8 md:w-12 md:h-12' : 'w-12 h-12'
-                      } ${
-                        activeHotspot === hotspot.id
-                          ? 'bg-white border-gray-300 scale-125 shadow-lg z-20'
-                          : 'bg-white border-gray-200 hover:border-gold-500 hover:scale-110 z-10'
-                      }`}
-                      style={{
-                        left: `calc(${hotspot.x}% - ${isMobile ? '16px' : '24px'})`,
-                        top: `calc(${hotspot.y}% - ${isMobile ? '16px' : '24px'})`,
-                      }}
-                      aria-label={`View details about ${hotspot.title}`}
-                      whileHover={{ scale: isMobile ? 1.05 : 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <div className={`w-full h-full flex items-center justify-center ${
-                        activeHotspot === hotspot.id ? 'text-gray-800' : 'text-gray-700'
-                      }`}>
-                        {hotspot.icon}
-                      </div>
-                      
-                      {/* Outer ring animation for hotspots */}
-                      <motion.div 
-                        className="absolute inset-0 rounded-full border-2 border-leather-500 opacity-0"
-                        animate={{ 
-                          opacity: [0, 0.5, 0],
-                          scale: [1, 1.5, 1],
-                        }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity,
-                          delay: Math.random() * 1.5
-                        }}
-                      />
-                      
-                      {/* Active hotspot indicator */}
-                      {activeHotspot === hotspot.id && (
-                        <motion.div 
-                          className="absolute inset-0 rounded-full border-2 border-gold-400"
-                          initial={{ opacity: 0, scale: 1.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      )}
-                    </motion.button>
-                  ))}
-                </AnimatePresence>
-
-                {/* Enhanced Hotspot Details Card - Mobile Optimized */}
-                <AnimatePresence>
-                  {activeHotspot && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                      transition={{ duration: 0.3, type: "spring" }}
-                      className="absolute bottom-4 md:bottom-6 left-4 right-4 md:left-6 md:right-6 bg-white/95 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-gold-500/30 shadow-xl z-30"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {(() => {
-                        const hotspot = tabContent[activeTab].hotspots.find(h => h.id === activeHotspot);
-                        if (!hotspot) return null;
-                        
-                        return (
-                          <div className="space-y-3 md:space-y-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
-                                <motion.div 
-                                  className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-gold-500 to-copper-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0"
-                                  initial={{ scale: 0, rotate: -180 }}
-                                  animate={{ scale: 1, rotate: 0 }}
-                                  transition={{ duration: 0.5, type: "spring" }}
-                                >
-                                  {hotspot.icon}
-                                </motion.div>
-                                <div className="min-w-0 flex-1">
-                                  <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">{hotspot.title}</h3>
-                                  <p className="text-gray-600 mt-1 text-sm md:text-base line-clamp-2">{hotspot.description}</p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => setActiveHotspot(null)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 flex-shrink-0 ml-2"
-                                aria-label="Close details"
-                              >
-                                <X className="w-4 h-4 md:w-5 md:h-5" />
-                              </button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 pt-2">
-                              {hotspot.features.map((feature, index) => (
-                                <motion.div 
-                                  key={index} 
-                                  className="flex items-center space-x-2 md:space-x-3 p-2 rounded-lg bg-gray-100/70"
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                                >
-                                  <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-gold-500 flex-shrink-0" />
-                                  <span className="text-xs md:text-sm text-gray-700">{feature}</span>
-                                </motion.div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                {/* Instructions Overlay - Mobile Optimized */}
-                <AnimatePresence>
-                  {!activeHotspot && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute bottom-3 md:bottom-4 left-1/2 transform -translate-x-1/2 rounded-full overflow-hidden"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(245,245,245,0.9) 100%)',
-                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2)',
-                        backdropFilter: 'blur(10px)'
-                      }}
-                    >
-                      <div className="relative px-3 py-2 md:px-4 md:py-2">
-                        <div className="absolute inset-0 opacity-30 bg-gradient-to-b from-white/50 to-transparent"></div>
-                        <p className="text-xs md:text-sm text-gray-700 flex items-center space-x-2 relative z-10">
-                          <MousePointer className="w-3 h-3 md:w-4 md:h-4 text-amber-800" />
-                          <span>{isMobile ? 'Tap markers to explore' : 'Click on the markers to explore features'}</span>
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              <motion.div 
-                className="text-center mt-6 md:mt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                <p className="text-gray-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed px-4">
-                  {tabContent[activeTab].description}
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Enhanced Features Grid - Mobile Optimized */}
-        <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-gray-950 overflow-hidden">
-          {/* Background Elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold-500/10 to-copper-500/10"></div>
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-                               radial-gradient(circle at 75% 75%, rgba(237, 125, 84, 0.1) 0%, transparent 50%)`
-            }}></div>
-          </div>
-
-          {/* Floating Particles - Reduced for Mobile */}
-          <div className="absolute inset-0 opacity-30">
-            {[...Array(isMobile ? 8 : 15)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full bg-gold-400/20"
-                style={{
-                  width: Math.random() * (isMobile ? 8 : 12) + 4 + 'px',
-                  height: Math.random() * (isMobile ? 8 : 12) + 4 + 'px',
-                  top: Math.random() * 100 + '%',
-                  left: Math.random() * 100 + '%',
-                  animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
-                  animationDelay: Math.random() * 5 + 's'
-                }}
-              ></div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="max-w-7xl mx-auto relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12 md:mb-16"
-            >
-              {/* Enhanced Badge */}
+      {/* Orvibo Smart Devices Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Integrated Smart</span>
+              <span className="block text-clay-100 mt-2">Gaming Devices</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Seamlessly control your gaming environment with cutting-edge smart devices for ultimate immersion.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {orviboDevices.map((device, index) => (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={device.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-gold-500/20 to-copper-500/20 backdrop-blur-sm border border-gold-500/30 rounded-full px-4 py-2 md:px-6 md:py-2 mb-4 md:mb-6"
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
               >
-                <Zap className="w-3 h-3 md:w-4 md:h-4 text-gold-400" />
-                <span className="text-gold-200 font-medium text-xs md:text-sm">Advanced Technology</span>
+                <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center mb-4">
+                  <device.Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{device.title}</h3>
+                <p className="text-sm text-clay-400 mb-3">{device.category}</p>
+                <p className="text-clay-300 text-sm mb-4">{device.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {device.features.map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-clay-600/30 text-clay-200 px-2 py-1 rounded-full">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
               </motion.div>
-              
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
-                <span className="gradient-text-luxury bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">Why Choose</span>
-                <span className="block text-white mt-2">Smart Gaming Walls?</span>
-              </h2>
-              <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed px-4">
-                Experience the perfect fusion of cutting-edge technology, premium design, and intelligent automation that transforms ordinary gaming spaces into extraordinary entertainment environments.
-              </p>
-            </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Features Grid - Responsive */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[
-                {
-                  icon: <Monitor className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Premium Displays",
-                  description: "Ultra-low latency 4K gaming monitors with HDR support and variable refresh rates for competitive gaming.",
-                  features: ["4K 120Hz displays", "HDR10+ support", "Variable refresh rate", "Ultra-low input lag"]
-                },
-                {
-                  icon: <Volume2 className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Immersive Audio",
-                  description: "Spatial audio systems with gaming-optimised sound profiles and voice chat clarity.",
-                  features: ["7.1 surround sound", "Gaming audio profiles", "Voice chat clarity", "Bass enhancement"]
-                },
-                {
-                  icon: <Lightbulb className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Dynamic Lighting",
-                  description: "RGB lighting that syncs with gameplay for an immersive gaming experience.",
-                  features: ["Gameplay sync", "Colour customisation", "Ambient modes", "Voice control"]
-                },
-                {
-                  icon: <Gamepad2 className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Console Storage",
-                  description: "Organised storage with integrated cooling and cable management for all gaming consoles.",
-                  features: ["Multiple console support", "Active cooling", "Cable management", "Quick access design"]
-                },
-                {
-                  icon: <Settings className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Smart Automation",
-                  description: "Intelligent automation that learns your gaming habits and optimises the environment.",
-                  features: ["Automated profiles", "Smart scheduling", "Climate control", "Voice commands"]
-                },
-                {
-                  icon: <Shield className="w-6 h-6 md:w-8 md:h-8" />,
-                  title: "Professional Installation",
-                  description: "Expert installation with comprehensive warranty and ongoing support.",
-                  features: ["Professional setup", "5-year warranty", "Free maintenance", "24/7 support"]
-                }
-              ].map((feature, index) => (
+      {/* Gaming Panel Finishes Section — REWORKED (2-row clamp + expand) */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Gaming-Optimized</span>
+              <span className="block text-clay-100 mt-2">Wall Finishes</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Choose finishes engineered for acoustic control, glare-free visuals, and daily durability—ideal for immersive play and streaming setups.
+            </p>
+          </motion.div>
+
+          <div className="space-y-10">
+            {finishCategories.map((category, index) => {
+              const isOpen = !!expanded[category.id];
+              const visiblePanels = isOpen
+                ? category.panels
+                : category.panels.slice(0, DEFAULT_MAX_VISIBLE);
+
+              return (
                 <motion.div
-                  key={index}
+                  key={category.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-gray-800/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 border border-gold-500/20 hover:border-gold-400/40 transition-all duration-300 group"
-                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  className="relative rounded-2xl border border-clay-500/20 bg-gradient-to-br from-taupe-800/40 to-clay-800/30 backdrop-blur-md"
                 >
-                  <div className="flex items-center space-x-4 mb-4 md:mb-6">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-gold-500 to-copper-500 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
-                      {feature.icon}
-                    </div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white">{feature.title}</h3>
-                  </div>
-                  <p className="text-gray-300 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">{feature.description}</p>
-                  <div className="space-y-2 md:space-y-3">
-                    {feature.features.map((item, idx) => (
-                      <div key={idx} className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-gold-400 flex-shrink-0" />
-                        <span className="text-gray-400 text-sm md:text-base">{item}</span>
+                  {/* Category Header */}
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="grid place-items-center size-12 rounded-xl bg-gradient-to-r from-clay-500 to-taupe-500">
+                        <category.icon className="w-6 h-6 text-white" />
                       </div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Enhanced CTA Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-center mt-12 md:mt-16"
-            >
-              <div className="bg-gradient-to-r from-gold-500/10 to-copper-500/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 border border-gold-500/20 relative overflow-hidden">
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shine"></div>
-                
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 relative z-10">
-                  Ready to Transform Your Gaming Space?
-                </h3>
-                <p className="text-gray-300 mb-4 md:mb-6 max-w-2xl mx-auto relative z-10 text-sm md:text-base">
-                  Experience the ultimate gaming setup with our smart wall systems. Schedule a free consultation today.
-                </p>
-                <button className="bg-gradient-to-r from-gold-500 to-copper-500 text-white px-6 py-3 md:px-8 md:py-3 rounded-full font-semibold hover:from-gold-600 hover:to-copper-600 transition-all duration-300 shadow-lg hover:shadow-gold-500/30 relative z-10 text-sm md:text-base">
-                  Get Free Consultation
-                </button>
-              </div>
-            </motion.div>
-          </div>
-
-          <style>{`
-            @keyframes float {
-              0%, 100% { transform: translateY(0) rotate(0deg); }
-              50% { transform: translateY(-10px) rotate(5deg); }
-            }
-          `}</style>
-        </section>
-
-        {/* Enhanced FAQ Section - Mobile Optimized */}
-        <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-          {/* Background Elements */}
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              background: "radial-gradient(ellipse at center, #3d2914 0%, #2a1810 30%, #1a0f0a 60%, #0d0806 100%)"
-            }}
-          />
-
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold-500/10 to-copper-500/10"></div>
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-                               radial-gradient(circle at 75% 75%, rgba(237, 125, 84, 0.1) 0%, transparent 50%)`
-            }}></div>
-          </div>
-
-          {/* Floating Particles - Reduced for Mobile */}
-          <div className="absolute inset-0 opacity-30">
-            {[...Array(isMobile ? 5 : 10)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full bg-gold-400/20"
-                style={{
-                  width: Math.random() * (isMobile ? 6 : 10) + 4 + 'px',
-                  height: Math.random() * (isMobile ? 6 : 10) + 4 + 'px',
-                  top: Math.random() * 100 + '%',
-                  left: Math.random() * 100 + '%',
-                  animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
-                  animationDelay: Math.random() * 5 + 's'
-                }}
-              ></div>
-            ))}
-          </div>
-
-          <div className="max-w-4xl mx-auto relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-12 md:mb-16"
-            >
-              {/* Enhanced Badge */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-gold-500/20 to-copper-500/20 backdrop-blur-sm border border-gold-500/30 rounded-full px-4 py-2 md:px-6 md:py-2 mb-4 md:mb-6"
-              >
-                <HelpCircle className="w-3 h-3 md:w-4 md:h-4 text-gold-400" />
-                <span className="text-gold-200 font-medium text-xs md:text-sm">Common Questions</span>
-              </motion.div>
-              
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
-                <span className="gradient-text-luxury bg-clip-text text-transparent bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">Frequently Asked</span>
-                <span className="block text-white mt-2">Questions</span>
-              </h2>
-              <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed px-4">
-                Everything you need to know about smart gaming wall installation and features
-              </p>
-            </motion.div>
-
-            <div className="space-y-3 md:space-y-4">
-              {faqData.map((faq, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group bg-gray-800/50 backdrop-blur-sm rounded-xl md:rounded-2xl border border-gold-500/20 overflow-hidden hover:border-gold-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-gold-500/10"
-                  whileHover={{ y: -3 }}
-                >
-                  <button
-                    onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                    className="w-full px-4 py-4 md:px-8 md:py-6 text-left flex items-center justify-between hover:bg-gray-700/30 transition-all duration-300"
-                  >
-                    <div className="flex items-start space-x-3 md:space-x-4 flex-1 min-w-0">
-                      {/* Number Indicator */}
-                      <div className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-gold-500 to-copper-500 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm mt-1">
-                        {index + 1}
-                      </div>
-                      <span className="text-base md:text-lg font-semibold text-white pr-4 text-left leading-tight">{faq.question}</span>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                        expandedFaq === index 
-                          ? 'bg-gold-500/20 rotate-180' 
-                          : 'bg-gray-700/50 group-hover:bg-gold-500/10'
-                      }`}>
-                        <ChevronDown
-                          className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 ${
-                            expandedFaq === index ? 'text-gold-400 rotate-180' : 'text-gray-400 group-hover:text-gold-400'
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  </button>
-                  
-                  <AnimatePresence>
-                    {expandedFaq === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-4 pb-4 md:px-8 md:pb-6 ml-8 md:ml-12 border-l-2 border-gold-500/30 pl-4 md:pl-6">
-                          <motion.p 
-                            className="text-gray-300 leading-relaxed text-sm md:text-base"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.4 }}
-                          >
-                            {faq.answer}
-                          </motion.p>
-                          
-                          {/* Additional action buttons for certain FAQs */}
-                          {(faq.question.includes('installation') || faq.question.includes('price')) && (
-                            <motion.div 
-                              className="mt-3 md:mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3, duration: 0.4 }}
-                            >
-                              <button className="px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-gold-500/10 to-copper-500/10 text-gold-300 rounded-full text-xs md:text-sm font-medium border border-gold-500/30 hover:from-gold-500/20 hover:to-copper-500/20 transition-all duration-300">
-                                Get Quote
-                              </button>
-                              <button className="px-3 py-2 md:px-4 md:py-2 bg-gray-700/50 text-gray-300 rounded-full text-xs md:text-sm font-medium border border-gray-600 hover:bg-gray-700/70 transition-all duration-300">
-                                View Gallery
-                              </button>
-                            </motion.div>
-                          )}
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className="text-2xl font-bold text-white">
+                            {category.name}
+                          </h3>
+                          <span className="inline-flex items-center gap-2 rounded-full border border-clay-500/30 bg-clay-900/40 px-3 py-1 text-xs text-clay-200/80">
+                            {category.panels.length} finishes
+                          </span>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        <p className="text-clay-300 mt-1.5">{category.desc}</p>
+                      </div>
+                    </div>
+
+                    {/* Helper badges (text-only) */}
+                    <div className="flex items-center gap-2 text-xs text-clay-200/80">
+                      <span className="inline-flex items-center gap-2 rounded-md border border-clay-600/30 bg-clay-800/40 px-2.5 py-1">
+                        Acoustic-aware
+                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-md border border-clay-600/30 bg-clay-800/40 px-2.5 py-1">
+                        Scratch-resistant
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Panels */}
+                  <div className="pb-3">
+                    {/* Mobile: horizontal rail */}
+                    <div className="md:hidden px-6">
+                      <div className="-mx-1 flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-clay-700/60">
+                        {visiblePanels.map((panel) => (
+                          <div
+                            key={panel.id}
+                            className="group relative w-56 min-w-56 overflow-hidden rounded-xl border border-clay-600/30 bg-clay-900/40 hover:border-clay-400/50 transition-colors"
+                          >
+                            <div className="aspect-[16/10] overflow-hidden relative">
+                              <img
+                                src={panel.img}
+                                alt={panel.name}
+                                loading="lazy"
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                onError={(e) => {
+                                  const t = e.currentTarget as HTMLImageElement;
+                                  t.style.display = "none";
+                                  const fallback = document.createElement("div");
+                                  fallback.className =
+                                    "flex h-full w-full items-center justify-center bg-clay-800/50 text-clay-300/80 text-xs";
+                                  fallback.textContent = "Image unavailable";
+                                  t.parentElement?.appendChild(fallback);
+                                }}
+                              />
+                              <div className="pointer-events-none absolute right-2 top-2 rounded-md bg-clay-900/70 px-2 py-1 text-[10px] font-medium text-white/90 ring-1 ring-inset ring-white/10 backdrop-blur">
+                                {panel.id}
+                              </div>
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
+                            </div>
+                            <div className="p-4">
+                              <h4 className="font-semibold text-white leading-tight">
+                                {panel.name}
+                              </h4>
+                              {panel.desc ? (
+                                <p className="mt-1 text-sm text-clay-300 line-clamp-2">
+                                  {panel.desc}
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Desktop Grid: 2-row clamp by default (md:grid-cols-3) */}
+                    <div className="hidden md:block">
+                      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-5 px-6 pb-6">
+                        <AnimatePresence initial={false}>
+                          {visiblePanels.map((panel) => (
+                            <motion.div
+                              key={panel.id}
+                              initial={{ opacity: 0, y: 16 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              transition={{ duration: 0.25 }}
+                              className="group relative overflow-hidden rounded-xl border border-clay-600/30 bg-clay-900/40 hover:border-clay-400/50 transition-colors"
+                            >
+                              <div className="aspect-[16/10] overflow-hidden relative">
+                                <img
+                                  src={panel.img}
+                                  alt={panel.name}
+                                  loading="lazy"
+                                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  onError={(e) => {
+                                    const t = e.currentTarget as HTMLImageElement;
+                                    t.style.display = "none";
+                                    const fallback = document.createElement("div");
+                                    fallback.className =
+                                      "flex h-full w-full items-center justify-center bg-clay-800/50 text-clay-300/80 text-xs";
+                                    fallback.textContent = "Image unavailable";
+                                    t.parentElement?.appendChild(fallback);
+                                  }}
+                                />
+                                <div className="pointer-events-none absolute right-2 top-2 rounded-md bg-clay-900/70 px-2 py-1 text-[10px] font-medium text-white/90 ring-1 ring-inset ring-white/10 backdrop-blur">
+                                  {panel.id}
+                                </div>
+                                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
+                              </div>
+                              <div className="p-4">
+                                <div className="flex items-start justify-between gap-2">
+                                  <h4 className="font-semibold text-white leading-tight">
+                                    {panel.name}
+                                  </h4>
+                                </div>
+                                {panel.desc ? (
+                                  <p className="mt-1 text-sm text-clay-300 line-clamp-2">
+                                    {panel.desc}
+                                  </p>
+                                ) : null}
+                              </div>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expand / Collapse */}
+                  {category.panels.length > DEFAULT_MAX_VISIBLE && (
+                    <div className="flex justify-center pb-6">
+                      <button
+                        onClick={() => toggleCategory(category.id)}
+                        className="inline-flex items-center gap-2 rounded-lg border border-clay-600/30 bg-clay-800/40 px-4 py-2 text-clay-100 hover:border-clay-400/50 hover:bg-clay-800/60 transition-colors"
+                        aria-expanded={isOpen}
+                        aria-controls={`finishes-${category.id}`}
+                      >
+                        {isOpen ? "Show less ▲" : "Show all finishes ▼"}
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
-              ))}
-            </div>
-
-            {/* Enhanced CTA Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-center mt-12 md:mt-16"
-            >
-              <div className="bg-gradient-to-r from-gold-500/10 to-copper-500/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-6 md:p-8 border border-gold-500/20 relative overflow-hidden">
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shine"></div>
-                
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-3 md:mb-4 relative z-10">
-                  Still Have Questions?
-                </h3>
-                <p className="text-gray-300 mb-4 md:mb-6 max-w-2xl mx-auto relative z-10 text-sm md:text-base">
-                  Our gaming specialists are ready to answer all your questions and help you design the perfect setup.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center relative z-10">
-                  <button className="bg-gradient-to-r from-gold-500 to-copper-500 text-white px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold hover:from-gold-600 hover:to-copper-600 transition-all duration-300 shadow-lg hover:shadow-gold-500/30 flex items-center justify-center space-x-2 text-sm md:text-base">
-                    <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
-                    <span>Chat with Expert</span>
-                  </button>
-                  <button className="border border-gold-500/30 text-gold-300 px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold hover:bg-gold-500/10 transition-all duration-300 flex items-center justify-center space-x-2 text-sm md:text-base">
-                    <Phone className="w-4 h-4 md:w-5 md:h-5" />
-                    <span>Call Now</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              );
+            })}
           </div>
+        </div>
+      </section>
 
-          <style>{`
-            @keyframes float {
-              0%, 100% { transform: translateY(0) rotate(0deg); }
-              50% { transform: translateY(-8px) rotate(5deg); }
-            }
-            @keyframes shine {
-              0% { transform: translateX(-100%) skewX(-15deg); }
-              100% { transform: translateX(100%) skewX(-15deg); }
-            }
-            .animate-shine {
-              animation: shine 3s infinite;
-            }
-          `}</style>
-        </section>
+      {/* FAQ Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-mocha-900">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Frequently Asked</span>
+              <span className="block text-clay-100">Questions</span>
+            </h2>
+            <p className="text-xl text-clay-300">
+              Everything you need to know about optimizing your gaming space with Smart Walls.
+            </p>
+          </motion.div>
 
-        {/* Enhanced Related Searches Section - Mobile Optimized */}
-        <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-gray-950 overflow-hidden">
-          {/* Background Elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold-500/10 to-copper-500/10"></div>
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-                               radial-gradient(circle at 75% 75%, rgba(237, 125, 84, 0.1) 0%, transparent 50%)`
-            }}></div>
-          </div>
-
-          {/* Floating Particles - Reduced for Mobile */}
-          <div className="absolute inset-0 opacity-30">
-            {[...Array(isMobile ? 6 : 12)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full bg-gold-400/20"
-                style={{
-                  width: Math.random() * (isMobile ? 6 : 8) + 3 + 'px',
-                  height: Math.random() * (isMobile ? 6 : 8) + 3 + 'px',
-                  top: Math.random() * 100 + '%',
-                  left: Math.random() * 100 + '%',
-                  animation: `float ${Math.random() * 8 + 8}s infinite ease-in-out`,
-                  animationDelay: Math.random() * 4 + 's'
-                }}
-              ></div>
+          <div className="space-y-4">
+            {faqData.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/50 backdrop-blur-sm rounded-2xl border border-clay-500/20 overflow-hidden hover:border-clay-400/40 transition-all duration-300"
+              >
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                  className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-taupe-700/30 transition-colors"
+                >
+                  <span className="text-lg font-semibold text-white pr-4">{faq.question}</span>
+                  <ChevronDown
+                    className={`w-6 h-6 text-clay-400 transition-transform duration-300 ${
+                      expandedFaq === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {expandedFaq === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-8 pb-6">
+                        <p className="text-clay-300 leading-relaxed">{faq.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="max-w-5xl mx-auto relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-8 md:mb-12"
-            >
-              {/* Enhanced Badge */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-gold-500/20 to-copper-500/20 backdrop-blur-sm border border-gold-500/30 rounded-full px-4 py-1.5 md:px-5 md:py-1.5 mb-3 md:mb-4"
+      {/* Local Signals Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-clay-900">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-gradient-to-r from-clay-500/10 to-taupe-500/10 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/30"
+          >
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">UK Nationwide Gaming Wall Installation</h3>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 text-clay-300">
+              <div>
+                <h4 className="font-semibold text-white mb-2">Glasgow HQ</h4>
+                <p className="text-sm">SMK Business Centre, 4 The Piazza, Glasgow G5 8BE. Your central point for gaming wall design and project coordination.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">UK Coverage</h4>
+                <p className="text-sm">Expert installation teams available across England, Scotland, Wales, and Northern Ireland, bringing professional gaming setups to your home.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">Gaming Specialists</h4>
+                <p className="text-sm">Dedicated to creating optimal gaming environments, from casual setups to professional streaming studios, with a focus on performance and aesthetics.</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-gray-950">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Ready to Level Up</span>
+              <span className="block text-clay-100 mt-2">Your Gaming Space?</span>
+            </h2>
+            <p className="text-xl text-clay-300 mb-10 max-w-3xl mx-auto">
+              Contact us today for a free consultation and let's design the ultimate smart gaming wall tailored to your needs.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <motion.button
+                onClick={() => setIsQuoteModalOpen(true)}
+                className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Search className="w-3 h-3 md:w-3.5 md:h-3.5 text-gold-400" />
-                <span className="text-gold-200 font-medium text-xs">Popular Topics</span>
-              </motion.div>
-              
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 md:mb-3">
-                Related Searches
-              </h2>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm md:text-base">
-                Popular gaming wall and smart home automation searches
-              </p>
-            </motion.div>
-
-            <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
-              {relatedSearches.map((search, index) => (
-                <motion.button
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    duration: 0.4, 
-                    delay: index * 0.05,
-                    type: "spring",
-                    stiffness: 100
-                  }}
-                  whileHover={{ 
-                    scale: 1.05, 
-                    y: -3,
-                    transition: { duration: 0.2 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group relative bg-gray-800/50 backdrop-blur-sm border border-gold-500/30 rounded-full px-3 py-2 md:px-6 md:py-3 text-xs md:text-sm text-gray-300 hover:text-white hover:border-gold-400/60 hover:bg-gradient-to-r hover:from-gold-500/10 hover:to-copper-500/10 transition-all duration-300 cursor-pointer overflow-hidden"
-                >
-                  {/* Shine effect on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -translate-x-full group-hover:translate-x-full"></div>
-                  
-                  {/* Inner content */}
-                  <span className="relative z-10 flex items-center">
-                    {search}
-                    <ArrowUpRight className="w-2.5 h-2.5 md:w-3.5 md:h-3.5 ml-1 md:ml-2 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-0.5 transition-all duration-300" />
-                  </span>
-                </motion.button>
-              ))}
+                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" />
+                <span className="z-10">Get a Gaming Wall Quote</span>
+              </motion.button>
+              <motion.a
+                href="tel:+441417393377"
+                className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span>Call: +44 141 739 3377</span>
+              </motion.a>
             </div>
 
-            {/* Enhanced CTA Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center mt-12 md:mt-16"
-            >
-              <div className="bg-gradient-to-r from-gold-500/10 to-copper-500/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-gold-500/20 relative overflow-hidden">
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shine"></div>
-                
-                <h3 className="text-lg md:text-xl font-semibold text-white mb-2 md:mb-3 relative z-10">
-                  Can't Find What You're Looking For?
-                </h3>
-                <p className="text-gray-400 mb-3 md:mb-5 text-xs md:text-sm relative z-10">
-                  Our experts can help you find the perfect gaming wall solution
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2 md:gap-3 justify-center relative z-10">
-                  <button className="bg-gradient-to-r from-gold-500 to-copper-500 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-semibold hover:from-gold-600 hover:to-copper-600 transition-all duration-300 shadow-lg hover:shadow-gold-500/30 flex items-center justify-center space-x-2">
-                    <MessageCircle className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>Contact Us</span>
-                  </button>
-                  <button className="border border-gold-500/30 text-gold-300 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-semibold hover:bg-gold-500/10 transition-all duration-300 flex items-center justify-center space-x-2">
-                    <Phone className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>Call Expert</span>
-                  </button>
-                </div>
+            <div className="flex items-center justify-center space-x-6 text-clay-400">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Free Consultation</span>
               </div>
-            </motion.div>
-          </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Custom Design</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Professional Installation</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-          <style>{`
-            @keyframes float {
-              0%, 100% { transform: translateY(0) rotate(0deg); }
-              50% { transform: translateY(-6px) rotate(3deg); }
-            }
-            @keyframes shine {
-              0% { transform: translateX(-100%) skewX(-15deg); }
-              100% { transform: translateX(200%) skewX(-15deg); }
-            }
-            .animate-shine {
-              animation: shine 4s infinite;
-            }
-          `}</style>
-        </section>
+      <Footer />
 
-        {/* Footer */}
-        <Footer />
-
-        {/* Quote Modal */}
-        <AnimatePresence>
-          {isQuoteModalOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setIsQuoteModalOpen(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-mocha-900 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md w-full border border-gold-500/30 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="text-center mb-4 md:mb-6">
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-gold-500 to-copper-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Get Your Free Consultation</h3>
-                  <p className="text-gray-300 text-sm md:text-base">Our gaming specialists will help you design the perfect smart gaming wall for your space.</p>
-                </div>
-                
-                <div className="space-y-3 md:space-y-4">
-                  <button className="w-full bg-gradient-to-r from-gold-500 to-copper-500 text-white py-3 md:py-4 rounded-xl font-semibold hover:from-gold-600 hover:to-copper-600 transition-all duration-300 text-sm md:text-base">
-                    Schedule Free Consultation
-                  </button>
-                  <button className="w-full border border-gold-500/30 text-gold-300 py-3 md:py-4 rounded-xl font-semibold hover:bg-gold-500/10 transition-all duration-300 text-sm md:text-base">
-                    Call: +44 141 739 3377
-                  </button>
-                </div>
-                
-                <button
-                  onClick={() => setIsQuoteModalOpen(false)}
-                  className="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+      {/* Quote Modal */}
+      <AnimatePresence>
+        {isQuoteModalOpen && (
+          <SwQuoteModal
+            isOpen={isQuoteModalOpen}
+            onClose={() => setIsQuoteModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
 export default SmartGamingWall;
-

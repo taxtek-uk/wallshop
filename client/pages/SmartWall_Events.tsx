@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
 import Navigation from '@/components/Navigation'; 
 import Footer from '@/components/Footer'; 
+import SwQuoteModal from '@/components/SwQuoteModal';
 import { 
   Calendar, 
   Lightbulb, 
   Volume2, 
-  Thermometer, 
   Smartphone, 
   Settings, 
   Phone, 
@@ -17,7 +17,6 @@ import {
   Star, 
   Shield, 
   Zap,
-  Ruler,
   Download,
   Home, 
   Users, 
@@ -47,12 +46,32 @@ import {
   Play,
   Pause,
   Info,
-  Monitor,
+  ChevronRight,
+  Archive,
+  Layers,
+  Droplets,
+  Flame,
   Mic,
-  Camera,
+  PanelsTopLeft,
+  LampCeiling,
+  Fan,
+  TreePine,
+  Square,
+  Gem,
+  Headphones,
+  Thermometer,
+  Sparkle,
+  Menu,
+  Gauge,
+  Wifi as WifiIcon,
+  Megaphone,
+  Monitor,
   Presentation,
+  Camera,
   Projector,
-  Headphones
+  Tv,
+  Layers3,
+  Shuffle
 } from 'lucide-react'; 
 
 // SEO Head Management Utility 
@@ -90,6 +109,7 @@ const SEOHead: React.FC<{
     setMetaTag('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'); 
     setMetaTag('author', 'The Wall Shop'); 
     setMetaTag('viewport', 'width=device-width, initial-scale=1.0'); 
+    setMetaTag('hreflang', 'en-GB'); 
 
     // Canonical URL 
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement; 
@@ -111,7 +131,7 @@ const SEOHead: React.FC<{
       setMetaTag('og:image', ogImage, true); 
       setMetaTag('og:image:width', '1200', true); 
       setMetaTag('og:image:height', '630', true); 
-      setMetaTag('og:image:alt', 'Smart Event Wall by The Wall Shop', true); 
+      setMetaTag('og:image:alt', 'Smart Events Wall by The Wall Shop', true); 
     } 
 
     // Twitter Card tags 
@@ -123,28 +143,41 @@ const SEOHead: React.FC<{
     } 
 
     // JSON-LD Structured Data 
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "The Wall Shop",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "knowsAbout": [
+        "event wall installations",
+        "exhibition display systems",
+        "modular event staging",
+        "smart event technology",
+        "dynamic event lighting",
+        "event branding solutions",
+        "portable wall systems",
+        "event space design"
+      ]
+    };
+
     const serviceSchema = { 
       "@context": "https://schema.org", 
       "@type": "Service", 
       "name": "Smart Event Wall Installation", 
-      "description": "Professional smart event wall installation with interactive displays, dynamic lighting, immersive audio, and real-time content management. Transform your event space into an intelligent, engaging environment.", 
-      "provider": { 
-        "@type": "Organization", 
-        "name": "The Wall Shop", 
-        "url": "https://www.thewallshop.co.uk", 
-        "telephone": "+44 141 739 3377", 
-        "email": "info@thewallshop.co.uk", 
-        "address": { 
-          "@type": "PostalAddress", 
-          "streetAddress": "SMK Business Centre, 4 The Piazza", 
-          "addressLocality": "Glasgow", 
-          "postalCode": "G5 8BE", 
-          "addressCountry": "GB" 
-        } 
-      }, 
+      "description": "Professional smart event wall installation with modular staging, dynamic displays, and intelligent lighting. Transform your events and exhibitions with cutting-edge wall technology.", 
+      "provider": organizationSchema,
       "areaServed": "United Kingdom", 
       "serviceType": "Smart Wall Installation", 
-      "category": "Event Technology", 
+      "category": "Event Design", 
       "offers": { 
         "@type": "Offer", 
         "availability": "https://schema.org/InStock", 
@@ -153,76 +186,151 @@ const SEOHead: React.FC<{
       } 
     }; 
 
+    const localBusinessSchema = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "The Wall Shop",
+      "description": "Professional smart wall installation specialists serving events, exhibitions, and venues across the UK",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 55.8642,
+        "longitude": -4.2518
+      },
+      "openingHours": "Mo-Fr 09:00-17:00",
+      "priceRange": "£££"
+    };
+
+    const eventSchema = {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": "Smart Wall Event Solutions",
+      "description": "Discover how smart walls can transform your events and exhibitions with modular staging and dynamic displays",
+      "organizer": organizationSchema,
+      "location": {
+        "@type": "Place",
+        "name": "UK Nationwide",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "GB"
+        }
+      },
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode"
+    };
+
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.thewallshop.co.uk"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Smart Walls",
+          "item": "https://www.thewallshop.co.uk/smart-walls"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Events",
+          "item": "https://www.thewallshop.co.uk/smart-walls/events"
+        }
+      ]
+    };
+
     const faqSchema = { 
       "@context": "https://schema.org", 
       "@type": "FAQPage", 
       "mainEntity": [ 
         { 
           "@type": "Question", 
-          "name": "How do smart event walls enhance attendee engagement?", 
+          "name": "Are the walls suitable for outdoor events?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Smart event walls enhance engagement through interactive displays, real-time content updates, immersive lighting effects, and responsive audio systems that adapt to event dynamics and audience participation." 
+            "text": "Yes, our modular wall systems include weather-resistant options with IP65 ratings for outdoor events, festivals, and exhibitions with full protection against rain and dust." 
           } 
         }, 
         { 
           "@type": "Question", 
-          "name": "What event sizes work with smart wall systems?", 
+          "name": "How quickly can event walls be installed?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Our smart event walls accommodate venues from intimate 50-person gatherings to large 1000+ attendee conferences. Each installation is custom-designed to match your event space and audience requirements." 
+            "text": "Our modular system allows rapid deployment with most event installations completed within 4-6 hours. Pre-event setup and testing ensure everything is ready for your opening." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "Can event organisers control smart wall features?", 
+          "name": "Can the displays show live content?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Yes, comprehensive control interfaces allow real-time management of displays, lighting, audio, and interactive features. The system includes preset configurations, live content updates, and remote control capabilities." 
+            "text": "Absolutely. The integrated display system supports live streaming, real-time social media feeds, interactive presentations, and dynamic content updates throughout your event." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "Do smart event walls include interactive capabilities?", 
+          "name": "What sizes are available for events?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Yes, advanced touch interfaces, gesture recognition, and audience response systems enable real-time interaction, live polling, social media integration, and collaborative content creation." 
+            "text": "Our modular system scales from small exhibition booths (2m x 2m) to large event backdrops (20m+ wide) with custom configurations for any venue size." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "What display options are available for event walls?", 
+          "name": "Is the system portable between venues?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "High-resolution LED displays include 4K video walls, interactive touch screens, projection mapping capabilities, holographic displays, and seamless multi-screen configurations for immersive visual experiences." 
+            "text": "Yes, the modular design allows complete portability with quick-connect systems, wheeled transport cases, and setup guides for easy relocation between venues." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "How does live content integration work?", 
+          "name": "Can branding be customised for each event?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Smart walls integrate with live streaming platforms, social media feeds, presentation software, and event management systems for real-time content updates, audience feedback, and dynamic information display." 
+            "text": "Absolutely. Digital displays allow instant branding updates, while modular panels can be reconfigured with custom graphics, colours, and layouts for each event." 
           } 
-        }, 
-        { 
-          "@type": "Question", 
-          "name": "Are smart event walls suitable for different event types?", 
-          "acceptedAnswer": { 
-            "@type": "Answer", 
-            "text": "Absolutely. The system adapts to conferences, exhibitions, product launches, corporate events, trade shows, and entertainment venues with customisable content, branding, and interactive features." 
-          } 
-        }, 
-        { 
-          "@type": "Question", 
-          "name": "What warranty is provided for event wall installations?", 
-          "acceptedAnswer": { 
-            "@type": "Answer", 
-            "text": "We provide a comprehensive 5-year warranty covering all smart components, display systems, interactive technology, audio equipment, and installation workmanship with dedicated event support services." 
-          } 
-        } 
+        }
       ] 
     }; 
+
+    const howToSchema = {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How Smart Event Walls Work",
+      "description": "Step-by-step guide to understanding smart event wall functionality and setup",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Modular Assembly",
+          "text": "Connect modular wall panels using the quick-lock system to create custom configurations for your event space"
+        },
+        {
+          "@type": "HowToStep", 
+          "name": "Content Management",
+          "text": "Upload and schedule content through the cloud-based management system for dynamic displays and branding"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Live Control",
+          "text": "Control lighting, displays, and audio remotely during events using smartphone apps or dedicated control panels"
+        }
+      ]
+    };
 
     // Insert or update JSON-LD scripts 
     const insertJsonLd = (schema: any, id: string) => { 
@@ -236,983 +344,742 @@ const SEOHead: React.FC<{
       script.textContent = JSON.stringify(schema); 
     }; 
 
+    insertJsonLd(organizationSchema, 'organization-schema');
     insertJsonLd(serviceSchema, 'service-schema'); 
+    insertJsonLd(localBusinessSchema, 'local-business-schema');
+    insertJsonLd(eventSchema, 'event-schema');
+    insertJsonLd(breadcrumbSchema, 'breadcrumb-schema');
     insertJsonLd(faqSchema, 'faq-schema'); 
+    insertJsonLd(howToSchema, 'howto-schema');
 
   }, [title, description, canonical, keywords, ogImage]); 
 
   return null; 
 }; 
 
-// Types 
-interface Hotspot { 
-  id: string; 
-  x: number; 
-  y: number; 
-  title: string; 
-  description: string; 
-  icon: React.ReactNode; 
-  features: string[]; 
-} 
-
-interface EventSize { 
-  id: string; 
-  name: string; 
-  capacity: string; 
-  description: string; 
-  price: string; 
-} 
-
-interface ControlMethod { 
-  id: string; 
-  name: string; 
-  icon: React.ReactNode; 
-  description: string; 
-  features: string[]; 
-} 
-
 const SmartWallEvents: React.FC = () => { 
-  const [selectedEventSize, setSelectedEventSize] = useState<string>('medium'); 
-  const [selectedControl, setSelectedControl] = useState<string>('panel'); 
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null); 
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false); 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null); 
-  const [isHelpMode, setIsHelpMode] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null); 
 
-  // Event size configurations 
-  const eventSizes: EventSize[] = [ 
-    { 
-      id: 'small', 
-      name: 'Intimate Gathering', 
-      capacity: '50-150 attendees', 
-      description: 'Perfect for workshops, seminars, and small conferences', 
-      price: 'From £8,500' 
-    }, 
-    { 
-      id: 'medium', 
-      name: 'Corporate Event', 
-      capacity: '200-500 attendees', 
-      description: 'Ideal for most business events and exhibitions', 
-      price: 'From £18,000' 
-    }, 
-    { 
-      id: 'large', 
-      name: 'Major Conference', 
-      capacity: '500+ attendees', 
-      description: 'Premium solution for large-scale events', 
-      price: 'From £35,000' 
-    } 
-  ]; 
+  // Orvibo Smart Devices for Events
+  const orviboDevices = [
+    {
+      key: "mixPad",
+      title: "MixPad D1 Smart Panel",
+      category: "Event Control",
+      desc: "Centralised control for lighting, displays, and audio with preset event scenes and live adjustments.",
+      features: ["Event scenes", "Live control", "Remote access"],
+      Icon: PanelsTopLeft,
+    },
+    {
+      key: "smartLighting",
+      title: "Dynamic Lighting System",
+      category: "Stage Lighting",
+      desc: "Programmable RGB lighting with music sync and dramatic effects for impactful presentations.",
+      features: ["RGB effects", "Music sync", "Scene presets"],
+      Icon: LampCeiling,
+    },
+    {
+      key: "smartDisplays",
+      title: "Integrated Display System",
+      category: "Visual Content",
+      desc: "High-resolution displays for presentations, branding, and interactive content with cloud management.",
+      features: ["4K displays", "Cloud content", "Interactive touch"],
+      Icon: Monitor,
+    },
+    {
+      key: "smartAudio",
+      title: "Distributed Audio System",
+      category: "Sound Management",
+      desc: "Zone-based audio control with wireless microphones and background music for clear presentations.",
+      features: ["Zone control", "Wireless mics", "Auto mixing"],
+      Icon: Speaker,
+    }
+  ];
 
-  // Control method configurations 
-  const controlMethods: ControlMethod[] = [ 
-    { 
-      id: 'panel', 
-      name: 'Event Control Centre', 
-      icon: <Monitor className="w-6 h-6" />, 
-      description: 'Professional control stations for event management', 
-      features: ['Live content control', 'Real-time monitoring', 'Emergency systems', 'Multi-operator support'] 
-    }, 
-    { 
-      id: 'phone', 
-      name: 'Mobile Event Management', 
-      icon: <Smartphone className="w-6 h-6" />, 
-      description: 'Complete control through mobile devices', 
-      features: ['iOS & Android apps', 'Remote operation', 'Live streaming control', 'Social media integration'] 
-    } 
-  ]; 
+  // Events-Specific Wall Panel Finishes
+  const finishCategories = [
+    {
+      id: 'modular',
+      name: "Modular Stage Series",
+      desc: "Quick-assembly panels for flexible event staging and backdrop creation.",
+      icon: Layers3,
+      panels: [
+        { id: "M8026", name: "Stage Black", desc: "Professional black finish for stage backdrops", img: "/images/carbon-rock-boards/solid/7.jpg" },
+        { id: "M8039", name: "Event White", desc: "Clean white finish for corporate presentations", img: "/images/carbon-rock-boards/solid/4.jpg" },
+        { id: "M8008", name: "Charcoal Pro", desc: "Neutral charcoal for versatile event styling", img: "/images/carbon-rock-boards/solid/2.jpg" }
+      ]
+    },
+    {
+      id: 'branding',
+      name: "Brand Display Collection",
+      desc: "Customisable surfaces for logos, graphics, and dynamic brand presentations.",
+      icon: Palette,
+      panels: [
+        { id: "B9016", name: "Digital Canvas", desc: "Smooth surface optimised for projection mapping", img: "/images/carbon-rock-boards/stone/1.jpg" },
+        { id: "B9051", name: "Logo Mount", desc: "Textured finish with integrated mounting points", img: "/images/carbon-rock-boards/stone/4.jpg" },
+        { id: "B9015", name: "Media Wall", desc: "High-contrast surface for video wall installations", img: "/images/carbon-rock-boards/stone/5.jpg" }
+      ]
+    },
+    {
+      id: 'portable',
+      name: "Portable Event Series",
+      desc: "Lightweight panels with transport cases for touring events and exhibitions.",
+      icon: Shuffle,
+      panels: [
+        { id: "P3231", name: "Travel Pro", desc: "Ultra-light panels with wheeled transport cases", img: "/images/carbon-rock-boards/wood/1.jpg" },
+        { id: "P3017", name: "Expo Standard", desc: "Standard exhibition panels with quick-connect system", img: "/images/carbon-rock-boards/wood/2.jpg" },
+        { id: "P3204", name: "Festival Tough", desc: "Reinforced panels for outdoor festival environments", img: "/images/carbon-rock-boards/wood/5.jpg" }
+      ]
+    }
+  ];
 
-  // Event-centric hotspots
-  const hotspots: Hotspot[] = [ 
-    { 
-      id: 'interactive-displays', 
-      x: 50, 
-      y: 30, 
-      title: 'Interactive Display Systems', 
-      description: 'High-resolution displays with touch and gesture control', 
-      icon: <Monitor className="w-5 h-5" />, 
-      features: ['4K video walls', 'Touch interaction', 'Gesture recognition', 'Multi-user support'] 
-    }, 
-    { 
-      id: 'dynamic-lighting', 
-      x: 25, 
-      y: 45, 
-      title: 'Dynamic Event Lighting', 
-      description: 'Immersive lighting that responds to event content', 
-      icon: <Lightbulb className="w-5 h-5" />, 
-      features: ['Colour synchronisation', 'Content-reactive lighting', 'Mood enhancement', 'Brand theming'] 
-    }, 
-    { 
-      id: 'audio-system', 
-      x: 75, 
-      y: 45, 
-      title: 'Immersive Audio', 
-      description: 'Spatial audio systems for engaging experiences', 
-      icon: <Volume2 className="w-5 h-5" />, 
-      features: ['Surround sound', 'Voice clarity', 'Music integration', 'Noise management'] 
-    }, 
-    { 
-      id: 'content-management', 
-      x: 40, 
-      y: 65, 
-      title: 'Live Content Management', 
-      description: 'Real-time content updates and social media integration', 
-      icon: <Presentation className="w-5 h-5" />, 
-      features: ['Live streaming', 'Social feeds', 'Real-time updates', 'Multi-source content'] 
-    }, 
-    { 
-      id: 'audience-interaction', 
-      x: 60, 
-      y: 65, 
-      title: 'Audience Engagement', 
-      description: 'Interactive features for attendee participation', 
-      icon: <Users className="w-5 h-5" />, 
-      features: ['Live polling', 'Q&A systems', 'Feedback collection', 'Gamification'] 
-    } 
-  ]; 
+  // Features data with events focus
+  const features = [
+    {
+      icon: <Layers3 className="w-8 h-8" />,
+      title: "Modular Staging",
+      description: "Quick-assembly modular panels create custom staging configurations for any event size, from intimate presentations to large exhibitions.",
+      gradient: "from-clay-500 to-taupe-500"
+    },
+    {
+      icon: <Monitor className="w-8 h-8" />,
+      title: "Dynamic Displays",
+      description: "Integrated high-resolution displays show live content, branding, presentations, and interactive elements with cloud-based content management.",
+      gradient: "from-taupe-500 to-clay-600"
+    },
+    {
+      icon: <LampCeiling className="w-8 h-8" />,
+      title: "Dramatic Lighting",
+      description: "Orvibo RGB lighting system creates stunning visual effects with music synchronisation and programmable scenes for impactful presentations.",
+      gradient: "from-clay-600 to-taupe-400"
+    },
+    {
+      icon: <Palette className="w-8 h-8" />,
+      title: "Brand Integration",
+      description: "Seamless brand integration with customisable panels, digital displays, and lighting that adapts to your event's visual identity.",
+      gradient: "from-taupe-400 to-clay-500"
+    },
+    {
+      icon: <Shuffle className="w-8 h-8" />,
+      title: "Portable System",
+      description: "Lightweight modular design with transport cases allows easy setup at multiple venues with consistent professional appearance.",
+      gradient: "from-clay-500 to-taupe-600"
+    },
+    {
+      icon: <Mic className="w-8 h-8" />,
+      title: "Audio Integration",
+      description: "Built-in audio system with wireless microphones, zone control, and automatic mixing ensures crystal-clear presentations.",
+      gradient: "from-taupe-600 to-clay-400"
+    }
+  ];
+
+  // Event use cases
+  const useCases = [
+    {
+      title: "Corporate Events",
+      description: "Professional presentations with integrated displays, branded staging, and sophisticated lighting for conferences and product launches.",
+      icon: <Presentation className="w-6 h-6" />,
+      features: ["Branded staging", "Presentation displays", "Professional lighting", "Audio integration"]
+    },
+    {
+      title: "Trade Exhibitions",
+      description: "Modular exhibition stands with dynamic displays, interactive elements, and portable design for multiple venue deployment.",
+      icon: <Monitor className="w-6 h-6" />,
+      features: ["Modular stands", "Interactive displays", "Portable design", "Quick setup"]
+    },
+    {
+      title: "Entertainment Events",
+      description: "Dynamic staging with RGB lighting effects, music synchronisation, and dramatic backdrops for concerts and performances.",
+      icon: <Music className="w-6 h-6" />,
+      features: ["RGB lighting", "Music sync", "Stage effects", "Dramatic backdrops"]
+    },
+    {
+      title: "Festival Installations",
+      description: "Weather-resistant outdoor systems with high-impact visuals, crowd management displays, and robust construction for festivals.",
+      icon: <Calendar className="w-6 h-6" />,
+      features: ["Weather resistant", "High-impact visuals", "Crowd displays", "Robust construction"]
+    }
+  ];
 
   // FAQ Data 
   const faqData = [ 
     { 
-      question: "How do smart event walls enhance attendee engagement?", 
-      answer: "Smart event walls enhance engagement through interactive displays that respond to touch and gestures, real-time content updates from social media and live feeds, immersive lighting effects that synchronise with presentations, and responsive audio systems that adapt to event dynamics and audience participation levels." 
+      question: "Are the walls suitable for outdoor events?", 
+      answer: "Yes, our modular wall systems include weather-resistant options with IP65 ratings for outdoor events, festivals, and exhibitions with full protection against rain and dust." 
     }, 
     { 
-      question: "What event sizes work with smart wall systems?", 
-      answer: "Our smart event walls accommodate venues from intimate 50-person workshops to large 1000+ attendee conferences and exhibitions. Each installation is custom-designed to match your event space dimensions, audience size, and specific engagement requirements." 
-    }, 
+      question: "How quickly can event walls be installed?", 
+      answer: "Our modular system allows rapid deployment with most event installations completed within 4-6 hours. Pre-event setup and testing ensure everything is ready for your opening." 
+    },
     { 
-      question: "Can event organisers control smart wall features?", 
-      answer: "Yes, comprehensive control interfaces allow real-time management of displays, lighting scenes, audio levels, and interactive features. The system includes preset configurations for different event segments, live content updates, emergency controls, and remote management capabilities." 
-    }, 
+      question: "Can the displays show live content?", 
+      answer: "Absolutely. The integrated display system supports live streaming, real-time social media feeds, interactive presentations, and dynamic content updates throughout your event." 
+    },
     { 
-      question: "Do smart event walls include interactive capabilities?", 
-      answer: "Yes, advanced touch interfaces support multi-user interaction, gesture recognition enables hands-free control, audience response systems facilitate live polling and Q&A sessions, and social media integration allows real-time content sharing and collaborative experiences." 
-    }, 
+      question: "What sizes are available for events?", 
+      answer: "Our modular system scales from small exhibition booths (2m x 2m) to large event backdrops (20m+ wide) with custom configurations for any venue size." 
+    },
     { 
-      question: "What display options are available for event walls?", 
-      answer: "High-resolution LED displays include seamless 4K video walls, interactive touch screens of various sizes, projection mapping capabilities for immersive environments, holographic display options, and multi-screen configurations that create panoramic visual experiences." 
-    }, 
+      question: "Is the system portable between venues?", 
+      answer: "Yes, the modular design allows complete portability with quick-connect systems, wheeled transport cases, and setup guides for easy relocation between venues." 
+    },
     { 
-      question: "How does live content integration work?", 
-      answer: "Smart walls integrate seamlessly with live streaming platforms, social media feeds, presentation software, and event management systems. This enables real-time content updates, live audience feedback display, dynamic information sharing, and instant social media content integration." 
-    }, 
-    { 
-      question: "Are smart event walls suitable for different event types?", 
-      answer: "Absolutely. The system adapts to conferences, exhibitions, product launches, corporate events, trade shows, entertainment venues, and educational seminars with fully customisable content templates, branding options, and interactive features tailored to each event type." 
-    }, 
-    { 
-      question: "What warranty is provided for event wall installations?", 
-      answer: "We provide a comprehensive 5-year warranty covering all smart components, display systems, interactive technology, audio equipment, and installation workmanship. This includes dedicated event support services, on-site technical assistance, and priority maintenance for critical events." 
-    } 
+      question: "Can branding be customised for each event?", 
+      answer: "Absolutely. Digital displays allow instant branding updates, while modular panels can be reconfigured with custom graphics, colours, and layouts for each event." 
+    }
   ]; 
 
-  // Related searches data 
-  const relatedSearches = [ 
-    "smart event technology UK", "interactive event displays", "conference wall systems", "exhibition technology", 
-    "event lighting systems", "digital event solutions", "interactive conference walls", "event audio visual", 
-    "smart exhibition displays", "event management technology", "conference room technology", "trade show displays" 
-  ]; 
+  // How it works steps
+  const howItWorksSteps = [
+    {
+      step: 1,
+      title: "Event Planning",
+      description: "We work with your event team to understand requirements, venue constraints, and design objectives for the perfect smart wall solution.",
+      icon: <Search className="w-8 h-8" />
+    },
+    {
+      step: 2,
+      title: "Custom Configuration",
+      description: "Design modular wall layouts with integrated displays, lighting, and branding elements tailored to your event's unique needs.",
+      icon: <Palette className="w-8 h-8" />
+    },
+    {
+      step: 3,
+      title: "Rapid Deployment",
+      description: "Our experienced team delivers and installs the complete system with pre-event testing to ensure flawless operation.",
+      icon: <Settings className="w-8 h-8" />
+    },
+    {
+      step: 4,
+      title: "Live Support",
+      description: "On-site technical support during your event ensures smooth operation with real-time adjustments and content management.",
+      icon: <Users className="w-8 h-8" />
+    }
+  ];
 
-  // Get current event size details 
-  const currentEventSize = eventSizes.find(size => size.id === selectedEventSize) || eventSizes[1]; 
-  const currentControl = controlMethods.find(method => method.id === selectedControl) || controlMethods[0]; 
-
-  // Quote Modal Component 
-  const QuoteModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => { 
-    const [formData, setFormData] = useState({ 
-      name: '', 
-      email: '', 
-      phone: '', 
-      eventType: '', 
-      attendees: '', 
-      location: '', 
-      timeline: '', 
-      requirements: '' 
-    }); 
-
-    const handleSubmit = (e: React.FormEvent) => { 
-      e.preventDefault(); 
-      // Handle form submission 
-      console.log('Quote request submitted:', formData); 
-      onClose(); 
-    }; 
-
-    if (!isOpen) return null; 
-
-    return ( 
-      <AnimatePresence> 
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }} 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
-          onClick={onClose} 
-        > 
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }} 
-            exit={{ scale: 0.9, opacity: 0 }} 
-            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" 
-            onClick={(e) => e.stopPropagation()} 
-          > 
-            <div className="p-6"> 
-              <div className="flex justify-between items-center mb-6"> 
-                <h2 className="text-2xl font-bold text-gray-900">Request a Tailored Quote</h2> 
-                <button 
-                  onClick={onClose} 
-                  className="text-gray-400 hover:text-gray-600 transition-colors" 
-                > 
-                  <X className="w-6 h-6" /> 
-                </button> 
-              </div> 
-
-              <form onSubmit={handleSubmit} className="space-y-4"> 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label> 
-                    <input 
-                      type="text" 
-                      required 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.name} 
-                      onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label> 
-                    <input 
-                      type="email" 
-                      required 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.email} 
-                      onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                    /> 
-                  </div> 
-                </div> 
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label> 
-                    <input 
-                      type="tel" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.phone} 
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Event Type</label> 
-                    <select 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.eventType} 
-                      onChange={(e) => setFormData({...formData, eventType: e.target.value})} 
-                    > 
-                      <option value="">Select type</option> 
-                      <option value="conference">Conference</option> 
-                      <option value="exhibition">Exhibition</option> 
-                      <option value="product-launch">Product Launch</option> 
-                      <option value="corporate-event">Corporate Event</option> 
-                      <option value="trade-show">Trade Show</option> 
-                      <option value="other">Other</option> 
-                    </select> 
-                  </div> 
-                </div> 
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expected Attendees</label> 
-                    <input 
-                      type="text" 
-                      placeholder="e.g., 200-300" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.attendees} 
-                      onChange={(e) => setFormData({...formData, attendees: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Event Location</label> 
-                    <input 
-                      type="text" 
-                      placeholder="City, Venue" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.location} 
-                      onChange={(e) => setFormData({...formData, location: e.target.value})} 
-                    /> 
-                  </div> 
-                </div> 
-
-                <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Event Timeline</label> 
-                  <select 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    value={formData.timeline} 
-                    onChange={(e) => setFormData({...formData, timeline: e.target.value})} 
-                  > 
-                    <option value="">Select timeline</option> 
-                    <option value="immediate">Immediate (1-2 months)</option> 
-                    <option value="short">Short term (3-6 months)</option> 
-                    <option value="medium">Medium term (6-12 months)</option> 
-                    <option value="long">Long term (12+ months)</option> 
-                  </select> 
-                </div> 
-
-                <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Specific Requirements</label> 
-                  <textarea 
-                    rows={4} 
-                    placeholder="Tell us about your event's specific needs, interactive features, or any special requirements..." 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    value={formData.requirements} 
-                    onChange={(e) => setFormData({...formData, requirements: e.target.value})} 
-                  /> 
-                </div> 
-
-                <div className="flex gap-4 pt-4"> 
-                  <button 
-                    type="button" 
-                    onClick={onClose} 
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors" 
-                  > 
-                    Cancel 
-                  </button> 
-                  <button 
-                    type="submit" 
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" 
-                  > 
-                    Request Quote 
-                  </button> 
-                </div> 
-              </form> 
-            </div> 
-          </motion.div> 
-        </motion.div> 
-      </AnimatePresence> 
-    ); 
-  }; 
+  // Case study snippets
+  const caseStudies = [
+    {
+      title: "Tech Conference 2024",
+      location: "London ExCeL",
+      challenge: "Create immersive brand experience for 5,000 attendees",
+      solution: "20m curved smart wall with interactive displays and synchronized lighting",
+      result: "87% increase in booth engagement and social media mentions"
+    },
+    {
+      title: "Fashion Week Showcase",
+      location: "Manchester Central", 
+      challenge: "Flexible staging for multiple runway shows",
+      solution: "Modular wall system with quick-change branding and dramatic lighting",
+      result: "50% faster setup between shows, enhanced visual impact"
+    },
+    {
+      title: "Music Festival Stage",
+      location: "Edinburgh Festival",
+      challenge: "Weather-resistant backdrop for outdoor performances",
+      solution: "IP65-rated modular walls with RGB lighting and audio integration",
+      result: "Zero weather-related downtime, stunning visual performances"
+    }
+  ];
 
   return ( 
-    <div className="min-h-screen bg-white"> 
+    <div className="min-h-screen bg-gray-950"> 
       <SEOHead 
-        title="Smart Event Walls | Interactive Event Technology | The Wall Shop" 
-        description="Transform your events with smart wall technology. Interactive displays, dynamic lighting, immersive audio, and real-time content management for engaging attendee experiences. Professional installation across the UK." 
-        canonical="https://www.thewallshop.co.uk/smart-walls/event" 
-        keywords="smart event walls, interactive event displays, conference wall systems, exhibition technology, event lighting systems, digital event solutions, interactive conference walls, event audio visual, smart exhibition displays, event management technology, conference room technology, trade show displays" 
-        ogImage="https://www.thewallshop.co.uk/images/event-hero.webp" 
+        title="Smart Walls for Events & Exhibitions | Modular, Dynamic Displays | The Wall Shop"
+        description="Transform your events with smart walls featuring modular staging, dynamic displays, and Orvibo lighting. Professional installation for exhibitions, conferences, and festivals across the UK."
+        canonical="https://www.thewallshop.co.uk/smart-walls/events"
+        keywords="smart event walls, modular event staging, exhibition displays, event lighting control, portable wall systems, event branding, dynamic displays, orvibo events"
+        ogImage="https://www.thewallshop.co.uk/images/smart-walls/events-hero.webp"
       /> 
-
+      
       <Navigation /> 
 
       {/* Hero Section */} 
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"> 
-        <div className="absolute inset-0"> 
-          <img 
-            src="/images/event-hero.webp" 
-            alt="Smart Event Wall Installation" 
-            className="w-full h-full object-cover opacity-40" 
-          /> 
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 to-slate-800/60"></div> 
-        </div> 
+      <section className="relative min-h-screen flex flex-col justify-start md:justify-center items-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-950 via-clay-950 to-taupe-950 overflow-hidden"> 
+        {/* Background Elements */} 
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-clay-900/20 via-transparent to-transparent"></div> 
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-clay-500/10 rounded-full blur-3xl animate-pulse"></div> 
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-taupe-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div> 
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"> 
+        <div className="relative z-10 max-w-7xl mx-auto text-center pt-20 md:pt-0"> 
           <motion.div 
             initial={{ opacity: 0, y: 30 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8 }} 
-            className="space-y-8" 
+            transition={{ duration: 1 }} 
+            className="mb-8" 
           > 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"> 
-              Smart Event 
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> 
-                Walls 
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400"> 
+                Smart Walls for 
+              </span> 
+              <br /> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-taupe-300 via-taupe-200 to-taupe-400"> 
+                Events & Exhibitions 
               </span> 
             </h1> 
-            
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed"> 
-              Transform your events with intelligent wall technology featuring interactive displays, dynamic lighting, and immersive experiences that captivate and engage your audience. 
+            <p className="text-xl md:text-2xl text-clay-300 max-w-4xl mx-auto leading-relaxed"> 
+              Transform your events with intelligent modular walls featuring dynamic displays, dramatic lighting, 
+              and portable staging. Professional installation for conferences, exhibitions, and festivals. 
             </p> 
+          </motion.div> 
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center"> 
-              <button 
-                onClick={() => setIsQuoteModalOpen(true)} 
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg" 
+          {/* Key Stats */} 
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.3 }} 
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto" 
+          > 
+            {[ 
+              { icon: <Layers3 className="w-8 h-8" />, value: "4-6h", label: "Setup Time" }, 
+              { icon: <Monitor className="w-8 h-8" />, value: "4K", label: "Display Quality" }, 
+              { icon: <LampCeiling className="w-8 h-8" />, value: "RGB", label: "Lighting Effects" }, 
+              { icon: <Shuffle className="w-8 h-8" />, value: "Portable", label: "Multi-Venue" } 
+            ].map((stat, index) => ( 
+              <motion.div 
+                key={index} 
+                className="text-center p-4 rounded-2xl bg-gradient-to-b from-gray-900/50 to-black/50 backdrop-blur-sm border border-clay-500/20 hover:border-clay-500/40 transition-all duration-300"
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
               > 
-                Request a Tailored Quote 
-              </button> 
-              <button 
-                onClick={() => setIsHelpMode(!isHelpMode)} 
-                className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-sm" 
-              > 
-                <HelpCircle className="w-5 h-5 inline mr-2" /> 
-                Explore Features 
-              </button> 
-            </div> 
+                <div className="w-16 h-16 bg-gradient-to-r from-clay-500/30 to-taupe-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-clay-500/40"> 
+                  <div className="text-clay-300">{stat.icon}</div> 
+                </div> 
+                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div> 
+                <div className="text-clay-300 text-sm mt-1">{stat.label}</div> 
+              </motion.div> 
+            ))} 
+          </motion.div> 
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Monitor className="w-8 h-8 text-blue-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Interactive Displays</h3> 
-                <p className="text-gray-400">Touch-responsive walls with real-time content</p> 
-              </div> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Lightbulb className="w-8 h-8 text-purple-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Dynamic Lighting</h3> 
-                <p className="text-gray-400">Immersive lighting that responds to content</p> 
-              </div> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Users className="w-8 h-8 text-green-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Audience Engagement</h3> 
-                <p className="text-gray-400">Interactive features for attendee participation</p> 
-              </div> 
-            </div> 
+          {/* Enhanced CTA Buttons */} 
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.6 }} 
+            className="flex flex-col sm:flex-row gap-4 justify-center pt-8" 
+          > 
+            <motion.button 
+              onClick={() => setIsQuoteModalOpen(true)} 
+              className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            > 
+              <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" /> 
+              <span className="z-10">Request Event Quote</span> 
+            </motion.button> 
+            <motion.a 
+              href="tel:+441417393377" 
+              className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            > 
+              <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
+              <span>Call: +44 141 739 3377</span> 
+            </motion.a> 
           </motion.div> 
         </div> 
       </section> 
 
-      {/* Breadcrumbs */} 
-      <section className="bg-gray-50 py-4"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <nav className="flex items-center space-x-2 text-sm text-gray-600"> 
-            <Home className="w-4 h-4" /> 
-            <span>/</span> 
-            <span>Smart Walls</span> 
-            <span>/</span> 
-            <span className="text-blue-600 font-medium">Events</span> 
-          </nav> 
-        </div> 
-      </section> 
+      {/* Breadcrumbs */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-gray-900 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex items-center space-x-2 text-sm">
+            <a href="/" className="text-clay-400 hover:text-clay-300 transition-colors">Home</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <a href="/smart-walls" className="text-clay-400 hover:text-clay-300 transition-colors">Smart Walls</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <span className="text-clay-200">Events</span>
+          </nav>
+        </div>
+      </section>
 
       {/* Features Grid */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Intelligent Event Solutions 
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-clay-900"> 
+        <div className="max-w-7xl mx-auto"> 
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            transition={{ duration: 0.8 }} 
+            className="text-center mb-16" 
+          > 
+            <h2 className="text-4xl md:text-5xl font-bold mb-6"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Smart Event</span> 
+              <span className="block text-clay-100 mt-2">Features</span> 
             </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Our smart event walls integrate cutting-edge technology to create immersive, interactive experiences that captivate audiences and enhance event engagement across all types of gatherings. 
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto"> 
+              Experience the perfect blend of modular flexibility, dynamic displays, and intelligent automation  
+              that transforms your events into unforgettable experiences. 
             </p> 
-          </div> 
+          </motion.div> 
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Monitor className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Interactive Display Systems</h3> 
-              <p className="text-gray-700 mb-4"> 
-                High-resolution displays with advanced touch and gesture recognition, enabling real-time interaction, multi-user collaboration, and immersive visual experiences. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />4K video walls</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Touch interaction</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Gesture recognition</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Multi-user support</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Lightbulb className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Dynamic Event Lighting</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Immersive lighting systems that synchronise with content, respond to audience interaction, and create atmospheric effects that enhance the overall event experience. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Colour synchronisation</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Content-reactive lighting</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Mood enhancement</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Brand theming</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Volume2 className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Immersive Audio Systems</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Spatial audio technology that delivers crystal-clear sound, directional audio zones, and immersive soundscapes that complement visual content and enhance audience engagement. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Surround sound systems</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Voice clarity enhancement</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Music integration</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Noise management</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Presentation className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Live Content Management</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Real-time content integration from multiple sources including live streams, social media feeds, presentations, and interactive applications for dynamic event experiences. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Live streaming integration</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Social media feeds</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Real-time updates</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Multi-source content</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.4 }} 
-              className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Users className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Audience Engagement Tools</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Interactive features that encourage attendee participation through live polling, Q&A systems, feedback collection, and gamification elements that make events more engaging. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Live polling systems</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Q&A management</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Feedback collection</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Gamification features</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.5 }} 
-              className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Settings className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Event Control Systems</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Professional-grade control interfaces designed for event management, allowing real-time adjustments, preset configurations, and seamless operation throughout your event. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Live content control</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Real-time monitoring</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Emergency systems</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Multi-operator support</li> 
-              </ul> 
-            </motion.div> 
-          </div> 
-        </div> 
-      </section> 
-
-      {/* Interactive Event Size Selector */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Solutions for Every Event Scale 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              From intimate workshops to major conferences, our smart wall systems scale to meet your event's specific requirements and audience size. 
-            </p> 
-          </div> 
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"> 
-            {eventSizes.map((size) => ( 
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"> 
+            {features.map((feature, index) => ( 
               <motion.div 
-                key={size.id} 
-                initial={{ opacity: 0, y: 20 }} 
+                key={index} 
+                initial={{ opacity: 0, y: 30 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
-                transition={{ duration: 0.6 }} 
-                className={`p-8 rounded-xl cursor-pointer transition-all duration-300 ${ 
-                  selectedEventSize === size.id 
-                    ? 'bg-blue-600 text-white shadow-xl scale-105' 
-                    : 'bg-white text-gray-900 hover:shadow-lg hover:scale-102' 
-                }`} 
-                onClick={() => setSelectedEventSize(size.id)} 
+                viewport={{ once: true }} 
+                transition={{ duration: 0.6, delay: index * 0.1 }} 
+                className="group bg-taupe-800/50 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300 hover:transform hover:scale-105" 
               > 
-                <div className="text-center"> 
-                  <h3 className="text-2xl font-bold mb-2">{size.name}</h3> 
-                  <p className={`text-lg mb-4 ${ 
-                    selectedEventSize === size.id ? 'text-blue-100' : 'text-gray-600' 
-                  }`}> 
-                    {size.capacity} 
-                  </p> 
-                  <p className={`mb-6 ${ 
-                    selectedEventSize === size.id ? 'text-blue-100' : 'text-gray-700' 
-                  }`}> 
-                    {size.description} 
-                  </p> 
-                  <div className={`text-2xl font-bold ${ 
-                    selectedEventSize === size.id ? 'text-white' : 'text-blue-600' 
-                  }`}> 
-                    {size.price} 
-                  </div> 
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}> 
+                  <div className="text-white">{feature.icon}</div> 
                 </div> 
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-clay-200 transition-colors"> 
+                  {feature.title} 
+                </h3> 
+                <p className="text-clay-300 leading-relaxed">{feature.description}</p> 
               </motion.div> 
             ))} 
           </div> 
-
-          <div className="bg-white rounded-xl p-8 shadow-lg"> 
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center"> 
-              {currentEventSize.name} Configuration 
-            </h3> 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> 
-              <div> 
-                <img 
-                  src="/images/event-detail-1.webp" 
-                  alt="Event Smart Wall Interaction" 
-                  className="w-full h-64 object-cover rounded-lg mb-4" 
-                /> 
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Interactive Technology</h4> 
-                <p className="text-gray-700"> 
-                  Advanced interactive systems designed for {currentEventSize.capacity} events, featuring touch-responsive displays and real-time audience engagement capabilities. 
-                </p> 
-              </div> 
-              <div> 
-                <img 
-                  src="/images/event-detail-2.webp" 
-                  alt="Event Immersive Experience" 
-                  className="w-full h-64 object-cover rounded-lg mb-4" 
-                /> 
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Immersive Experience</h4> 
-                <p className="text-gray-700"> 
-                  Dynamic lighting and audio systems tailored for {currentEventSize.capacity} gatherings, creating captivating environments that enhance attendee engagement and event impact. 
-                </p> 
-              </div> 
-            </div> 
-          </div> 
         </div> 
       </section> 
 
-      {/* Control Methods */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Professional Event Control 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Choose from professional-grade control systems designed for live event management, ensuring seamless operation and real-time responsiveness throughout your event. 
-            </p> 
-          </div> 
+      {/* Orvibo Smart Devices Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Orvibo Event</span>
+              <span className="block text-clay-100 mt-2">Smart Technology</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Professional-grade Orvibo smart devices designed specifically for event and exhibition environments.
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"> 
-            {controlMethods.map((method) => ( 
-              <motion.div 
-                key={method.id} 
-                initial={{ opacity: 0, x: method.id === 'panel' ? -20 : 20 }} 
-                whileInView={{ opacity: 1, x: 0 }} 
-                transition={{ duration: 0.6 }} 
-                className={`p-8 rounded-xl cursor-pointer transition-all duration-300 ${ 
-                  selectedControl === method.id 
-                    ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-xl' 
-                    : 'bg-gray-50 text-gray-900 hover:shadow-lg' 
-                }`} 
-                onClick={() => setSelectedControl(method.id)} 
-              > 
-                <div className="flex items-center mb-6"> 
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-4 ${ 
-                    selectedControl === method.id ? 'bg-white/20' : 'bg-blue-600' 
-                  }`}> 
-                    <div className={selectedControl === method.id ? 'text-white' : 'text-white'}> 
-                      {method.icon} 
-                    </div> 
-                  </div> 
-                  <h3 className="text-xl font-bold">{method.name}</h3> 
-                </div> 
-                <p className={`mb-6 ${ 
-                  selectedControl === method.id ? 'text-blue-100' : 'text-gray-700' 
-                }`}> 
-                  {method.description} 
-                </p> 
-                <ul className="space-y-2"> 
-                  {method.features.map((feature, index) => ( 
-                    <li key={index} className="flex items-center"> 
-                      <CheckCircle className={`w-4 h-4 mr-2 ${ 
-                        selectedControl === method.id ? 'text-green-300' : 'text-green-500' 
-                      }`} /> 
-                      <span className={selectedControl === method.id ? 'text-blue-100' : 'text-gray-600'}> 
-                        {feature} 
-                      </span> 
-                    </li> 
-                  ))} 
-                </ul> 
-              </motion.div> 
-            ))} 
-          </div> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {orviboDevices.map((device, index) => (
+              <motion.div
+                key={device.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center mb-4">
+                  <device.Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{device.title}</h3>
+                <p className="text-sm text-clay-400 mb-3">{device.category}</p>
+                <p className="text-clay-300 text-sm mb-4">{device.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {device.features.map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-clay-600/30 text-clay-200 px-2 py-1 rounded-full">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8"> 
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center"> 
-              {currentControl.name} Features 
-            </h3> 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"> 
-              {currentControl.features.map((feature, index) => ( 
-                <div key={index} className="text-center"> 
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3"> 
-                    <CheckCircle className="w-6 h-6 text-white" /> 
-                  </div> 
-                  <p className="text-gray-700 font-medium">{feature}</p> 
-                </div> 
-              ))} 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+      {/* Event Panel Finishes Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Event-Ready Panel</span>
+              <span className="block text-clay-100 mt-2">System Options</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Specially designed panel systems with modular flexibility, transport solutions, and professional finishes for event environments.
+            </p>
+          </motion.div>
 
-      {/* Long-tail Content Cluster */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Event Technology Solutions 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Comprehensive smart wall technology designed specifically for the events industry, enhancing attendee experiences and providing powerful tools for event organisers. 
-            </p> 
-          </div> 
+          <div className="space-y-12">
+            {finishCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                    <category.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
+                    <p className="text-clay-300">{category.desc}</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {category.panels.map((panel) => (
+                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
+                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
+                        <img 
+                          src={panel.img} 
+                          alt={panel.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-white">{panel.name}</h4>
+                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
+                        </div>
+                        <p className="text-sm text-clay-300">{panel.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Camera className="w-12 h-12 text-blue-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Live Streaming Integration</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Seamless integration with live streaming platforms, enabling real-time broadcast of events, remote attendee participation, and multi-platform content distribution. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Multi-platform streaming</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Remote participation</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Content recording</li> 
-              </ul> 
-            </motion.div> 
+      {/* Event Use Cases Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Event</span>
+              <span className="block text-clay-100 mt-2">Use Cases</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Tailored solutions for different event types and venue requirements.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Mic className="w-12 h-12 text-purple-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Audio Enhancement</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Advanced audio processing with noise cancellation, voice enhancement, and spatial audio distribution for crystal-clear communication and immersive sound experiences. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Noise cancellation</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Voice enhancement</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Spatial audio</li> 
-              </ul> 
-            </motion.div> 
+          <div className="grid md:grid-cols-2 gap-8">
+            {useCases.map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-8 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center">
+                    {useCase.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{useCase.title}</h3>
+                </div>
+                <p className="text-clay-300 mb-6">{useCase.description}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {useCase.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-clay-400" />
+                      <span className="text-sm text-clay-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Projector className="w-12 h-12 text-green-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Projection Mapping</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Advanced projection mapping capabilities that transform any surface into an interactive display, creating immersive environments and stunning visual effects. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />3D surface mapping</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />Interactive projections</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />Dynamic content</li> 
-              </ul> 
-            </motion.div> 
+      {/* Gallery Section */}
+      {/* <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Event</span>
+              <span className="block text-clay-100 mt-2">Gallery</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              See how smart walls transform events and exhibitions across the UK.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Wifi className="w-12 h-12 text-orange-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Network Integration</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Robust network infrastructure supporting high-bandwidth content delivery, real-time data synchronisation, and seamless connectivity for all event technologies. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />High-speed connectivity</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />Data synchronisation</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />Redundant systems</li> 
-              </ul> 
-            </motion.div> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+                { title: "Corporate Conference", img: "/images/smart-walls/events/corporate_conference.webp", desc: "Professional staging with integrated displays" },
+                { title: "Trade Exhibition", img: "/images/smart-walls/events/trade_exhibition.webp", desc: "Modular stands with interactive elements" },
+                { title: "Product Launch", img: "/images/smart-walls/events/product_launch.webp", desc: "Dramatic lighting with brand integration" },
+                { title: "Music Festival", img: "/images/smart-walls/events/music_festival.webp", desc: "Weather-resistant outdoor installation" },
+                { title: "Fashion Show", img: "/images/smart-walls/events/fashion_show.webp", desc: "Quick-change modular backdrop system" },
+                { title: "Awards Ceremony", img: "/images/smart-walls/events/awards_ceremony.webp", desc: "Elegant staging with dynamic lighting" }
+                ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group bg-clay-800/40 rounded-xl overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300"
+              >
+                <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
+                  <img 
+                    src={item.img} 
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <h4 className="font-semibold mb-1">{item.title}</h4>
+                    <p className="text-sm text-gray-300">{item.desc}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section> */}
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.4 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Calendar className="w-12 h-12 text-red-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Event Scheduling</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Intelligent scheduling systems that automate content delivery, manage session transitions, and coordinate all event elements for seamless execution. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-red-500 mr-2" />Automated scheduling</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-red-500 mr-2" />Session management</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-red-500 mr-2" />Content coordination</li> 
-              </ul> 
-            </motion.div> 
+      {/* How It Works Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">How It</span>
+              <span className="block text-clay-100 mt-2">Works</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              From initial planning to live event support, we handle every aspect of your event transformation.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.5 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Headphones className="w-12 h-12 text-indigo-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Accessibility Features</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Comprehensive accessibility support including hearing loops, visual aids, multi-language support, and assistive technologies for inclusive event experiences. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Hearing loop systems</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Visual accessibility</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Multi-language support</li> 
-              </ul> 
-            </motion.div> 
-          </div> 
-        </div> 
-      </section> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorksSteps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-20 h-20 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <div className="text-white">{step.icon}</div>
+                </div>
+                <div className="w-8 h-8 bg-clay-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-sm font-bold">
+                  {step.step}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{step.title}</h3>
+                <p className="text-clay-300">{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Compliance & Safety */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Compliance & Safety Standards 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              All our smart event wall installations meet stringent UK safety standards and event industry regulations, ensuring complete compliance and attendee safety. 
-            </p> 
-          </div> 
+      {/* Case Studies Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Success</span>
+              <span className="block text-clay-100 mt-2">Stories</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Real results from events and exhibitions across the UK that have transformed their impact with smart walls.
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Shield className="w-8 h-8 text-red-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Fire Safety</h3> 
-              <p className="text-gray-600">BS 5839 compliant fire detection and emergency evacuation systems</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Zap className="w-8 h-8 text-blue-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Electrical Safety</h3> 
-              <p className="text-gray-600">BS 7671 (18th Edition) wiring regulations compliance</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <CheckCircle className="w-8 h-8 text-green-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Event Regulations</h3> 
-              <p className="text-gray-600">Full compliance with UK event safety and licensing requirements</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Users className="w-8 h-8 text-purple-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Accessibility</h3> 
-              <p className="text-gray-600">DDA and Equality Act 2010 accessibility compliance</p> 
-            </motion.div> 
-          </div> 
-
-          <div className="mt-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8"> 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> 
-              <div> 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Safety Certifications</h3> 
-                <ul className="space-y-3 text-gray-700"> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />CE marking for all electronic components</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />UKCA conformity assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />RoHS compliance for environmental safety</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />IP65 rating for moisture resistance</li> 
-                </ul> 
-              </div> 
-              <div> 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Installation Standards</h3> 
-                <ul className="space-y-3 text-gray-700"> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />NICEIC approved electrical installation</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Professional structural assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Health and safety risk assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Post-installation safety certification</li> 
-                </ul> 
-              </div> 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+          <div className="grid md:grid-cols-3 gap-8">
+            {caseStudies.map((study, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <MapPin className="w-4 h-4 text-clay-400" />
+                  <span className="text-clay-400 text-sm">{study.location}</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{study.title}</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-clay-400">Challenge:</span>
+                    <p className="text-clay-300">{study.challenge}</p>
+                  </div>
+                  <div>
+                    <span className="text-clay-400">Solution:</span>
+                    <p className="text-clay-300">{study.solution}</p>
+                  </div>
+                  <div>
+                    <span className="text-clay-400">Result:</span>
+                    <p className="text-clay-300">{study.result}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* FAQ Section */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Frequently Asked Questions 
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-mocha-900"> 
+        <div className="max-w-4xl mx-auto"> 
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            transition={{ duration: 0.8 }} 
+            className="text-center mb-16" 
+          > 
+            <h2 className="text-4xl md:text-5xl font-bold mb-6"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Frequently Asked</span> 
+              <span className="block text-clay-100">Questions</span> 
             </h2> 
-            <p className="text-xl text-gray-600"> 
-              Common questions about smart event wall installations and technology 
+            <p className="text-xl text-clay-300"> 
+              Everything you need to know about smart event wall installation and exhibition technology 
             </p> 
-          </div> 
+          </motion.div> 
 
           <div className="space-y-4"> 
             {faqData.map((faq, index) => ( 
@@ -1220,16 +1087,17 @@ const SmartWallEvents: React.FC = () => {
                 key={index} 
                 initial={{ opacity: 0, y: 20 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }} 
                 transition={{ duration: 0.6, delay: index * 0.1 }} 
-                className="bg-white rounded-lg shadow-md overflow-hidden" 
+                className="bg-taupe-800/50 backdrop-blur-sm rounded-2xl border border-clay-500/20 overflow-hidden hover:border-clay-400/40 transition-all duration-300" 
               > 
                 <button 
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors" 
                   onClick={() => setExpandedFaq(expandedFaq === index ? null : index)} 
+                  className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-taupe-700/30 transition-colors" 
                 > 
-                  <span className="font-semibold text-gray-900">{faq.question}</span> 
+                  <span className="text-lg font-semibold text-white pr-4">{faq.question}</span> 
                   <ChevronDown 
-                    className={`w-5 h-5 text-gray-500 transition-transform ${ 
+                    className={`w-6 h-6 text-clay-400 transition-transform duration-300 ${ 
                       expandedFaq === index ? 'rotate-180' : '' 
                     }`} 
                   /> 
@@ -1241,9 +1109,11 @@ const SmartWallEvents: React.FC = () => {
                       animate={{ height: 'auto', opacity: 1 }} 
                       exit={{ height: 0, opacity: 0 }} 
                       transition={{ duration: 0.3 }} 
-                      className="px-6 pb-4" 
+                      className="overflow-hidden" 
                     > 
-                      <p className="text-gray-700 leading-relaxed">{faq.answer}</p> 
+                      <div className="px-8 pb-6"> 
+                        <p className="text-clay-300 leading-relaxed">{faq.answer}</p> 
+                      </div> 
                     </motion.div> 
                   )} 
                 </AnimatePresence> 
@@ -1253,120 +1123,108 @@ const SmartWallEvents: React.FC = () => {
         </div> 
       </section> 
 
-      {/* Related Searches */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Related Event Technology 
-            </h2> 
-            <p className="text-xl text-gray-600"> 
-              Explore related smart event solutions and interactive technology 
-            </p> 
-          </div> 
+      {/* Local Signals Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-clay-900">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-gradient-to-r from-clay-500/10 to-taupe-500/10 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/30"
+          >
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">UK Nationwide Event Support</h3>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 text-clay-300">
+              <div>
+                <h4 className="font-semibold text-white mb-2">Glasgow HQ</h4>
+                <p className="text-sm">SMK Business Centre, 4 The Piazza, Glasgow G5 8BE. Professional event planning and project coordination from our Scottish headquarters.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">UK Coverage</h4>
+                <p className="text-sm">Certified event technicians across England, Scotland, Wales, and Northern Ireland. Local support with national expertise.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">Event Specialists</h4>
+                <p className="text-sm">Specialising in conferences, exhibitions, festivals, and corporate events with experience in major UK venues.</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"> 
-            {relatedSearches.map((search, index) => ( 
-              <motion.div 
-                key={index} 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                whileInView={{ opacity: 1, scale: 1 }} 
-                transition={{ duration: 0.4, delay: index * 0.05 }} 
-                className="bg-gray-50 hover:bg-blue-50 p-4 rounded-lg text-center cursor-pointer transition-colors group" 
-              > 
-                <Search className="w-5 h-5 text-gray-400 group-hover:text-blue-500 mx-auto mb-2 transition-colors" /> 
-                <span className="text-sm text-gray-700 group-hover:text-blue-700 transition-colors"> 
-                  {search} 
-                </span> 
-              </motion.div> 
-            ))} 
-          </div> 
-        </div> 
-      </section> 
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-gray-950">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Transform Your</span>
+              <span className="block text-clay-100 mt-2">Next Event</span>
+            </h2>
+            <p className="text-xl text-clay-300 mb-10 max-w-3xl mx-auto">
+              Join hundreds of UK events that have created unforgettable experiences with smart walls. 
+              Professional installation, live support, and cutting-edge technology included.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <motion.button
+                onClick={() => setIsQuoteModalOpen(true)}
+                className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" />
+                <span className="z-10">Get Event Quote</span>
+              </motion.button>
+              <motion.a
+                href="tel:+441417393377"
+                className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span>Call: +44 141 739 3377</span>
+              </motion.a>
+            </div>
 
-      {/* Contact/CTA Sidebar */} 
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"> 
-            <div className="text-white"> 
-              <h2 className="text-3xl md:text-4xl font-bold mb-6"> 
-                Ready to Transform Your Events? 
-              </h2> 
-              <p className="text-xl text-blue-100 mb-8"> 
-                Get a personalised consultation and detailed quote for your smart event wall installation. Our experts will design a solution tailored to your event's unique requirements and audience. 
-              </p> 
-              <div className="space-y-4"> 
-                <div className="flex items-center"> 
-                  <Phone className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">+44 141 739 3377</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <Mail className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">info@thewallshop.co.uk</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <MapPin className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <Clock className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">Mon–Fri, 9:00 AM–6:00 PM PST</span> 
-                </div> 
-              </div> 
-            </div> 
-            <div className="bg-white rounded-xl p-8 shadow-2xl"> 
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Get Your Quote Today</h3> 
-              <form className="space-y-4"> 
-                <div> 
-                  <input 
-                    type="text" 
-                    placeholder="Event Name" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <input 
-                    type="email" 
-                    placeholder="Email Address" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <input 
-                    type="tel" 
-                    placeholder="Phone Number" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"> 
-                    <option>Expected Attendees</option> 
-                    <option>50-150 attendees</option> 
-                    <option>200-500 attendees</option> 
-                    <option>500+ attendees</option> 
-                  </select> 
-                </div> 
-                <div> 
-                  <textarea 
-                    rows={4} 
-                    placeholder="Tell us about your event and requirements..." 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <button 
-                  type="submit" 
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300" 
-                > 
-                  Request a Tailored Quote 
-                </button> 
-              </form> 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+            <div className="flex items-center justify-center space-x-6 text-clay-400">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Free Consultation</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Rapid Deployment</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Live Support</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-      <Footer /> 
-      <QuoteModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} /> 
+      <Footer />
+
+      {/* Quote Modal */} 
+      <AnimatePresence>
+        {isQuoteModalOpen && (
+          <SwQuoteModal
+            isOpen={isQuoteModalOpen}
+            onClose={() => setIsQuoteModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div> 
   ); 
 }; 

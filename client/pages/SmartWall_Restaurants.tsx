@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
 import Navigation from '@/components/Navigation'; 
 import Footer from '@/components/Footer'; 
+import SwQuoteModal from '@/components/SwQuoteModal';
 import { 
   Utensils, 
   Lightbulb, 
   Volume2, 
-  Thermometer, 
   Smartphone, 
   Settings, 
   Phone, 
@@ -17,7 +17,6 @@ import {
   Star, 
   Shield, 
   Zap,
-  Ruler,
   Download,
   Home, 
   Users, 
@@ -47,12 +46,25 @@ import {
   Play,
   Pause,
   Info,
-  ChefHat,
-  Coffee,
-  Wine,
+  ChevronRight,
+  Archive,
+  Layers,
+  Droplets,
+  Flame,
+  Mic,
+  PanelsTopLeft,
+  LampCeiling,
+  Fan,
+  TreePine,
+  Square,
+  Gem,
   Headphones,
-  Monitor,
-  Mic
+  Thermometer,
+  Sparkle,
+  Menu,
+  Gauge,
+  Wifi as WifiIcon,
+  Megaphone
 } from 'lucide-react'; 
 
 // SEO Head Management Utility 
@@ -90,6 +102,7 @@ const SEOHead: React.FC<{
     setMetaTag('robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'); 
     setMetaTag('author', 'The Wall Shop'); 
     setMetaTag('viewport', 'width=device-width, initial-scale=1.0'); 
+    setMetaTag('hreflang', 'en-GB'); 
 
     // Canonical URL 
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement; 
@@ -123,25 +136,38 @@ const SEOHead: React.FC<{
     } 
 
     // JSON-LD Structured Data 
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "The Wall Shop",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "knowsAbout": [
+        "restaurant interior design",
+        "acoustic wall panels",
+        "smart restaurant technology",
+        "dining ambience control",
+        "commercial wall installations",
+        "restaurant lighting systems",
+        "hygienic wall surfaces",
+        "modular restaurant design"
+      ]
+    };
+
     const serviceSchema = { 
       "@context": "https://schema.org", 
       "@type": "Service", 
       "name": "Smart Restaurant Wall Installation", 
-      "description": "Professional smart restaurant wall installation with integrated lighting, climate control, acoustic management, and digital display technology. Transform your restaurant into an intelligent dining environment.", 
-      "provider": { 
-        "@type": "Organization", 
-        "name": "The Wall Shop", 
-        "url": "https://www.thewallshop.co.uk", 
-        "telephone": "+44 141 739 3377", 
-        "email": "info@thewallshop.co.uk", 
-        "address": { 
-          "@type": "PostalAddress", 
-          "streetAddress": "SMK Business Centre, 4 The Piazza", 
-          "addressLocality": "Glasgow", 
-          "postalCode": "G5 8BE", 
-          "addressCountry": "GB" 
-        } 
-      }, 
+      "description": "Professional smart restaurant wall installation with acoustic panels, ambient lighting control, and hygienic surfaces. Transform your restaurant into an intelligent dining environment with enhanced acoustics and ambience.", 
+      "provider": organizationSchema,
       "areaServed": "United Kingdom", 
       "serviceType": "Smart Wall Installation", 
       "category": "Restaurant Design", 
@@ -153,76 +179,133 @@ const SEOHead: React.FC<{
       } 
     }; 
 
+    const localBusinessSchema = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "The Wall Shop",
+      "description": "Professional smart wall installation specialists serving restaurants and hospitality venues across the UK",
+      "url": "https://www.thewallshop.co.uk",
+      "telephone": "+44 141 739 3377",
+      "email": "info@thewallshop.co.uk",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SMK Business Centre, 4 The Piazza",
+        "addressLocality": "Glasgow",
+        "postalCode": "G5 8BE",
+        "addressCountry": "GB"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 55.8642,
+        "longitude": -4.2518
+      },
+      "openingHours": "Mo-Fr 09:00-17:00",
+      "priceRange": "£££"
+    };
+
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.thewallshop.co.uk"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Smart Walls",
+          "item": "https://www.thewallshop.co.uk/smart-walls"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Restaurants",
+          "item": "https://www.thewallshop.co.uk/smart-walls/restaurants"
+        }
+      ]
+    };
+
     const faqSchema = { 
       "@context": "https://schema.org", 
       "@type": "FAQPage", 
       "mainEntity": [ 
         { 
           "@type": "Question", 
-          "name": "How do smart restaurant walls enhance dining experiences?", 
+          "name": "Are the panels suitable for commercial kitchens?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Smart restaurant walls enhance dining through dynamic ambient lighting that adapts to meal times, acoustic management for optimal conversation levels, climate control for guest comfort, and integrated digital displays for menu presentations and entertainment." 
+            "text": "Yes, our WPC panels are specifically designed for commercial environments with excellent heat resistance, moisture protection, and easy-clean surfaces that meet commercial hygiene standards." 
           } 
         }, 
         { 
           "@type": "Question", 
-          "name": "What restaurant sizes work with smart wall systems?", 
+          "name": "How do smart walls improve restaurant acoustics?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Our smart restaurant walls accommodate venues from intimate bistros to large dining halls. Each installation is custom-designed to complement your restaurant's layout, seating capacity, and operational requirements." 
+            "text": "Our acoustic panels reduce noise levels by up to 40%, creating a more comfortable dining atmosphere. The modular design allows targeted acoustic treatment in high-noise areas." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "Can restaurant staff control smart wall features?", 
+          "name": "Can the lighting adapt to different dining periods?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Yes, comprehensive staff control interfaces allow management of lighting, temperature, audio, and digital displays. The system includes scheduling features, preset configurations, and remote access capabilities." 
+            "text": "Absolutely. The Orvibo smart lighting system includes preset scenes for breakfast (bright), lunch (balanced), dinner (warm), and late dining (ambient) with automatic scheduling." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "Do smart restaurant walls include acoustic management?", 
+          "name": "Are the surfaces easy to sanitise?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Yes, integrated acoustic panels and sound management systems maintain optimal noise levels for comfortable dining conversations whilst reducing external disturbances and kitchen noise." 
+            "text": "Yes, all surfaces feature antimicrobial coatings and wipe-clean finishes that resist stains and bacteria, meeting commercial food safety requirements." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "What lighting options are available for restaurant walls?", 
+          "name": "How quickly can the system be installed?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "LED lighting includes warm ambient lighting for intimate dining, adjustable brightness for different meal periods, colour-changing options for special events, and accent lighting to highlight architectural features and artwork." 
+            "text": "Most restaurant installations are completed within 2-3 days with minimal disruption to operations. We work around your opening hours to ensure continuity." 
           } 
-        }, 
+        },
         { 
           "@type": "Question", 
-          "name": "How does digital menu integration work?", 
+          "name": "Can staff control the system easily?", 
           "acceptedAnswer": { 
             "@type": "Answer", 
-            "text": "Smart walls can integrate digital menu displays that update in real-time, showcase daily specials, highlight seasonal offerings, and provide nutritional information whilst maintaining elegant aesthetics that complement your restaurant's design." 
+            "text": "Yes, the Orvibo MixPad provides one-touch scene control, and staff can adjust lighting and music through the smartphone app or voice commands." 
           } 
-        }, 
-        { 
-          "@type": "Question", 
-          "name": "Are smart restaurant walls suitable for different cuisines?", 
-          "acceptedAnswer": { 
-            "@type": "Answer", 
-            "text": "Absolutely. The system adapts to any cuisine style with customisable lighting themes, acoustic settings for different dining cultures, and flexible digital displays that can showcase cuisine-specific content and cultural elements." 
-          } 
-        }, 
-        { 
-          "@type": "Question", 
-          "name": "What warranty is provided for restaurant wall installations?", 
-          "acceptedAnswer": { 
-            "@type": "Answer", 
-            "text": "We provide a comprehensive 5-year warranty covering all smart components, LED systems, acoustic panels, climate control, and installation workmanship. This includes regular maintenance visits and software updates." 
-          } 
-        } 
+        }
       ] 
     }; 
+
+    const howToSchema = {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How Smart Restaurant Walls Work",
+      "description": "Step-by-step guide to understanding smart restaurant wall functionality",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Scene Selection",
+          "text": "Choose from preset dining scenes or create custom ambience settings using the MixPad control panel"
+        },
+        {
+          "@type": "HowToStep", 
+          "name": "Automatic Adjustment",
+          "text": "Lighting, music, and climate automatically adjust based on time of day and occupancy levels"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Staff Control",
+          "text": "Restaurant staff can override settings using smartphone app or voice commands for special events"
+        }
+      ]
+    };
 
     // Insert or update JSON-LD scripts 
     const insertJsonLd = (schema: any, id: string) => { 
@@ -236,983 +319,741 @@ const SEOHead: React.FC<{
       script.textContent = JSON.stringify(schema); 
     }; 
 
+    insertJsonLd(organizationSchema, 'organization-schema');
     insertJsonLd(serviceSchema, 'service-schema'); 
+    insertJsonLd(localBusinessSchema, 'local-business-schema');
+    insertJsonLd(breadcrumbSchema, 'breadcrumb-schema');
     insertJsonLd(faqSchema, 'faq-schema'); 
+    insertJsonLd(howToSchema, 'howto-schema');
 
   }, [title, description, canonical, keywords, ogImage]); 
 
   return null; 
 }; 
 
-// Types 
-interface Hotspot { 
-  id: string; 
-  x: number; 
-  y: number; 
-  title: string; 
-  description: string; 
-  icon: React.ReactNode; 
-  features: string[]; 
-} 
-
-interface RestaurantSize { 
-  id: string; 
-  name: string; 
-  capacity: string; 
-  description: string; 
-  price: string; 
-} 
-
-interface ControlMethod { 
-  id: string; 
-  name: string; 
-  icon: React.ReactNode; 
-  description: string; 
-  features: string[]; 
-} 
-
-const SmartWallRestaurant: React.FC = () => { 
-  const [selectedRestaurantSize, setSelectedRestaurantSize] = useState<string>('medium'); 
-  const [selectedControl, setSelectedControl] = useState<string>('panel'); 
-  const [activeHotspot, setActiveHotspot] = useState<string | null>(null); 
+const SmartWallRestaurants: React.FC = () => { 
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false); 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null); 
-  const [isHelpMode, setIsHelpMode] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null); 
 
-  // Restaurant size configurations 
-  const restaurantSizes: RestaurantSize[] = [ 
-    { 
-      id: 'small', 
-      name: 'Intimate Bistro', 
-      capacity: '20-40 covers', 
-      description: 'Perfect for cosy dining establishments and cafés', 
-      price: 'From £4,500' 
-    }, 
-    { 
-      id: 'medium', 
-      name: 'Family Restaurant', 
-      capacity: '50-100 covers', 
-      description: 'Ideal for most dining establishments', 
-      price: 'From £8,200' 
-    }, 
-    { 
-      id: 'large', 
-      name: 'Fine Dining Hall', 
-      capacity: '100+ covers', 
-      description: 'Luxury solution for large restaurants', 
-      price: 'From £15,000' 
-    } 
-  ]; 
+  // Orvibo Smart Devices for Restaurants
+  const orviboDevices = [
+    {
+      key: "mixPad",
+      title: "MixPad D1 Smart Panel",
+      category: "Scene Control",
+      desc: "One-touch dining scene control with voice intercom for seamless restaurant operations.",
+      features: ["Dining scenes", "Voice intercom", "Staff control"],
+      Icon: PanelsTopLeft,
+    },
+    {
+      key: "smartLighting",
+      title: "Smart Lighting System",
+      category: "Ambience Control",
+      desc: "Dynamic lighting scenes that adapt to dining periods and create the perfect atmosphere.",
+      features: ["Scene presets", "Dimming control", "Colour temperature"],
+      Icon: LampCeiling,
+    },
+    {
+      key: "smartMusic",
+      title: "Background Music System",
+      category: "Audio Control",
+      desc: "Distributed audio system with zone control for different dining areas.",
+      features: ["Zone control", "Playlist management", "Volume automation"],
+      Icon: Speaker,
+    },
+    {
+      key: "smartClimate",
+      title: "Climate Control",
+      category: "Comfort",
+      desc: "Intelligent temperature and air quality management for optimal dining comfort.",
+      features: ["Auto scheduling", "Zone control", "Energy efficiency"],
+      Icon: Fan,
+    }
+  ];
 
-  // Control method configurations 
-  const controlMethods: ControlMethod[] = [ 
-    { 
-      id: 'panel', 
-      name: 'Staff Control Panel', 
-      icon: <Monitor className="w-6 h-6" />, 
-      description: 'Dedicated control stations for restaurant staff', 
-      features: ['Staff control panels', 'Quick presets', 'Emergency controls', 'Shift scheduling'] 
-    }, 
-    { 
-      id: 'phone', 
-      name: 'Mobile Management', 
-      icon: <Smartphone className="w-6 h-6" />, 
-      description: 'Complete control through smartphone or tablet', 
-      features: ['iOS & Android apps', 'Remote management', 'Real-time monitoring', 'Multi-user access'] 
-    } 
-  ]; 
+  // Restaurant-Specific Wall Panel Finishes
+  const finishCategories = [
+    {
+      id: 'acoustic',
+      name: "Acoustic Dining Series",
+      desc: "Sound-absorbing panels that reduce noise and enhance conversation.",
+      icon: Headphones,
+      panels: [
+        { id: "A8026", name: "Warm Oak", desc: "Natural oak texture with acoustic foam backing", img: "/images/carbon-rock-boards/wood/1.jpg" },
+        { id: "A8039", name: "Soft Linen", desc: "Fabric-look finish with superior sound absorption", img: "/images/carbon-rock-boards/solid/4.jpg" },
+        { id: "A8008", name: "Charcoal Felt", desc: "Modern felt texture with premium acoustic properties", img: "/images/carbon-rock-boards/solid/7.jpg" }
+      ]
+    },
+    {
+      id: 'hygienic',
+      name: "Hygienic Commercial Series",
+      desc: "Easy-clean surfaces with antimicrobial properties for food service areas.",
+      icon: Shield,
+      panels: [
+        { id: "H9016", name: "Pure White", desc: "Antimicrobial white finish for kitchen areas", img: "/images/carbon-rock-boards/solid/2.jpg" },
+        { id: "H9051", name: "Steel Grey", desc: "Industrial grey with stain-resistant coating", img: "/images/carbon-rock-boards/stone/4.jpg" },
+        { id: "H9015", name: "Midnight Black", desc: "Sophisticated black with easy-clean surface", img: "/images/carbon-rock-boards/solid/7.jpg" }
+      ]
+    },
+    {
+      id: 'feature',
+      name: "Feature Wall Collection",
+      desc: "Statement panels that create focal points and brand identity.",
+      icon: Sparkle,
+      panels: [
+        { id: "F3231", name: "Marble Elegance", desc: "Luxury marble pattern for upscale dining", img: "/images/carbon-rock-boards/stone/1.jpg" },
+        { id: "F3017", name: "Rustic Brick", desc: "Exposed brick texture for casual dining", img: "/images/carbon-rock-boards/stone/4.jpg" },
+        { id: "F3204", name: "Industrial Concrete", desc: "Modern concrete finish for contemporary spaces", img: "/images/carbon-rock-boards/stone/5.jpg" }
+      ]
+    }
+  ];
 
-  // Restaurant-centric hotspots
-  const hotspots: Hotspot[] = [ 
-    { 
-      id: 'ambient-lighting', 
-      x: 30, 
-      y: 25, 
-      title: 'Dynamic Ambient Lighting', 
-      description: 'Sophisticated LED lighting that adapts to dining periods', 
-      icon: <Lightbulb className="w-5 h-5" />, 
-      features: ['Meal period adaptation', 'Colour temperature control', 'Dimming capabilities', 'Accent lighting'] 
-    }, 
-    { 
-      id: 'climate-control', 
-      x: 70, 
-      y: 35, 
-      title: 'Climate Management', 
-      description: 'Intelligent temperature and air quality control', 
-      icon: <Thermometer className="w-5 h-5" />, 
-      features: ['Zone-based temperature', 'Air quality monitoring', 'Humidity control', 'Energy efficiency'] 
-    }, 
-    { 
-      id: 'acoustic-system', 
-      x: 25, 
-      y: 55, 
-      title: 'Acoustic Management', 
-      description: 'Sound control for optimal dining atmosphere', 
-      icon: <Volume2 className="w-5 h-5" />, 
-      features: ['Noise reduction', 'Background music', 'Conversation zones', 'Kitchen sound isolation'] 
-    }, 
-    { 
-      id: 'digital-displays', 
-      x: 75, 
-      y: 55, 
-      title: 'Digital Menu Integration', 
-      description: 'Seamlessly integrated digital displays for menus and promotions', 
-      icon: <Monitor className="w-5 h-5" />, 
-      features: ['Real-time menu updates', 'Promotional content', 'Nutritional information', 'Multi-language support'] 
-    }, 
-    { 
-      id: 'staff-controls', 
-      x: 50, 
-      y: 70, 
-      title: 'Staff Control Systems', 
-      description: 'Intuitive controls for restaurant operations', 
-      icon: <Settings className="w-5 h-5" />, 
-      features: ['Quick scene changes', 'Emergency controls', 'Shift presets', 'Remote access'] 
-    } 
-  ]; 
+  // Features data with restaurant focus
+  const features = [
+    {
+      icon: <Headphones className="w-8 h-8" />,
+      title: "Acoustic Comfort",
+      description: "Sound-absorbing panels reduce noise levels by up to 40%, creating a comfortable dining atmosphere that enhances conversation and customer experience.",
+      gradient: "from-clay-500 to-taupe-500"
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "Hygienic Surfaces",
+      description: "Antimicrobial coatings and easy-clean finishes meet commercial food safety standards with superior stain and bacteria resistance.",
+      gradient: "from-taupe-500 to-clay-600"
+    },
+    {
+      icon: <LampCeiling className="w-8 h-8" />,
+      title: "Dining Scene Lighting",
+      description: "Orvibo smart lighting adapts to dining periods - bright for breakfast, warm for dinner, with automatic scheduling and manual override.",
+      gradient: "from-clay-600 to-taupe-400"
+    },
+    {
+      icon: <Menu className="w-8 h-8" />,
+      title: "Digital Menu Integration",
+      description: "Built-in display mounting for digital menus and promotional content with concealed cable management and easy updates.",
+      gradient: "from-taupe-400 to-clay-500"
+    },
+    {
+      icon: <Thermometer className="w-8 h-8" />,
+      title: "Climate Zoning",
+      description: "Intelligent temperature control for different dining areas with energy-efficient operation and guest comfort optimisation.",
+      gradient: "from-clay-500 to-taupe-600"
+    },
+    {
+      icon: <Mic className="w-8 h-8" />,
+      title: "Staff Communication",
+      description: "Integrated intercom system allows seamless communication between front-of-house and kitchen staff through MixPad panels.",
+      gradient: "from-taupe-600 to-clay-400"
+    }
+  ];
+
+  // Restaurant use cases
+  const useCases = [
+    {
+      title: "Fine Dining Ambience",
+      description: "Create an intimate atmosphere with warm lighting, acoustic comfort, and elegant finishes that enhance the premium dining experience.",
+      icon: <Star className="w-6 h-6" />,
+      features: ["Warm lighting scenes", "Acoustic panels", "Luxury finishes", "Climate control"]
+    },
+    {
+      title: "Casual Dining Energy",
+      description: "Maintain a lively atmosphere with dynamic lighting, background music control, and easy-clean surfaces for high-turnover environments.",
+      icon: <Users className="w-6 h-6" />,
+      features: ["Dynamic lighting", "Music zones", "Hygienic surfaces", "Quick cleaning"]
+    },
+    {
+      title: "Kitchen Integration",
+      description: "Seamless connection between dining and kitchen areas with intercom systems, display integration, and commercial-grade hygiene.",
+      icon: <Utensils className="w-6 h-6" />,
+      features: ["Staff intercom", "Digital displays", "Heat resistance", "Easy maintenance"]
+    },
+    {
+      title: "Brand Experience",
+      description: "Reinforce brand identity with customisable feature walls, integrated displays, and programmable lighting that reflects your restaurant's personality.",
+      icon: <Palette className="w-6 h-6" />,
+      features: ["Custom finishes", "Brand colours", "Digital integration", "Flexible layouts"]
+    }
+  ];
 
   // FAQ Data 
   const faqData = [ 
     { 
-      question: "How do smart restaurant walls enhance dining experiences?", 
-      answer: "Smart restaurant walls enhance dining through dynamic ambient lighting that adapts to different meal times and occasions, sophisticated acoustic management for optimal conversation levels, precise climate control for guest comfort, and integrated digital displays for elegant menu presentations and promotional content." 
+      question: "Are the panels suitable for commercial kitchens?", 
+      answer: "Yes, our WPC panels are specifically designed for commercial environments with excellent heat resistance, moisture protection, and easy-clean surfaces that meet commercial hygiene standards." 
     }, 
     { 
-      question: "What restaurant sizes work with smart wall systems?", 
-      answer: "Our smart restaurant walls accommodate venues from intimate 20-cover bistros to large 100+ cover dining halls. Each installation is custom-designed to complement your restaurant's layout, seating capacity, kitchen operations, and specific operational requirements." 
-    }, 
+      question: "How do smart walls improve restaurant acoustics?", 
+      answer: "Our acoustic panels reduce noise levels by up to 40%, creating a more comfortable dining atmosphere. The modular design allows targeted acoustic treatment in high-noise areas." 
+    },
     { 
-      question: "Can restaurant staff control smart wall features?", 
-      answer: "Yes, comprehensive staff control interfaces allow easy management of lighting scenes, temperature zones, audio levels, and digital displays. The system includes quick preset configurations, shift scheduling features, emergency controls, and remote access capabilities for managers." 
-    }, 
+      question: "Can the lighting adapt to different dining periods?", 
+      answer: "Absolutely. The Orvibo smart lighting system includes preset scenes for breakfast (bright), lunch (balanced), dinner (warm), and late dining (ambient) with automatic scheduling." 
+    },
     { 
-      question: "Do smart restaurant walls include acoustic management?", 
-      answer: "Yes, integrated acoustic panels and advanced sound management systems maintain optimal noise levels for comfortable dining conversations whilst effectively reducing external disturbances, kitchen noise, and managing background music distribution throughout the venue." 
-    }, 
+      question: "Are the surfaces easy to sanitise?", 
+      answer: "Yes, all surfaces feature antimicrobial coatings and wipe-clean finishes that resist stains and bacteria, meeting commercial food safety requirements." 
+    },
     { 
-      question: "What lighting options are available for restaurant walls?", 
-      answer: "LED lighting includes warm ambient lighting for intimate evening dining, adjustable brightness for different meal periods, full colour-changing options for special events and celebrations, accent lighting to highlight architectural features, and task lighting for specific dining areas." 
-    }, 
+      question: "How quickly can the system be installed?", 
+      answer: "Most restaurant installations are completed within 2-3 days with minimal disruption to operations. We work around your opening hours to ensure continuity." 
+    },
     { 
-      question: "How does digital menu integration work?", 
-      answer: "Smart walls seamlessly integrate digital menu displays that update in real-time with daily specials, showcase seasonal offerings with high-quality imagery, provide detailed nutritional information, support multiple languages, and maintain elegant aesthetics that complement your restaurant's interior design." 
-    }, 
-    { 
-      question: "Are smart restaurant walls suitable for different cuisines?", 
-      answer: "Absolutely. The system adapts to any cuisine style with customisable lighting themes that reflect cultural dining preferences, acoustic settings optimised for different dining cultures, and flexible digital displays that can showcase cuisine-specific content, cultural elements, and authentic atmosphere." 
-    }, 
-    { 
-      question: "What warranty is provided for restaurant wall installations?", 
-      answer: "We provide a comprehensive 5-year warranty covering all smart components, LED lighting systems, acoustic panels, climate control units, digital displays, and installation workmanship. This includes regular maintenance visits, software updates, and dedicated technical support for hospitality operations." 
-    } 
+      question: "Can staff control the system easily?", 
+      answer: "Yes, the Orvibo MixPad provides one-touch scene control, and staff can adjust lighting and music through the smartphone app or voice commands." 
+    }
   ]; 
 
-  // Related searches data 
-  const relatedSearches = [ 
-    "smart restaurant design UK", "restaurant lighting systems", "dining room climate control", "restaurant acoustic solutions", 
-    "digital menu displays", "restaurant automation", "hospitality technology", "restaurant LED lighting", 
-    "intelligent dining systems", "restaurant smart controls", "commercial dining technology", "restaurant wall panels" 
-  ]; 
+  // How it works steps
+  const howItWorksSteps = [
+    {
+      step: 1,
+      title: "Restaurant Assessment",
+      description: "We analyse your dining space, acoustics, lighting needs, and operational requirements to design the perfect smart wall solution.",
+      icon: <Search className="w-8 h-8" />
+    },
+    {
+      step: 2,
+      title: "Custom Design",
+      description: "Create a tailored design incorporating acoustic panels, smart devices, and finishes that match your restaurant's brand and atmosphere.",
+      icon: <Palette className="w-8 h-8" />
+    },
+    {
+      step: 3,
+      title: "Professional Installation",
+      description: "Our certified installers complete the installation with minimal disruption, working around your operating hours to ensure continuity.",
+      icon: <Settings className="w-8 h-8" />
+    },
+    {
+      step: 4,
+      title: "Staff Training",
+      description: "Comprehensive training on the Orvibo system ensures your staff can easily control lighting, music, and scenes for optimal dining experiences.",
+      icon: <Users className="w-8 h-8" />
+    }
+  ];
 
-  // Get current restaurant size details 
-  const currentRestaurantSize = restaurantSizes.find(size => size.id === selectedRestaurantSize) || restaurantSizes[1]; 
-  const currentControl = controlMethods.find(method => method.id === selectedControl) || controlMethods[0]; 
-
-  // Quote Modal Component 
-  const QuoteModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => { 
-    const [formData, setFormData] = useState({ 
-      name: '', 
-      email: '', 
-      phone: '', 
-      restaurantType: '', 
-      covers: '', 
-      location: '', 
-      timeline: '', 
-      requirements: '' 
-    }); 
-
-    const handleSubmit = (e: React.FormEvent) => { 
-      e.preventDefault(); 
-      // Handle form submission 
-      console.log('Quote request submitted:', formData); 
-      onClose(); 
-    }; 
-
-    if (!isOpen) return null; 
-
-    return ( 
-      <AnimatePresence> 
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }} 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
-          onClick={onClose} 
-        > 
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }} 
-            exit={{ scale: 0.9, opacity: 0 }} 
-            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" 
-            onClick={(e) => e.stopPropagation()} 
-          > 
-            <div className="p-6"> 
-              <div className="flex justify-between items-center mb-6"> 
-                <h2 className="text-2xl font-bold text-gray-900">Request a Tailored Quote</h2> 
-                <button 
-                  onClick={onClose} 
-                  className="text-gray-400 hover:text-gray-600 transition-colors" 
-                > 
-                  <X className="w-6 h-6" /> 
-                </button> 
-              </div> 
-
-              <form onSubmit={handleSubmit} className="space-y-4"> 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label> 
-                    <input 
-                      type="text" 
-                      required 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.name} 
-                      onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label> 
-                    <input 
-                      type="email" 
-                      required 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.email} 
-                      onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                    /> 
-                  </div> 
-                </div> 
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label> 
-                    <input 
-                      type="tel" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.phone} 
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Restaurant Type</label> 
-                    <select 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.restaurantType} 
-                      onChange={(e) => setFormData({...formData, restaurantType: e.target.value})} 
-                    > 
-                      <option value="">Select type</option> 
-                      <option value="fine-dining">Fine Dining</option> 
-                      <option value="casual-dining">Casual Dining</option> 
-                      <option value="bistro">Bistro</option> 
-                      <option value="cafe">Café</option> 
-                      <option value="fast-casual">Fast Casual</option> 
-                      <option value="other">Other</option> 
-                    </select> 
-                  </div> 
-                </div> 
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Covers</label> 
-                    <input 
-                      type="text" 
-                      placeholder="e.g., 50-80" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.covers} 
-                      onChange={(e) => setFormData({...formData, covers: e.target.value})} 
-                    /> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label> 
-                    <input 
-                      type="text" 
-                      placeholder="City, Region" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      value={formData.location} 
-                      onChange={(e) => setFormData({...formData, location: e.target.value})} 
-                    /> 
-                  </div> 
-                </div> 
-
-                <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Project Timeline</label> 
-                  <select 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    value={formData.timeline} 
-                    onChange={(e) => setFormData({...formData, timeline: e.target.value})} 
-                  > 
-                    <option value="">Select timeline</option> 
-                    <option value="immediate">Immediate (1-2 months)</option> 
-                    <option value="short">Short term (3-6 months)</option> 
-                    <option value="medium">Medium term (6-12 months)</option> 
-                    <option value="long">Long term (12+ months)</option> 
-                  </select> 
-                </div> 
-
-                <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Specific Requirements</label> 
-                  <textarea 
-                    rows={4} 
-                    placeholder="Tell us about your restaurant's specific needs, design preferences, or any special requirements..." 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    value={formData.requirements} 
-                    onChange={(e) => setFormData({...formData, requirements: e.target.value})} 
-                  /> 
-                </div> 
-
-                <div className="flex gap-4 pt-4"> 
-                  <button 
-                    type="button" 
-                    onClick={onClose} 
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors" 
-                  > 
-                    Cancel 
-                  </button> 
-                  <button 
-                    type="submit" 
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" 
-                  > 
-                    Request Quote 
-                  </button> 
-                </div> 
-              </form> 
-            </div> 
-          </motion.div> 
-        </motion.div> 
-      </AnimatePresence> 
-    ); 
-  }; 
+  // Case study snippets
+  const caseStudies = [
+    {
+      title: "The Merchant City Bistro",
+      location: "Glasgow",
+      challenge: "Excessive noise levels affecting customer experience",
+      solution: "Acoustic panels reduced noise by 35%, improving customer satisfaction scores by 28%",
+      result: "Increased average dining time and positive reviews"
+    },
+    {
+      title: "Riverside Restaurant",
+      location: "Edinburgh", 
+      challenge: "Inconsistent lighting affecting ambience throughout the day",
+      solution: "Smart lighting system with automated scenes for different dining periods",
+      result: "Enhanced atmosphere and 15% increase in evening bookings"
+    },
+    {
+      title: "Urban Kitchen",
+      location: "Manchester",
+      challenge: "Difficult to maintain hygiene standards in open kitchen design",
+      solution: "Hygienic wall panels with antimicrobial coating and easy-clean surfaces",
+      result: "Improved hygiene ratings and reduced cleaning time by 40%"
+    }
+  ];
 
   return ( 
-    <div className="min-h-screen bg-white"> 
+    <div className="min-h-screen bg-gray-950"> 
       <SEOHead 
-        title="Smart Restaurant Walls | Intelligent Dining Solutions | The Wall Shop" 
-        description="Transform your restaurant with smart wall technology. Integrated lighting, climate control, acoustic management, and digital displays for enhanced dining experiences. Professional installation across the UK." 
-        canonical="https://www.thewallshop.co.uk/smart-walls/restaurant" 
-        keywords="smart restaurant walls, restaurant lighting systems, dining room climate control, restaurant acoustic solutions, digital menu displays, restaurant automation, hospitality technology, restaurant LED lighting, intelligent dining systems, restaurant smart controls, commercial dining technology, restaurant wall panels" 
-        ogImage="https://www.thewallshop.co.uk/images/restaurant-hero.webp" 
+        title="Smart Walls for Restaurants | Acoustic, Hygienic & Ambient Dining | The Wall Shop"
+        description="Transform your restaurant with smart walls featuring acoustic panels, hygienic surfaces, and Orvibo ambient lighting. Professional installation with staff-friendly controls across the UK."
+        canonical="https://www.thewallshop.co.uk/smart-walls/restaurants"
+        keywords="smart restaurant walls, acoustic panels restaurant, restaurant lighting control, hygienic wall panels, commercial wall installation, restaurant ambience, dining atmosphere, orvibo restaurant"
+        ogImage="https://www.thewallshop.co.uk/images/smart-walls/restaurant-hero.webp"
       /> 
-
+      
       <Navigation /> 
 
       {/* Hero Section */} 
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"> 
-        <div className="absolute inset-0"> 
-          <img 
-            src="/images/restaurant-hero.webp" 
-            alt="Smart Restaurant Wall Installation" 
-            className="w-full h-full object-cover opacity-40" 
-          /> 
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 to-slate-800/60"></div> 
-        </div> 
+      <section className="relative min-h-screen flex flex-col justify-start md:justify-center items-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-950 via-clay-950 to-taupe-950 overflow-hidden"> 
+        {/* Background Elements */} 
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-clay-900/20 via-transparent to-transparent"></div> 
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-clay-500/10 rounded-full blur-3xl animate-pulse"></div> 
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-taupe-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div> 
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"> 
+        <div className="relative z-10 max-w-7xl mx-auto text-center pt-20 md:pt-0"> 
           <motion.div 
             initial={{ opacity: 0, y: 30 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.8 }} 
-            className="space-y-8" 
+            transition={{ duration: 1 }} 
+            className="mb-8" 
           > 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"> 
-              Smart Restaurant 
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> 
-                Walls 
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400"> 
+                Smart Walls for 
+              </span> 
+              <br /> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-taupe-300 via-taupe-200 to-taupe-400"> 
+                Restaurants 
               </span> 
             </h1> 
-            
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed"> 
-              Transform your dining establishment with intelligent wall technology that enhances guest experiences through dynamic lighting, climate control, and seamless digital integration. 
+            <p className="text-xl md:text-2xl text-clay-300 max-w-4xl mx-auto leading-relaxed"> 
+              Transform your dining space with intelligent walls that enhance acoustics, create perfect ambience, 
+              and maintain commercial hygiene standards. Professional installation with staff-friendly controls. 
             </p> 
+          </motion.div> 
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center"> 
-              <button 
-                onClick={() => setIsQuoteModalOpen(true)} 
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg" 
+          {/* Key Stats */} 
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.3 }} 
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto" 
+          > 
+            {[ 
+              { icon: <Headphones className="w-8 h-8" />, value: "40%", label: "Noise Reduction" }, 
+              { icon: <Shield className="w-8 h-8" />, value: "24/7", label: "Hygiene Protection" }, 
+              { icon: <LampCeiling className="w-8 h-8" />, value: "Auto", label: "Scene Control" }, 
+              { icon: <Mic className="w-8 h-8" />, value: "Voice", label: "Staff Control" } 
+            ].map((stat, index) => ( 
+              <motion.div 
+                key={index} 
+                className="text-center p-4 rounded-2xl bg-gradient-to-b from-gray-900/50 to-black/50 backdrop-blur-sm border border-clay-500/20 hover:border-clay-500/40 transition-all duration-300"
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
               > 
-                Request a Tailored Quote 
-              </button> 
-              <button 
-                onClick={() => setIsHelpMode(!isHelpMode)} 
-                className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 backdrop-blur-sm" 
-              > 
-                <HelpCircle className="w-5 h-5 inline mr-2" /> 
-                Explore Features 
-              </button> 
-            </div> 
+                <div className="w-16 h-16 bg-gradient-to-r from-clay-500/30 to-taupe-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-clay-500/40"> 
+                  <div className="text-clay-300">{stat.icon}</div> 
+                </div> 
+                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div> 
+                <div className="text-clay-300 text-sm mt-1">{stat.label}</div> 
+              </motion.div> 
+            ))} 
+          </motion.div> 
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Lightbulb className="w-8 h-8 text-blue-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Dynamic Lighting</h3> 
-                <p className="text-gray-400">Adaptive ambient lighting for every dining occasion</p> 
-              </div> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Volume2 className="w-8 h-8 text-purple-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Acoustic Control</h3> 
-                <p className="text-gray-400">Optimised sound management for comfortable dining</p> 
-              </div> 
-              <div className="text-center"> 
-                <div className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"> 
-                  <Monitor className="w-8 h-8 text-green-400" /> 
-                </div> 
-                <h3 className="text-lg font-semibold text-white mb-2">Digital Integration</h3> 
-                <p className="text-gray-400">Seamless menu displays and promotional content</p> 
-              </div> 
-            </div> 
+          {/* Enhanced CTA Buttons */} 
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.6 }} 
+            className="flex flex-col sm:flex-row gap-4 justify-center pt-8" 
+          > 
+            <motion.button 
+              onClick={() => setIsQuoteModalOpen(true)} 
+              className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            > 
+              <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" /> 
+              <span className="z-10">Request Restaurant Quote</span> 
+            </motion.button> 
+            <motion.a 
+              href="tel:+441417393377" 
+              className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            > 
+              <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
+              <span>Call: +44 141 739 3377</span> 
+            </motion.a> 
           </motion.div> 
         </div> 
       </section> 
 
-      {/* Breadcrumbs */} 
-      <section className="bg-gray-50 py-4"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <nav className="flex items-center space-x-2 text-sm text-gray-600"> 
-            <Home className="w-4 h-4" /> 
-            <span>/</span> 
-            <span>Smart Walls</span> 
-            <span>/</span> 
-            <span className="text-blue-600 font-medium">Restaurant</span> 
-          </nav> 
-        </div> 
-      </section> 
+      {/* Breadcrumbs */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-gray-900 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex items-center space-x-2 text-sm">
+            <a href="/" className="text-clay-400 hover:text-clay-300 transition-colors">Home</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <a href="/smart-walls" className="text-clay-400 hover:text-clay-300 transition-colors">Smart Walls</a>
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <span className="text-clay-200">Restaurants</span>
+          </nav>
+        </div>
+      </section>
 
       {/* Features Grid */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Intelligent Restaurant Solutions 
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-clay-900"> 
+        <div className="max-w-7xl mx-auto"> 
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            transition={{ duration: 0.8 }} 
+            className="text-center mb-16" 
+          > 
+            <h2 className="text-4xl md:text-5xl font-bold mb-6"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Smart Restaurant</span> 
+              <span className="block text-clay-100 mt-2">Features</span> 
             </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Our smart restaurant walls integrate seamlessly with your establishment's design whilst providing advanced functionality for enhanced guest experiences and operational efficiency. 
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto"> 
+              Experience the perfect blend of acoustic comfort, hygienic surfaces, and intelligent automation  
+              that transforms your restaurant into a sophisticated dining destination. 
             </p> 
-          </div> 
+          </motion.div> 
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Lightbulb className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Dynamic Ambient Lighting</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Sophisticated LED lighting systems that adapt to different meal periods, creating the perfect atmosphere for breakfast, lunch, dinner, and special events. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Meal period adaptation</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Colour temperature control</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Dimming capabilities</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Accent lighting</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Volume2 className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Acoustic Management</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Advanced sound control systems that maintain optimal noise levels for comfortable conversations whilst managing background music and reducing external disturbances. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Noise reduction panels</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Background music zones</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Conversation optimisation</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Kitchen sound isolation</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Thermometer className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Climate Management</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Intelligent temperature and air quality control systems that ensure optimal comfort for guests whilst maintaining energy efficiency throughout your restaurant. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Zone-based temperature</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Air quality monitoring</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Humidity control</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Energy efficiency</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Monitor className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Digital Menu Integration</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Seamlessly integrated digital displays that showcase menus, daily specials, and promotional content whilst maintaining elegant aesthetics that complement your restaurant's design. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Real-time menu updates</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Promotional content</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Nutritional information</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Multi-language support</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.4 }} 
-              className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Settings className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Staff Control Systems</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Intuitive control interfaces designed for restaurant operations, allowing staff to quickly adjust settings, manage different dining areas, and respond to guest needs efficiently. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Quick scene changes</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Emergency controls</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Shift presets</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Remote access</li> 
-              </ul> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.5 }} 
-              className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-8 rounded-xl" 
-            > 
-              <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-6"> 
-                <Smartphone className="w-6 h-6 text-white" /> 
-              </div> 
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Mobile Management</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Comprehensive smartphone and tablet applications that provide complete control over all smart wall features, enabling remote management and real-time monitoring. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />iOS & Android apps</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Remote management</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Real-time monitoring</li> 
-                <li className="flex items-center"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />Multi-user access</li> 
-              </ul> 
-            </motion.div> 
-          </div> 
-        </div> 
-      </section> 
-
-      {/* Interactive Restaurant Size Selector */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Solutions for Every Restaurant Size 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              From intimate bistros to large dining halls, our smart wall systems are tailored to your restaurant's specific capacity and operational requirements. 
-            </p> 
-          </div> 
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"> 
-            {restaurantSizes.map((size) => ( 
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"> 
+            {features.map((feature, index) => ( 
               <motion.div 
-                key={size.id} 
-                initial={{ opacity: 0, y: 20 }} 
+                key={index} 
+                initial={{ opacity: 0, y: 30 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
-                transition={{ duration: 0.6 }} 
-                className={`p-8 rounded-xl cursor-pointer transition-all duration-300 ${ 
-                  selectedRestaurantSize === size.id 
-                    ? 'bg-blue-600 text-white shadow-xl scale-105' 
-                    : 'bg-white text-gray-900 hover:shadow-lg hover:scale-102' 
-                }`} 
-                onClick={() => setSelectedRestaurantSize(size.id)} 
+                viewport={{ once: true }} 
+                transition={{ duration: 0.6, delay: index * 0.1 }} 
+                className="group bg-taupe-800/50 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300 hover:transform hover:scale-105" 
               > 
-                <div className="text-center"> 
-                  <h3 className="text-2xl font-bold mb-2">{size.name}</h3> 
-                  <p className={`text-lg mb-4 ${ 
-                    selectedRestaurantSize === size.id ? 'text-blue-100' : 'text-gray-600' 
-                  }`}> 
-                    {size.capacity} 
-                  </p> 
-                  <p className={`mb-6 ${ 
-                    selectedRestaurantSize === size.id ? 'text-blue-100' : 'text-gray-700' 
-                  }`}> 
-                    {size.description} 
-                  </p> 
-                  <div className={`text-2xl font-bold ${ 
-                    selectedRestaurantSize === size.id ? 'text-white' : 'text-blue-600' 
-                  }`}> 
-                    {size.price} 
-                  </div> 
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}> 
+                  <div className="text-white">{feature.icon}</div> 
                 </div> 
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-clay-200 transition-colors"> 
+                  {feature.title} 
+                </h3> 
+                <p className="text-clay-300 leading-relaxed">{feature.description}</p> 
               </motion.div> 
             ))} 
           </div> 
-
-          <div className="bg-white rounded-xl p-8 shadow-lg"> 
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center"> 
-              {currentRestaurantSize.name} Configuration 
-            </h3> 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> 
-              <div> 
-                <img 
-                  src="/images/restaurant-detail-1.webp" 
-                  alt="Restaurant Smart Wall Detail" 
-                  className="w-full h-64 object-cover rounded-lg mb-4" 
-                /> 
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Smart Control Integration</h4> 
-                <p className="text-gray-700"> 
-                  Seamlessly integrated control systems designed specifically for {currentRestaurantSize.capacity} establishments, providing intuitive management of all smart wall features. 
-                </p> 
-              </div> 
-              <div> 
-                <img 
-                  src="/images/restaurant-detail-2.webp" 
-                  alt="Restaurant Acoustic Management" 
-                  className="w-full h-64 object-cover rounded-lg mb-4" 
-                /> 
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">Acoustic Excellence</h4> 
-                <p className="text-gray-700"> 
-                  Advanced acoustic management tailored for {currentRestaurantSize.capacity} dining environments, ensuring optimal sound levels for comfortable guest conversations. 
-                </p> 
-              </div> 
-            </div> 
-          </div> 
         </div> 
       </section> 
 
-      {/* Control Methods */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Intuitive Control Systems 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Choose from professional-grade control interfaces designed for restaurant operations, ensuring your staff can efficiently manage all smart wall features. 
-            </p> 
-          </div> 
+      {/* Orvibo Smart Devices Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Orvibo Restaurant</span>
+              <span className="block text-clay-100 mt-2">Smart Automation</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Professional-grade Orvibo smart home devices designed specifically for restaurant environments.
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"> 
-            {controlMethods.map((method) => ( 
-              <motion.div 
-                key={method.id} 
-                initial={{ opacity: 0, x: method.id === 'panel' ? -20 : 20 }} 
-                whileInView={{ opacity: 1, x: 0 }} 
-                transition={{ duration: 0.6 }} 
-                className={`p-8 rounded-xl cursor-pointer transition-all duration-300 ${ 
-                  selectedControl === method.id 
-                    ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-xl' 
-                    : 'bg-gray-50 text-gray-900 hover:shadow-lg' 
-                }`} 
-                onClick={() => setSelectedControl(method.id)} 
-              > 
-                <div className="flex items-center mb-6"> 
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-4 ${ 
-                    selectedControl === method.id ? 'bg-white/20' : 'bg-blue-600' 
-                  }`}> 
-                    <div className={selectedControl === method.id ? 'text-white' : 'text-white'}> 
-                      {method.icon} 
-                    </div> 
-                  </div> 
-                  <h3 className="text-xl font-bold">{method.name}</h3> 
-                </div> 
-                <p className={`mb-6 ${ 
-                  selectedControl === method.id ? 'text-blue-100' : 'text-gray-700' 
-                }`}> 
-                  {method.description} 
-                </p> 
-                <ul className="space-y-2"> 
-                  {method.features.map((feature, index) => ( 
-                    <li key={index} className="flex items-center"> 
-                      <CheckCircle className={`w-4 h-4 mr-2 ${ 
-                        selectedControl === method.id ? 'text-green-300' : 'text-green-500' 
-                      }`} /> 
-                      <span className={selectedControl === method.id ? 'text-blue-100' : 'text-gray-600'}> 
-                        {feature} 
-                      </span> 
-                    </li> 
-                  ))} 
-                </ul> 
-              </motion.div> 
-            ))} 
-          </div> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {orviboDevices.map((device, index) => (
+              <motion.div
+                key={device.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center mb-4">
+                  <device.Icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{device.title}</h3>
+                <p className="text-sm text-clay-400 mb-3">{device.category}</p>
+                <p className="text-clay-300 text-sm mb-4">{device.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {device.features.map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-clay-600/30 text-clay-200 px-2 py-1 rounded-full">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8"> 
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center"> 
-              {currentControl.name} Features 
-            </h3> 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"> 
-              {currentControl.features.map((feature, index) => ( 
-                <div key={index} className="text-center"> 
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3"> 
-                    <CheckCircle className="w-6 h-6 text-white" /> 
-                  </div> 
-                  <p className="text-gray-700 font-medium">{feature}</p> 
-                </div> 
-              ))} 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+      {/* Restaurant Panel Finishes Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Restaurant-Grade Panel</span>
+              <span className="block text-clay-100 mt-2">Finish Options</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Specially selected finishes with enhanced acoustic properties, hygiene protection, and visual appeal for restaurant environments.
+            </p>
+          </motion.div>
 
-      {/* Long-tail Content Cluster */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Restaurant Technology Solutions 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              Comprehensive smart wall technology designed specifically for the hospitality industry, enhancing both guest experiences and operational efficiency. 
-            </p> 
-          </div> 
+          <div className="space-y-12">
+            {finishCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                    <category.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
+                    <p className="text-clay-300">{category.desc}</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {category.panels.map((panel) => (
+                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
+                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
+                        <img 
+                          src={panel.img} 
+                          alt={panel.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-white">{panel.name}</h4>
+                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
+                        </div>
+                        <p className="text-sm text-clay-300">{panel.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <ChefHat className="w-12 h-12 text-orange-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Kitchen Integration</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Smart walls can integrate with kitchen operations, displaying order status, managing service timing, and coordinating with kitchen display systems for seamless service flow. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />Order status displays</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />Service timing coordination</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-orange-500 mr-2" />Kitchen communication</li> 
-              </ul> 
-            </motion.div> 
+      {/* Restaurant Use Cases Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Restaurant</span>
+              <span className="block text-clay-100 mt-2">Use Cases</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Tailored solutions for different restaurant types and dining experiences.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Wine className="w-12 h-12 text-purple-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Wine & Beverage Displays</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Elegant digital displays for wine lists, cocktail menus, and beverage selections with detailed descriptions, pairing suggestions, and dynamic pricing updates. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Wine list management</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Pairing suggestions</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-purple-500 mr-2" />Dynamic pricing</li> 
-              </ul> 
-            </motion.div> 
+          <div className="grid md:grid-cols-2 gap-8">
+            {useCases.map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-8 border border-clay-500/20 hover:border-clay-400/40 transition-all duration-300"
+              >
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-lg flex items-center justify-center">
+                    {useCase.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{useCase.title}</h3>
+                </div>
+                <p className="text-clay-300 mb-6">{useCase.description}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {useCase.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-clay-400" />
+                      <span className="text-sm text-clay-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Users className="w-12 h-12 text-blue-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Guest Experience Enhancement</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Personalised dining experiences through adaptive lighting, customisable ambiance settings, and interactive features that respond to guest preferences and special occasions. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Personalised ambiance</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Special occasion modes</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-blue-500 mr-2" />Interactive features</li> 
-              </ul> 
-            </motion.div> 
+      {/* Gallery Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Restaurant</span>
+              <span className="block text-clay-100 mt-2">Gallery</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              See how smart walls transform restaurant spaces across the UK.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Zap className="w-12 h-12 text-yellow-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Energy Management</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Intelligent energy management systems that optimise power consumption, reduce operational costs, and support sustainability goals whilst maintaining optimal guest comfort. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-yellow-500 mr-2" />Power optimisation</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-yellow-500 mr-2" />Cost reduction</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-yellow-500 mr-2" />Sustainability support</li> 
-              </ul> 
-            </motion.div> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+  { title: "Fine Dining Ambience", img: "/images/smart-walls/restaurant/1.webp", desc: "Elegant acoustic panels with warm lighting" },
+  { title: "Casual Dining Energy", img: "/images/smart-walls/restaurant/2.webp", desc: "Dynamic lighting with easy-clean surfaces" },
+  { title: "Open Kitchen Design", img: "/images/smart-walls/restaurant/3.webp", desc: "Hygienic panels with integrated displays" },
+  { title: "Private Dining Room", img: "/images/smart-walls/restaurant/4.webp", desc: "Acoustic comfort with luxury finishes" },
+  { title: "Bar Area Integration", img: "/images/smart-walls/restaurant/5.webp", desc: "Feature walls with smart lighting" },
+  { title: "Outdoor Dining Extension", img: "/images/smart-walls/restaurant/6.webp", desc: "Weather-resistant panels with climate control" }
+].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group bg-clay-800/40 rounded-xl overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300"
+              >
+                <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
+                  <img 
+                    src={item.img} 
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <h4 className="font-semibold mb-1">{item.title}</h4>
+                    <p className="text-sm text-gray-300">{item.desc}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.4 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Shield className="w-12 h-12 text-green-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Safety & Security</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Integrated safety features including emergency lighting, security monitoring, fire safety compliance, and staff alert systems for comprehensive restaurant security. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />Emergency lighting</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />Security monitoring</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-green-500 mr-2" />Staff alerts</li> 
-              </ul> 
-            </motion.div> 
+      {/* How It Works Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">How It</span>
+              <span className="block text-clay-100 mt-2">Works</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              From initial consultation to staff training, we handle every aspect of your restaurant transformation.
+            </p>
+          </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.5 }} 
-              className="bg-white p-8 rounded-xl shadow-lg" 
-            > 
-              <Smartphone className="w-12 h-12 text-indigo-600 mb-6" /> 
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Mobile Integration</h3> 
-              <p className="text-gray-700 mb-4"> 
-                Seamless integration with mobile ordering systems, table service apps, and guest communication platforms for enhanced operational efficiency and guest satisfaction. 
-              </p> 
-              <ul className="space-y-2 text-sm text-gray-600"> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Mobile ordering</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Table service apps</li> 
-                <li className="flex items-center"><ArrowRight className="w-4 h-4 text-indigo-500 mr-2" />Guest communication</li> 
-              </ul> 
-            </motion.div> 
-          </div> 
-        </div> 
-      </section> 
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorksSteps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-20 h-20 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <div className="text-white">{step.icon}</div>
+                </div>
+                <div className="w-8 h-8 bg-clay-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-sm font-bold">
+                  {step.step}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{step.title}</h3>
+                <p className="text-clay-300">{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Compliance & Safety */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Compliance & Safety Standards 
-            </h2> 
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto"> 
-              All our smart restaurant wall installations meet stringent UK safety standards and hospitality industry regulations, ensuring complete compliance and guest safety. 
-            </p> 
-          </div> 
+      {/* Case Studies Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Success</span>
+              <span className="block text-clay-100 mt-2">Stories</span>
+            </h2>
+            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
+              Real results from restaurants across the UK that have transformed their spaces with smart walls.
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"> 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Shield className="w-8 h-8 text-red-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Fire Safety</h3> 
-              <p className="text-gray-600">BS 5839 compliant fire detection and emergency lighting systems</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.1 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Zap className="w-8 h-8 text-blue-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Electrical Safety</h3> 
-              <p className="text-gray-600">BS 7671 (18th Edition) wiring regulations compliance</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.2 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <CheckCircle className="w-8 h-8 text-green-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Building Regulations</h3> 
-              <p className="text-gray-600">Full compliance with UK Building Regulations Part L and M</p> 
-            </motion.div> 
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.6, delay: 0.3 }} 
-              className="text-center" 
-            > 
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"> 
-                <Users className="w-8 h-8 text-purple-600" /> 
-              </div> 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Accessibility</h3> 
-              <p className="text-gray-600">DDA and Equality Act 2010 accessibility compliance</p> 
-            </motion.div> 
-          </div> 
-
-          <div className="mt-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8"> 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> 
-              <div> 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Safety Certifications</h3> 
-                <ul className="space-y-3 text-gray-700"> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />CE marking for all electronic components</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />UKCA conformity assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />RoHS compliance for environmental safety</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />IP65 rating for moisture resistance</li> 
-                </ul> 
-              </div> 
-              <div> 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Installation Standards</h3> 
-                <ul className="space-y-3 text-gray-700"> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />NICEIC approved electrical installation</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Professional structural assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Health and safety risk assessment</li> 
-                  <li className="flex items-center"><CheckCircle className="w-5 h-5 text-green-500 mr-3" />Post-installation safety certification</li> 
-                </ul> 
-              </div> 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+          <div className="grid md:grid-cols-3 gap-8">
+            {caseStudies.map((study, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-taupe-800/40 backdrop-blur-sm rounded-xl p-6 border border-clay-500/20"
+              >
+                <div className="flex items-center space-x-2 mb-4">
+                  <MapPin className="w-4 h-4 text-clay-400" />
+                  <span className="text-clay-400 text-sm">{study.location}</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{study.title}</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-clay-400">Challenge:</span>
+                    <p className="text-clay-300">{study.challenge}</p>
+                  </div>
+                  <div>
+                    <span className="text-clay-400">Solution:</span>
+                    <p className="text-clay-300">{study.solution}</p>
+                  </div>
+                  <div>
+                    <span className="text-clay-400">Result:</span>
+                    <p className="text-clay-300">{study.result}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* FAQ Section */} 
-      <section className="py-20 bg-gray-50"> 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Frequently Asked Questions 
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-mocha-900"> 
+        <div className="max-w-4xl mx-auto"> 
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            transition={{ duration: 0.8 }} 
+            className="text-center mb-16" 
+          > 
+            <h2 className="text-4xl md:text-5xl font-bold mb-6"> 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Frequently Asked</span> 
+              <span className="block text-clay-100">Questions</span> 
             </h2> 
-            <p className="text-xl text-gray-600"> 
-              Common questions about smart restaurant wall installations and technology 
+            <p className="text-xl text-clay-300"> 
+              Everything you need to know about smart restaurant wall installation and dining automation 
             </p> 
-          </div> 
+          </motion.div> 
 
           <div className="space-y-4"> 
             {faqData.map((faq, index) => ( 
@@ -1220,16 +1061,17 @@ const SmartWallRestaurant: React.FC = () => {
                 key={index} 
                 initial={{ opacity: 0, y: 20 }} 
                 whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }} 
                 transition={{ duration: 0.6, delay: index * 0.1 }} 
-                className="bg-white rounded-lg shadow-md overflow-hidden" 
+                className="bg-taupe-800/50 backdrop-blur-sm rounded-2xl border border-clay-500/20 overflow-hidden hover:border-clay-400/40 transition-all duration-300" 
               > 
                 <button 
-                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors" 
                   onClick={() => setExpandedFaq(expandedFaq === index ? null : index)} 
+                  className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-taupe-700/30 transition-colors" 
                 > 
-                  <span className="font-semibold text-gray-900">{faq.question}</span> 
+                  <span className="text-lg font-semibold text-white pr-4">{faq.question}</span> 
                   <ChevronDown 
-                    className={`w-5 h-5 text-gray-500 transition-transform ${ 
+                    className={`w-6 h-6 text-clay-400 transition-transform duration-300 ${ 
                       expandedFaq === index ? 'rotate-180' : '' 
                     }`} 
                   /> 
@@ -1241,9 +1083,11 @@ const SmartWallRestaurant: React.FC = () => {
                       animate={{ height: 'auto', opacity: 1 }} 
                       exit={{ height: 0, opacity: 0 }} 
                       transition={{ duration: 0.3 }} 
-                      className="px-6 pb-4" 
+                      className="overflow-hidden" 
                     > 
-                      <p className="text-gray-700 leading-relaxed">{faq.answer}</p> 
+                      <div className="px-8 pb-6"> 
+                        <p className="text-clay-300 leading-relaxed">{faq.answer}</p> 
+                      </div> 
                     </motion.div> 
                   )} 
                 </AnimatePresence> 
@@ -1253,122 +1097,110 @@ const SmartWallRestaurant: React.FC = () => {
         </div> 
       </section> 
 
-      {/* Related Searches */} 
-      <section className="py-20 bg-white"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="text-center mb-16"> 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"> 
-              Related Restaurant Technology 
-            </h2> 
-            <p className="text-xl text-gray-600"> 
-              Explore related smart restaurant solutions and hospitality technology 
-            </p> 
-          </div> 
+      {/* Local Signals Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-clay-900">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-gradient-to-r from-clay-500/10 to-taupe-500/10 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/30"
+          >
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">UK Nationwide Installation</h3>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 text-clay-300">
+              <div>
+                <h4 className="font-semibold text-white mb-2">Glasgow HQ</h4>
+                <p className="text-sm">SMK Business Centre, 4 The Piazza, Glasgow G5 8BE. Professional consultation and project management from our Scottish headquarters.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">UK Coverage</h4>
+                <p className="text-sm">Certified installers across England, Scotland, Wales, and Northern Ireland. Local support with national expertise.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">Restaurant Focus</h4>
+                <p className="text-sm">Specialising in hospitality venues with experience in fine dining, casual restaurants, pubs, and commercial kitchens.</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"> 
-            {relatedSearches.map((search, index) => ( 
-              <motion.div 
-                key={index} 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                whileInView={{ opacity: 1, scale: 1 }} 
-                transition={{ duration: 0.4, delay: index * 0.05 }} 
-                className="bg-gray-50 hover:bg-blue-50 p-4 rounded-lg text-center cursor-pointer transition-colors group" 
-              > 
-                <Search className="w-5 h-5 text-gray-400 group-hover:text-blue-500 mx-auto mb-2 transition-colors" /> 
-                <span className="text-sm text-gray-700 group-hover:text-blue-700 transition-colors"> 
-                  {search} 
-                </span> 
-              </motion.div> 
-            ))} 
-          </div> 
-        </div> 
-      </section> 
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-gray-950">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Transform Your</span>
+              <span className="block text-clay-100 mt-2">Restaurant Today</span>
+            </h2>
+            <p className="text-xl text-clay-300 mb-10 max-w-3xl mx-auto">
+              Join hundreds of UK restaurants that have enhanced their dining experience with smart walls. 
+              Professional installation, staff training, and ongoing support included.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <motion.button
+                onClick={() => setIsQuoteModalOpen(true)}
+                className="px-8 py-4 text-lg font-semibold rounded-2xl flex items-center justify-center space-x-2 group relative overflow-hidden bg-gradient-to-r from-clay-600 to-taupe-700 text-white shadow-lg hover:from-clay-700 hover:to-taupe-800 transition-all duration-300"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform z-10" />
+                <span className="z-10">Get Restaurant Quote</span>
+              </motion.button>
+              <motion.a
+                href="tel:+441417393377"
+                className="border-2 border-clay-500/50 text-clay-200 px-8 py-4 rounded-2xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-2 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span>Call: +44 141 739 3377</span>
+              </motion.a>
+            </div>
 
-      {/* Contact/CTA Sidebar */} 
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600"> 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"> 
-            <div className="text-white"> 
-              <h2 className="text-3xl md:text-4xl font-bold mb-6"> 
-                Ready to Transform Your Restaurant? 
-              </h2> 
-              <p className="text-xl text-blue-100 mb-8"> 
-                Get a personalised consultation and detailed quote for your smart restaurant wall installation. Our experts will design a solution tailored to your establishment's unique requirements. 
-              </p> 
-              <div className="space-y-4"> 
-                <div className="flex items-center"> 
-                  <Phone className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">+44 141 739 3377</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <Mail className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">info@thewallshop.co.uk</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <MapPin className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">SMK Business Centre, 4 The Piazza, Glasgow, G5 8BE</span> 
-                </div> 
-                <div className="flex items-center"> 
-                  <Clock className="w-6 h-6 text-blue-300 mr-4" /> 
-                  <span className="text-lg">Mon–Fri, 9:00 AM–6:00 PM PST</span> 
-                </div> 
-              </div> 
-            </div> 
-            <div className="bg-white rounded-xl p-8 shadow-2xl"> 
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Get Your Quote Today</h3> 
-              <form className="space-y-4"> 
-                <div> 
-                  <input 
-                    type="text" 
-                    placeholder="Restaurant Name" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <input 
-                    type="email" 
-                    placeholder="Email Address" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <input 
-                    type="tel" 
-                    placeholder="Phone Number" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <div> 
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"> 
-                    <option>Number of Covers</option> 
-                    <option>20-40 covers</option> 
-                    <option>50-100 covers</option> 
-                    <option>100+ covers</option> 
-                  </select> 
-                </div> 
-                <div> 
-                  <textarea 
-                    rows={4} 
-                    placeholder="Tell us about your restaurant and requirements..." 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  /> 
-                </div> 
-                <button 
-                  type="submit" 
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300" 
-                > 
-                  Request a Tailored Quote 
-                </button> 
-              </form> 
-            </div> 
-          </div> 
-        </div> 
-      </section> 
+            <div className="flex items-center justify-center space-x-6 text-clay-400">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Free Consultation</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Professional Installation</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Staff Training</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-      <Footer /> 
-      <QuoteModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} /> 
+      <Footer />
+
+      {/* Quote Modal */} 
+      <AnimatePresence>
+        {isQuoteModalOpen && (
+          <SwQuoteModal
+            isOpen={isQuoteModalOpen}
+            onClose={() => setIsQuoteModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div> 
   ); 
 }; 
 
-export default SmartWallRestaurant;
+export default SmartWallRestaurants;
