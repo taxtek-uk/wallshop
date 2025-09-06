@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
 import Navigation from '@/components/Navigation'; 
+import FinishesSection from '@/components/FinishesSection';
 import Footer from '@/components/Footer'; 
 import SwQuoteModal from '@/components/SwQuoteModal';
 import { 
@@ -372,41 +373,7 @@ const SmartWallRestaurants: React.FC = () => {
   ];
 
   // Restaurant-Specific Wall Panel Finishes
-  const finishCategories = [
-    {
-      id: 'acoustic',
-      name: "Acoustic Dining Series",
-      desc: "Sound-absorbing panels that reduce noise and enhance conversation.",
-      icon: Headphones,
-      panels: [
-        { id: "A8026", name: "Warm Oak", desc: "Natural oak texture with acoustic foam backing", img: "/images/carbon-rock-boards/wood/1.jpg" },
-        { id: "A8039", name: "Soft Linen", desc: "Fabric-look finish with superior sound absorption", img: "/images/carbon-rock-boards/solid/4.jpg" },
-        { id: "A8008", name: "Charcoal Felt", desc: "Modern felt texture with premium acoustic properties", img: "/images/carbon-rock-boards/solid/7.jpg" }
-      ]
-    },
-    {
-      id: 'hygienic',
-      name: "Hygienic Commercial Series",
-      desc: "Easy-clean surfaces with antimicrobial properties for food service areas.",
-      icon: Shield,
-      panels: [
-        { id: "H9016", name: "Pure White", desc: "Antimicrobial white finish for kitchen areas", img: "/images/carbon-rock-boards/solid/2.jpg" },
-        { id: "H9051", name: "Steel Grey", desc: "Industrial grey with stain-resistant coating", img: "/images/carbon-rock-boards/stone/4.jpg" },
-        { id: "H9015", name: "Midnight Black", desc: "Sophisticated black with easy-clean surface", img: "/images/carbon-rock-boards/solid/7.jpg" }
-      ]
-    },
-    {
-      id: 'feature',
-      name: "Feature Wall Collection",
-      desc: "Statement panels that create focal points and brand identity.",
-      icon: Sparkle,
-      panels: [
-        { id: "F3231", name: "Marble Elegance", desc: "Luxury marble pattern for upscale dining", img: "/images/carbon-rock-boards/stone/1.jpg" },
-        { id: "F3017", name: "Rustic Brick", desc: "Exposed brick texture for casual dining", img: "/images/carbon-rock-boards/stone/4.jpg" },
-        { id: "F3204", name: "Industrial Concrete", desc: "Modern concrete finish for contemporary spaces", img: "/images/carbon-rock-boards/stone/5.jpg" }
-      ]
-    }
-  ];
+   
 
   // Features data with restaurant focus
   const features = [
@@ -780,53 +747,13 @@ const SmartWallRestaurants: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="space-y-12">
-            {finishCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
-                    <p className="text-clay-300">{category.desc}</p>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {category.panels.map((panel) => (
-                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
-                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
-                        <img 
-                          src={panel.img} 
-                          alt={panel.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-white">{panel.name}</h4>
-                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
-                        </div>
-                        <p className="text-sm text-clay-300">{panel.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+            <FinishesSection
+                         // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+                           defaultMaxVisible={8}
+                           helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+                           id="finishes"
+                           className=""
+                         />
         </div>
       </section>
 

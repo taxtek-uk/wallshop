@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation'; 
 import Footer from '@/components/Footer'; 
 import SwQuoteModal from '@/components/SwQuoteModal';
+import FinishesSection, { FINISH_CATEGORIES_DEFAULT } from '@/components/FinishesSection';
 import { 
   ChefHat, 
   Lightbulb, 
@@ -303,44 +304,7 @@ const SmartWallKitchen: React.FC = () => {
       Icon: LampCeiling,
     }
   ];
-
-  // Kitchen-Specific Wall Panel Finishes
-  const finishCategories = [
-    {
-      id: 'solid',
-      name: "Easy-Clean Solid Series",
-      desc: "Wipe-clean surfaces perfect for kitchen environments.",
-      icon: Square,
-      panels: [
-        { id: "T8026", name: "Ash Silver", desc: "Neutral silver-gray with stain-resistant finish", img: "/images/carbon-rock-boards/solid/2.jpg" },
-        { id: "T8039", name: "Ivory", desc: "Soft ivory tone perfect for bright kitchen spaces", img: "/images/carbon-rock-boards/solid/4.jpg" },
-        { id: "T8008", name: "Obsidian", desc: "Matte black with premium depth and easy maintenance", img: "/images/carbon-rock-boards/solid/7.jpg" }
-      ]
-    },
-    {
-      id: 'wood',
-      name: "Moisture-Resistant Wood Grain",
-      desc: "Natural wood aesthetics with kitchen-safe protection.",
-      icon: TreePine,
-      panels: [
-        { id: "T9016", name: "Ash Grey", desc: "Light ash grain with moisture protection", img: "/images/carbon-rock-boards/wood/1.jpg" },
-        { id: "T9051", name: "Walnut Mist", desc: "Mid-brown walnut with easy-clean coating", img: "/images/carbon-rock-boards/wood/2.jpg" },
-        { id: "T9015", name: "Weathered Storm", desc: "Weathered texture with enhanced durability", img: "/images/carbon-rock-boards/wood/5.jpg" }
-      ]
-    },
-    {
-      id: 'stone',
-      name: "Kitchen Stone Series",
-      desc: "Stone-look panels with superior heat and moisture resistance.",
-      icon: Gem,
-      panels: [
-        { id: "S3231", name: "White & Gold", desc: "Elegant stone texture with gold veining", img: "/images/carbon-rock-boards/stone/1.jpg" },
-        { id: "T3017", name: "Mid Grey & White", desc: "Neutral stone pattern ideal for modern kitchens", img: "/images/carbon-rock-boards/stone/4.jpg" },
-        { id: "T3204", name: "Dark Grey & Black", desc: "Bold stone texture with dramatic contrast", img: "/images/carbon-rock-boards/stone/5.jpg" }
-      ]
-    }
-  ];
-
+ 
   // Features data with Orvibo integration
   const features = [
     {
@@ -674,52 +638,15 @@ const SmartWallKitchen: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="space-y-12">
-            {finishCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
-                    <p className="text-clay-300">{category.desc}</p>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {category.panels.map((panel) => (
-                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
-                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
-                        <img 
-                          src={panel.img} 
-                          alt={panel.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-white">{panel.name}</h4>
-                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
-                        </div>
-                        <p className="text-sm text-clay-300">{panel.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+             
+                    <FinishesSection
+                         // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+                           defaultMaxVisible={8}
+                           helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+                           id="finishes"
+                           className=""
+                         />
+                
         </div>
       </section> 
 

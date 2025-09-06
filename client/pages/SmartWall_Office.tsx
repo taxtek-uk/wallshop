@@ -1355,11 +1355,7 @@ const SmartWallOffice: React.FC = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <div className={`w-10 h-10 bg-gradient-to-r ${category.color} rounded-xl flex items-center justify-center border border-white/20`}>
-                      <category.icon className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
+                   
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-200 transition-colors">

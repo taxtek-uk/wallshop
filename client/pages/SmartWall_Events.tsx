@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
 import Navigation from '@/components/Navigation'; 
+import FinishesSection from '@/components/FinishesSection';
 import Footer from '@/components/Footer'; 
 import SwQuoteModal from '@/components/SwQuoteModal';
 import { 
@@ -398,41 +399,7 @@ const SmartWallEvents: React.FC = () => {
   ];
 
   // Events-Specific Wall Panel Finishes
-  const finishCategories = [
-    {
-      id: 'modular',
-      name: "Modular Stage Series",
-      desc: "Quick-assembly panels for flexible event staging and backdrop creation.",
-      icon: Layers3,
-      panels: [
-        { id: "M8026", name: "Stage Black", desc: "Professional black finish for stage backdrops", img: "/images/carbon-rock-boards/solid/7.jpg" },
-        { id: "M8039", name: "Event White", desc: "Clean white finish for corporate presentations", img: "/images/carbon-rock-boards/solid/4.jpg" },
-        { id: "M8008", name: "Charcoal Pro", desc: "Neutral charcoal for versatile event styling", img: "/images/carbon-rock-boards/solid/2.jpg" }
-      ]
-    },
-    {
-      id: 'branding',
-      name: "Brand Display Collection",
-      desc: "Customisable surfaces for logos, graphics, and dynamic brand presentations.",
-      icon: Palette,
-      panels: [
-        { id: "B9016", name: "Digital Canvas", desc: "Smooth surface optimised for projection mapping", img: "/images/carbon-rock-boards/stone/1.jpg" },
-        { id: "B9051", name: "Logo Mount", desc: "Textured finish with integrated mounting points", img: "/images/carbon-rock-boards/stone/4.jpg" },
-        { id: "B9015", name: "Media Wall", desc: "High-contrast surface for video wall installations", img: "/images/carbon-rock-boards/stone/5.jpg" }
-      ]
-    },
-    {
-      id: 'portable',
-      name: "Portable Event Series",
-      desc: "Lightweight panels with transport cases for touring events and exhibitions.",
-      icon: Shuffle,
-      panels: [
-        { id: "P3231", name: "Travel Pro", desc: "Ultra-light panels with wheeled transport cases", img: "/images/carbon-rock-boards/wood/1.jpg" },
-        { id: "P3017", name: "Expo Standard", desc: "Standard exhibition panels with quick-connect system", img: "/images/carbon-rock-boards/wood/2.jpg" },
-        { id: "P3204", name: "Festival Tough", desc: "Reinforced panels for outdoor festival environments", img: "/images/carbon-rock-boards/wood/5.jpg" }
-      ]
-    }
-  ];
+   
 
   // Features data with events focus
   const features = [
@@ -806,53 +773,13 @@ const SmartWallEvents: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="space-y-12">
-            {finishCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
-                    <p className="text-clay-300">{category.desc}</p>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {category.panels.map((panel) => (
-                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
-                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
-                        <img 
-                          src={panel.img} 
-                          alt={panel.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-white">{panel.name}</h4>
-                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
-                        </div>
-                        <p className="text-sm text-clay-300">{panel.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+            <FinishesSection
+                         // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+                           defaultMaxVisible={8}
+                           helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+                           id="finishes"
+                           className=""
+                         />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
+import FinishesSection from '@/components/FinishesSection';
 import Footer from '@/components/Footer';
 import SwQuoteModal from '@/components/SwQuoteModal';
 import {
@@ -356,41 +357,7 @@ const SmartWallHotels: React.FC = () => {
   ];
 
   // Hotel-Specific Wall Panel Finishes
-  const finishCategories = [
-    {
-      id: 'luxury',
-      name: "Luxury & Lobby Series",
-      desc: "Premium finishes designed to create a sophisticated and welcoming ambiance in hotel lobbies and executive lounges.",
-      icon: Gem,
-      panels: [
-        { id: "L7012", name: "Marble Elegance", desc: "Polished marble effect for grand entrances", img: "/images/carbon-rock-boards/stone/2.jpg" },
-        { id: "L7025", name: "Walnut Grand", desc: "Rich walnut wood grain for classic luxury", img: "/images/carbon-rock-boards/wood/3.jpg" },
-        { id: "L7038", name: "Gold Vein", desc: "Subtle gold veining for a touch of opulence", img: "/images/carbon-rock-boards/stone/3.jpg" }
-      ]
-    },
-    {
-      id: 'suite',
-      name: "Suite & Guest Room Collection",
-      desc: "Durable and aesthetically pleasing options for guest rooms, focusing on comfort and easy maintenance.",
-      icon: BedDouble,
-      panels: [
-        { id: "S5001", name: "Soft Linen", desc: "Textured fabric-like finish for cozy interiors", img: "/images/carbon-rock-boards/solid/1.jpg" },
-        { id: "S5014", name: "Ash Wood", desc: "Light ash wood for a modern, minimalist feel", img: "/images/carbon-rock-boards/wood/4.jpg" },
-        { id: "S5027", name: "Stone Grey", desc: "Neutral grey stone for versatile design", img: "/images/carbon-rock-boards/stone/6.jpg" }
-      ]
-    },
-    {
-      id: 'wellness',
-      name: "Spa & Wellness Series",
-      desc: "Humidity-resistant and calming finishes for spa, gym, and pool areas, promoting relaxation.",
-      icon: Droplets,
-      panels: [
-        { id: "W9003", name: "Aqua Mist", desc: "Subtle blue-green for serene environments", img: "/images/carbon-rock-boards/solid/5.jpg" },
-        { id: "W9016", name: "Bamboo Calm", desc: "Natural bamboo texture for a tranquil feel", img: "/images/carbon-rock-boards/wood/6.jpg" },
-        { id: "W9029", name: "Mineral White", desc: "Clean white with a subtle mineral texture", img: "/images/carbon-rock-boards/solid/6.jpg" }
-      ]
-    }
-  ];
+   
 
   // Features data with hotel focus
   const features = [
@@ -769,53 +736,13 @@ const SmartWallHotels: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="space-y-12">
-            {finishCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
-                    <p className="text-clay-300">{category.desc}</p>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {category.panels.map((panel) => (
-                    <div key={panel.id} className="bg-clay-800/40 rounded-lg overflow-hidden border border-clay-600/30 hover:border-clay-500/50 transition-all duration-300">
-                      <div className="aspect-video bg-clay-700/30 relative overflow-hidden">
-                        <img 
-                          src={panel.img} 
-                          alt={panel.name}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-white">{panel.name}</h4>
-                          <span className="text-xs text-white bg-clay-700/50 px-2 py-1 rounded">{panel.id}</span>
-                        </div>
-                        <p className="text-sm text-clay-300">{panel.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+            <FinishesSection
+                         // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+                           defaultMaxVisible={8}
+                           helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+                           id="finishes"
+                           className=""
+                         />
         </div>
       </section>
 

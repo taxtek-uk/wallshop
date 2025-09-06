@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation'; 
 import Footer from '@/components/Footer'; 
 import SwQuoteModal from '@/components/SwQuoteModal';
+import FinishesSection from "@/components/FinishesSection";
 import { 
   Tv, 
   Lightbulb, 
@@ -304,44 +305,7 @@ const SmartWallLivingRoom: React.FC = () => {
       Icon: Music4,
     }
   ];
-
-  // Wall Panel Finishes
-  const finishCategories = [
-    {
-      id: 'wood',
-      name: "Wood Grain Series",
-      desc: "Warm wood aesthetics with durable surface.",
-      icon: TreePine,
-      panels: [
-        { id: "T9016", name: "Ash Grey", desc: "Soft ash grain with light grey overtone", img: "/images/carbon-rock-boards/wood/1.jpg" },
-        { id: "T9051", name: "Walnut Mist", desc: "Mid-brown walnut tone with subtle striations", img: "/images/carbon-rock-boards/wood/2.jpg" },
-        { id: "T9222", name: "Smoked Ash", desc: "Dark smoked ash grain with rich contrast", img: "/images/carbon-rock-boards/wood/3.jpg" }
-      ]
-    },
-    {
-      id: 'solid',
-      name: "Solid Color Series",
-      desc: "Industrial elegance with raw, minimalist tones.",
-      icon: Square,
-      panels: [
-        { id: "T8026", name: "Ash Silver", desc: "Neutral silver-gray with clean industrial look", img: "/images/carbon-rock-boards/solid/2.jpg" },
-        { id: "T8107", name: "Slate Blue", desc: "Dark blue-grey with sophisticated edge", img: "/images/carbon-rock-boards/solid/3.jpg" },
-        { id: "T8008", name: "Obsidian", desc: "Matte black with premium depth and richness", img: "/images/carbon-rock-boards/solid/7.jpg" }
-      ]
-    },
-    {
-      id: 'metallic',
-      name: "Metal Series",
-      desc: "Luxury feel with metallic luster and reflectivity.",
-      icon: Layers,
-      panels: [
-        { id: "LS-2A05", name: "Antique Copper", desc: "Rich antique copper finish with timeless charm", img: "/images/carbon-rock-boards/metal/ls-2a05.jpg" },
-        { id: "LS-2A08", name: "Champagne Gold", desc: "Luxurious champagne gold with refined glow", img: "/images/carbon-rock-boards/metal/ls-2a08.jpg" },
-        { id: "SZ-703", name: "Brushed Silver", desc: "Sleek brushed silver with modern appeal", img: "/images/carbon-rock-boards/metal/sz-703.jpg" }
-      ]
-    }
-  ];
-
+ 
   // Features data with Orvibo integration
   const features = [
     {
@@ -656,86 +620,13 @@ const SmartWallLivingRoom: React.FC = () => {
 
       {/* Wall Panel Finishes Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-clay-300 via-clay-200 to-clay-400">Premium Panel</span>
-              <span className="block text-clay-100 mt-2">Finish Options</span>
-            </h2>
-            <p className="text-xl text-clay-300 max-w-4xl mx-auto">
-              Choose from our curated selection of premium finishes to match your interior design vision.
-            </p>
-          </motion.div>
-
-          <div className="space-y-12">
-            {finishCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-taupe-800/30 backdrop-blur-sm rounded-2xl p-8 border border-clay-500/20"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-xl flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{category.name}</h3>
-                    <p className="text-clay-300">{category.desc}</p>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-3 gap-6">
-                    {category.panels.map((panel) => (
-                        <div
-                        key={panel.id}
-                        className="group relative bg-gradient-to-br from-clay-800/60 to-clay-900/40 rounded-2xl border border-clay-600/30 shadow-md hover:shadow-xl hover:border-clay-400/50 transition-all duration-500 overflow-hidden"
-                        >
-                        {/* Image Section */}
-                        <div className="aspect-video relative overflow-hidden">
-                            <img
-                            src={panel.img}
-                            alt={panel.name}
-                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-out"
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement
-                                target.style.display = 'none'
-                            }}
-                            />
-
-                            {/* Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
-
-                            {/* Badge */}
-                            <span className="absolute top-3 right-3 text-xs font-medium text-white bg-clay-700/70 px-2 py-1 rounded-lg backdrop-blur-sm">
-                            {panel.id}
-                            </span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-5 space-y-2">
-                            <h4 className="font-semibold text-lg text-white group-hover:text-clay-200 transition-colors">
-                            {panel.name}
-                            </h4>
-                            <p className="text-sm text-clay-300 leading-relaxed">
-                            {panel.desc}
-                            </p>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-
-              </motion.div>
-            ))}
-          </div>
-        </div>
+         <FinishesSection
+              // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+                defaultMaxVisible={8}
+                helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+                id="finishes"
+                className=""
+              />
       </section> 
 
       {/* Compliance Section */}

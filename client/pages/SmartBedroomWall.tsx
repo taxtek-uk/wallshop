@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
-import Navigation from '@/components/Navigation'; 
+import Navigation from '@/components/Navigation';
+import SwQuoteModal from '@/components/SwQuoteModal'; 
 import Footer from '@/components/Footer'; 
+import FinishesSection from "@/components/FinishesSection";
 import { 
   Bed, 
   Lightbulb, 
@@ -1082,7 +1084,20 @@ const SmartBedroomWall: React.FC = () => {
               </p> 
             </motion.div> 
           </div> 
-        </section> 
+        </section>
+
+
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-taupe-900 to-clay-900">
+                  
+           <FinishesSection
+             // categories={FINISH_CATEGORIES_DEFAULT} // ← override or filter if you like
+               defaultMaxVisible={8}
+               helperBadges={["Acoustic-aware", "Scratch-resistant"]}
+               id="finishes"
+               className=""
+             />
+         
+             </section>
 
         {/* Features Grid */} 
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-clay-900 to-taupe-900"> 
@@ -1307,59 +1322,15 @@ const SmartBedroomWall: React.FC = () => {
         {/* Footer */} 
         <Footer /> 
 
-        {/* Quote Modal */} 
-        <AnimatePresence> 
-          {isQuoteModalOpen && ( 
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" 
-              onClick={() => setIsQuoteModalOpen(false)} 
-            > 
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }} 
-                animate={{ scale: 1, opacity: 1 }} 
-                exit={{ scale: 0.9, opacity: 0 }} 
-                className="bg-mocha-900 rounded-3xl p-8 max-w-md w-full border border-clay-500/30 shadow-2xl" 
-                onClick={(e) => e.stopPropagation()} 
-              > 
-                <div className="text-center mb-6"> 
-                  <div className="w-16 h-16 bg-gradient-to-r from-clay-500 to-taupe-500 rounded-2xl flex items-center justify-center mx-auto mb-4"> 
-                    <Heart className="w-8 h-8 text-white" /> 
-                  </div> 
-                  <h3 className="text-2xl font-bold text-white mb-2">Get Your Free Sleep Consultation</h3> 
-                  <p className="text-clay-300">Ready to transform your bedroom into a wellness sanctuary? Let's discuss your vision.</p> 
-                </div> 
-
-                <div className="space-y-4"> 
-                  <a 
-                    href="tel:+441417393377" 
-                    className="w-full btn-luxury-earthy py-4 rounded-xl flex items-center justify-center space-x-3 group" 
-                  > 
-                    <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
-                    <span>Call Now: +44 141 739 3377</span> 
-                  </a> 
-                  
-                  <a 
-                    href="mailto:info@thewallshop.co.uk?subject=Smart Bedroom Wall Consultation" 
-                    className="w-full border-2 border-clay-500/50 text-clay-200 py-4 rounded-xl hover:bg-clay-500/10 hover:border-clay-400 transition-all duration-300 flex items-center justify-center space-x-3 group" 
-                  > 
-                    <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
-                    <span>Email Us</span> 
-                  </a> 
-                </div> 
-
-                <button 
-                  onClick={() => setIsQuoteModalOpen(false)} 
-                  className="absolute top-4 right-4 text-clay-400 hover:text-white transition-colors p-2" 
-                > 
-                  <X className="w-5 h-5" /> 
-                </button> 
-              </motion.div> 
-            </motion.div> 
-          )} 
-        </AnimatePresence> 
+     {/* Quote Modal */}
+           <AnimatePresence>
+             {isQuoteModalOpen && (
+               <SwQuoteModal
+                 isOpen={isQuoteModalOpen}
+                 onClose={() => setIsQuoteModalOpen(false)}
+               />
+             )}
+           </AnimatePresence>
       </div> 
     </> 
   ); 
