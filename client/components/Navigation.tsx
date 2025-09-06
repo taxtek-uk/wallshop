@@ -10,22 +10,22 @@ interface NavItem {
   to?: string;
   isHash?: boolean;
   children?: NavItem[];
+  highlight?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'Home', to: '/' },
   { name: 'Smart Walls', to: '/smart-walls', children: [
-    { name: 'Smart Living Room Wall', to: '/smart-walls/living-room' },
-    { name: 'Smart Wall for Gamers', to: '/smart-walls/gaming'},  
-    { name: 'Smart Wall for Bedroom', to: '/smart-walls/bedroom'},
-    { name: 'Smart Wall for Kitchen', to: '/smart-walls/kitchen' },
-    { name: 'Smart Wall for Bathroom', to: '/smart-walls/bathroom' },
-    { name: 'Smart Wall for the Office', to: '/smart-walls/office' },
-    { name: 'Smart Wall for Restaurant', to: '/smart-walls/restaurants' },
-    { name: 'Smart Wall for Events', to: '/smart-walls/events' },
-    { name: 'Smart Wall for Hotles', to: '/smart-walls/hotels' },
+      { name: 'Smart Walls for the', highlight: 'Living Room', to: '/smart-walls/living-room' },  
+    { name: 'Smart Wall for', highlight: 'Gamers', to: '/smart-walls/gaming' },  
+    { name: 'Smart Walls for the', highlight: 'Bedroom', to: '/smart-walls/bedroom' },  
+    { name: 'Smart Walls for the', highlight: 'Kitchen', to: '/smart-walls/kitchen' },  
+    { name: 'Smart Walls for the', highlight: 'Bathroom', to: '/smart-walls/bathroom' },  
+    { name: 'Smart Wall for the', highlight: 'Office', to: '/smart-walls/office' },  
+    { name: 'Smart Walls for', highlight: 'Restaurants', to: '/smart-walls/restaurants' },  
+    { name: 'Smart Wall for', highlight: 'Events', to: '/smart-walls/events' },  
+    { name: 'Smart Walls for', highlight: 'Hotel Reception Areas', to: '/smart-walls/hotels' },  
     { name: 'All Smart Walls', to: '/smart-walls' },
-      
   ] },
   { name: 'Smart Devices', to: '/smart-devices', children: [
       { name: 'Control Panels', to: '/smart-devices/orvibo/control-panels' },
@@ -120,7 +120,9 @@ export default function Navigation() {
           onClick={() => setOpenDropdown(null)}
         >
           <div className="flex justify-between items-center">
-            {item.name}
+            <span>
+              {item.name} {item.highlight && <span className="font-bold">{item.highlight}</span>}
+            </span>
             {hasKids && <ChevronRight size={14} className="text-gray-400" />}
           </div>
         </NavLink>
@@ -159,7 +161,9 @@ export default function Navigation() {
               style={{ paddingLeft: `${paddingLeft}px` }}
             >
               <div className="flex items-center justify-between">
-                <span className="text-base">{item.name}</span>
+                <span className="text-base">
+                  {item.name} {item.highlight && <span className="font-bold">{item.highlight}</span>}
+                </span>
                 <motion.div
                   animate={{ rotate: isExpanded ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
